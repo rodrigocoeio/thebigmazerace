@@ -1,0 +1,17 @@
+Neighbors Algorithm
+
+Example Maze:
+- Columns: 10
+- Rows: 6
+
+Example Tile Number 12:
+- Top Neighbor: tile_number - columns
+- Bottom Neighbor: tile_number + columns
+- Left Neighbor: tile_number - 1 ( check if it's in the same row )
+- Right Neighbor: tile_number + 1 ( check if it's in the same row )
+
+Sort Randomly a Neighbor:
+- if Top: remove top wall from current tile and bottom wall from sorted neighbor
+- if Bottom: remove bottom wall from current tile and top wall from sorted neighbor
+- if Left: remove left wall from current tile and right wall from sorted neighbor
+- if Right: remove right wall from current tile and left wall from sorted neighbor
