@@ -31,7 +31,7 @@ export default {
             left: true,
             right: true,
           },
-          visited: false,
+          visited: 0,
           goal: false,
         })
 
@@ -45,6 +45,7 @@ export default {
   },
 
   generateMaze() {
+    let changeCourseEveryNumberOfTiles = this.configs.changeWayEveryNumberOfTiles
     let tiles = this.tiles
     let currentTile = tiles[0]
     let stack = []
@@ -52,13 +53,13 @@ export default {
 
     // Walk through tiles
     while (currentTile) {
-      // Get random neighbor
-      let nextNeighbor = this.getRandomNeighbor(currentTile)
+      // Get random not visited neighbor
+      let nextNeighbor = this.getRandomNotVisitedNeighbor(currentTile)
 
       // Set current tile to visited
-      currentTile.visited = true
+      currentTile.visited++
 
-      if (nextNeighbor && stack.length < 10) {
+      if (nextNeighbor && stack.length < changeCourseEveryNumberOfTiles) {
         // Remove current and neighbor walls
         switch (nextNeighbor.position) {
           case 'top':
@@ -88,9 +89,9 @@ export default {
         currentTile = stack.pop()
       } else {
         let firstNotVisited = tiles.find((tile) => {
-          if (tile.visited) {
+          if (tile.visited > 0) {
             let neighbors = this.findNeighbors(tile)
-            console.log(neighbors)
+            neighbors = neighbors.filter((n) => n.tile.visited === 0)
             return neighbors.length > 0
           }
 
@@ -111,14 +112,16 @@ export default {
     this.tiles = tiles
   },
 
-  getRandomNeighbor(currentTile, tiles, openWalls) {
-    let neighbors = this.findNeighbors(currentTile, tiles, openWalls)
+  getRandomNotVisitedNeighbor(currentTile, tiles) {
+    let neighbors = this.findNeighbors(currentTile, tiles)
+    neighbors = neighbors.filter((n) => n.tile.visited === 0)
     let random = Math.floor(Math.random() * neighbors.length)
     let randomNeighbor = neighbors[random]
 
     return randomNeighbor
   },
-  findNeighbors(currentTile, tiles, openWalls) {
+
+  findNeighbors(currentTile, tiles) {
     let mazeColumns = this.configs.columns
     tiles = tiles ? tiles : this.tiles
 
@@ -146,31 +149,174 @@ export default {
 
     // Generate neighbors array
     let neighbors = []
-    if (
-      (!openWalls || (openWalls && !currentTile.walls.top)) &&
-      topNeighbor &&
-      !topNeighbor.visited
-    )
-      neighbors.push({ position: 'top', tile: topNeighbor })
-    if (
-      (!openWalls || (openWalls && !currentTile.walls.bottom)) &&
-      bottomNeighbor &&
-      !bottomNeighbor.visited
-    )
-      neighbors.push({ position: 'bottom', tile: bottomNeighbor })
-    if (
-      (!openWalls || (openWalls && !currentTile.walls.left)) &&
-      leftNeighbor &&
-      !leftNeighbor.visited
-    )
-      neighbors.push({ position: 'left', tile: leftNeighbor })
-    if (
-      (!openWalls || (openWalls && !currentTile.walls.right)) &&
-      rightNeighbor &&
-      !rightNeighbor.visited
-    )
-      neighbors.push({ position: 'right', tile: rightNeighbor })
+    if (topNeighbor) neighbors.push({ position: 'top', tile: topNeighbor })
+    if (bottomNeighbor) neighbors.push({ position: 'bottom', tile: bottomNeighbor })
+    if (leftNeighbor) neighbors.push({ position: 'left', tile: leftNeighbor })
+    if (rightNeighbor) neighbors.push({ position: 'right', tile: rightNeighbor })
 
     return neighbors
+  },
+
+  // Filters only opened walls neighbors
+  findOpenedNeighbors(currentTile, tiles) {
+    let neighbors = this.findNeighbors(currentTile, tiles)
+    neighbors = neighbors.filter((n) => !currentTile.walls[n.position])
+    return neighbors
+  },
+
+  getPlayerNextRandomTile(currentTile, lastTile, tiles) {
+    let inteligence = this.configs.inteligence
+    let neighbors = this.findOpenedNeighbors(currentTile, tiles)
+
+    // None or only one way available
+    if (neighbors.length === 0) return false
+    if (neighbors.length === 1) return neighbors[0]
+
+    let nextTile = false
+    switch (inteligence) {
+      case 'dumb':
+        nextTile = this.getDumbNextTile(currentTile, neighbors, lastTile, tiles)
+        break
+      case 'normal':
+        nextTile = this.getNormalNextTile(currentTile, neighbors, lastTile, tiles)
+        break
+      case 'smart':
+        nextTile = this.getSmartNextTile(currentTile, neighbors, lastTile, tiles)
+        break
+      case 'kickass':
+        nextTile = this.getKickAssNextTile(currentTile, neighbors, lastTile, tiles)
+        break
+    }
+
+    if (nextTile) {
+      //console.log(nextTile.position)
+      //console.log(currentTile.decisions[nextTile.position])
+      currentTile.decisions[nextTile.position]++
+    }
+
+    //if (lastTile) console.log('last ' + lastTile.number)
+    //console.log('current ' + currentTile.number)
+    //if (randomNeighbor) console.log('next ' + randomNeighbor.tile.number)
+
+    return nextTile
+  },
+
+  filtersLastNeighborOut(neighbors, lastTile) {
+    neighbors = neighbors.filter((n) => {
+      return !lastTile || n.tile.number != lastTile.number
+    })
+    return neighbors
+  },
+
+  // Gets random neighbor even last one
+  getDumbNextTile(currentTile, neighbors) {
+    let random = Math.floor(Math.random() * neighbors.length)
+    let randomNeighbor = neighbors[random]
+
+    return randomNeighbor
+  },
+
+  // Gets random neighbor avoiding last one
+  getNormalNextTile(currentTile, neighbors, lastTile) {
+    neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
+    return this.getDumbNextTile(currentTile, neighbors, lastTile)
+  },
+
+  // Gets neighbor calculation proportion by visited number then sort randomly
+  getSmartNextTile(currentTile, neighbors, lastTile) {
+    let decisions = currentTile.decisions
+    neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
+
+    // calcs % proportions to sort tiles
+    // neighbors with visits gets proportion divided by the number of visits
+    // the left proportion is added to the benefited tile, which is the one with less visits
+    let proportion_tiles = 100 / neighbors.length
+    let left_proportion = 0
+    let benefited_tile = false
+
+    // calc neighbors proportions of random sorting based on number of visits
+    let visits_proportion_threshold = neighbors.length == 3 ? 33.33 : 50
+    let total_visits = decisions.top + decisions.bottom + decisions.left + decisions.right
+
+    //console.log(total_visits)
+    neighbors.forEach((n) => {
+      let position = n.position
+      let decided_times = decisions[position]
+      if (!benefited_tile || benefited_tile.tile.decisions[position] > decided_times)
+        benefited_tile = n
+      let visits_proportion = (decided_times * 100) / total_visits
+
+      //console.log(visits_proportion)
+      let give_away_proportion =
+        visits_proportion && visits_proportion > visits_proportion_threshold
+          ? (proportion_tiles * visits_proportion) / 100
+          : 0
+
+      n.proportion = proportion_tiles - give_away_proportion
+      left_proportion = left_proportion + (proportion_tiles - n.proportion)
+    })
+
+    // add left_proportion to benefited_tile
+    benefited_tile.proportion = benefited_tile.proportion + left_proportion
+
+    // give neighbors sorting numbers
+    let min = 0
+    neighbors.forEach((n) => {
+      let max = min + n.proportion
+      n.sorting_numbers = {
+        min,
+        max,
+      }
+      min = max
+    })
+
+    let random_number = Math.random() * 100
+
+    let randomNeighbor = neighbors.find((n) => {
+      return random_number >= n.sorting_numbers.min && random_number <= n.sorting_numbers.max
+    })
+
+    console.log(randomNeighbor.position)
+    console.log(neighbors)
+    console.log('____________')
+
+    return randomNeighbor
+  },
+
+  // Gets the least decided (chosen) neighbor
+  getKickAssNextTile(currentTile, neighbors, lastTile, tiles) {
+    let decisions = currentTile.decisions
+    let times = 0
+    let leastDecidedNeighbor = false
+
+    console.log('_____________')
+    console.log('current tile')
+    console.log(currentTile)
+
+    neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
+
+    // Avoid dead ends
+    let findOpenedNeighbors = this.findOpenedNeighbors
+    neighbors = neighbors.filter((n) => {
+      let myNeighbors = findOpenedNeighbors(n.tile, tiles)
+
+      // if goal or have items walk into it anyways
+      if (myNeighbors.length === 1) {
+        return n.tile.goal
+      }
+      return true
+    })
+    neighbors.forEach((n) => {
+      let decided_times = decisions[n.position]
+      if (!leastDecidedNeighbor || n.tile.visited == 0 || decided_times < times) {
+        leastDecidedNeighbor = n
+        times = decided_times
+      }
+    })
+
+    console.log(leastDecidedNeighbor.position)
+    console.log('____________')
+
+    return leastDecidedNeighbor
   },
 }

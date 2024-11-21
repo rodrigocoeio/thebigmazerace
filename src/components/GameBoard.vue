@@ -13,11 +13,24 @@
     <input type="number" min="1" max="12" v-model="columns" />
     <label>Rows</label>
     <input type="number" min="1" max="12" v-model="rows" />
+    <label>Speed</label>
     <input type="number" min="100" max="500" v-model="playerSpeed" />
+    <label>Change Way Every</label>
+    <input type="number" min="1" max="100" v-model="changeWayEveryNumberOfTiles" />
+    <label>Inteligence</label>
+    <select v-model="inteligence">
+      <option value="dumb">Dumb</option>
+      <option value="normal">Normal</option>
+      <option value="smart">Smart</option>
+      <option value="kickass">KickAss</option>
+    </select>
+
     <button @click="resetMaze">Reset Maze</button>
     <button @click="startGame">Start Game</button>
     <button @click="stopGame">Stop Game</button>
     <button @click="restartGame">Restart Game</button>
+
+    Time: {{ timeElapsed }}s
   </div>
 
   <div id="game-canvas"></div>
@@ -39,9 +52,14 @@ export default
       return {
         columns: store.configs.columns,
         rows: store.configs.rows,
+        changeWayEveryNumberOfTiles: store.configs.changeWayEveryNumberOfTiles,
         board: false,
         background_audio: false,
-        playerSpeed: 100,
+        playerSpeed: store.configs.speed,
+        inteligence: store.configs.inteligence,
+        startTime: 0,
+        endTime: 0,
+        timeInterval: false,
         players: [
           {
             name: "Rabbit",
@@ -52,7 +70,7 @@ export default
             position: { x: 20, y: 25 },
             scale: 0.08
           },
-          {
+          /* {
             name: "Fox",
             image: "/images/fox.png",
             welcome: {
@@ -60,7 +78,7 @@ export default
             },
             position: { x: 60, y: 25 },
             scale: 0.06
-          }
+          } */
         ]
       };
     },
@@ -75,6 +93,16 @@ export default
       },
       music() {
         return store.configs.music;
+      },
+      timeElapsed() {
+        var timeDiff = this.endTime - this.startTime; //in ms
+        // strip the ms
+        timeDiff /= 1000;
+
+        // get seconds
+        var seconds = Math.round(timeDiff, 2);
+
+        return seconds
       }
     },
 
@@ -86,6 +114,13 @@ export default
       rows() {
         store.configs.rows = parseInt(this.rows)
         this.resetMaze()
+      },
+      changeWayEveryNumberOfTiles() {
+        store.configs.changeWayEveryNumberOfTiles = parseInt(this.changeWayEveryNumberOfTiles)
+        this.resetMaze()
+      },
+      inteligence() {
+        store.configs.inteligence = this.inteligence
       }
     },
 
@@ -106,14 +141,29 @@ export default
     methods: {
       startGame() {
         store.started = true;
+        this.startTime = new Date();
         this.$refs.players.forEach(player => player.start());
+
+        let Game = this
+        this.timeInterval = setInterval(() => {
+          Game.endTime = new Date()
+        })
       },
       stopGame() {
         store.started = false;
+        clearInterval(this.timeInterval)
       },
       restartGame() {
         this.stopGame()
         this.$refs.players.forEach($player => $player.restart())
+      },
+      finishGame(winner) {
+        this.endTime = new Date();
+        clearInterval(this.timeInterval)
+
+        store.started = false
+        store.finished = true
+        alert(winner.player.name + " has founded the chest in " + this.timeElapsed + "s")
       },
       resetMaze() {
         this.restartGame()

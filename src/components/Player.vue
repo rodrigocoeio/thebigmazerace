@@ -27,7 +27,9 @@ export default {
       start_position: false,
       tiles: [],
       tilesStack: [], // walked tiles
-      tile: false
+      lastTile: false,
+      currentTile: false,
+      nextTile: false,
     }
   },
 
@@ -53,19 +55,26 @@ export default {
   },
 
   watch: {
-    tile(tile) {
-      this.tilesStack.push(tile)
-    },
     selected() {
       this.selectedAnimation();
     },
     moving(moving) {
-      if (!moving && this.tile.goal) {
-        store.started = false
-        store.finished = true
-        alert(this.player.name + " has founded the chest!")
+      if (!moving && this.currentTile.goal) {
+        /* Finished */
+        this.stop()
+        this.$parent.finishGame(this)
+        return
       }
-      if (!moving) this.moveToNextTile();
+      else
+        if (!moving) {
+          this.lastTile = this.currentTile
+          this.currentTile = this.nextTile
+          this.nextTile = false
+
+          this.tilesStack.push(this.lastTile)
+          this.currentTile.visited++
+          this.moveToNextTile();
+        }
     }
   },
 
@@ -73,14 +82,26 @@ export default {
     start() {
       if (!this.tile) {
         this.tiles = store.tiles.map(tile => {
-          return { ...tile, visited: false }
+          return {
+            ...tile, visited: 0,
+            decisions: {
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+            }
+          }
         })
 
-        this.tile = this.tiles[0]
-        this.tile.visited = true
+        this.currentTile = this.tiles[0]
+        this.currentTile.visited = 1
       }
 
       this.moveToNextTile()
+    },
+    stop() {
+      this.moving = false
+      this.target = false
     },
     restart() {
       const x = this.player.position ? this.player.position.x : 0;
@@ -101,7 +122,9 @@ export default {
       if (!store.started || this.moving)
         return false
 
-      let nextTile = store.getRandomNeighbor(this.tile, this.tiles, true);
+      let lastTile = this.lastTile
+      let currentTile = this.currentTile
+      let nextTile = store.getPlayerNextRandomTile(currentTile, lastTile, this.tiles, true);
 
       if (!nextTile) {
         if (this.tilesStack.length > 0) {
@@ -110,9 +133,8 @@ export default {
       }
 
       if (nextTile) {
+        this.nextTile = nextTile.tile
         this.moveTo(nextTile.tile.number - 1, this.speed)
-        this.tile = nextTile.tile
-        this.tile.visited = true
       }
     },
     preload(PhaserGame) {

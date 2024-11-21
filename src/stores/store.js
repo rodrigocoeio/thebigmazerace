@@ -6,14 +6,24 @@ const state = {
     // Game Configs
     width: 1000,
     height: 450,
-    columns: 12,
-    rows: 12,
+    columns: 6,
+    rows: 6,
     difficulty: 'easy',
+    speed: 300,
+
+    // Inteligences
+    // dumb: Players doesn't remember where they came from, so they will randomly choose a next way
+    // normal: Players remember where they came from and won't go back
+    // smart: Players remember where they came from, and counts the visits they made to the neighbors and choose randomly proportionaly to the number of visits
+    // kickass: Players remember where they came from, and always choose least visited tiles first or tile with item
+    inteligence: 'kickass',
+
     players: 0,
     menu: true,
     sound: true,
     voice: true,
     music: true,
+    changeWayEveryNumberOfTiles: 5,
   },
   started: false, //  Game Started
   finished: true,
