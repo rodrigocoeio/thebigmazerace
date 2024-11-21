@@ -40,7 +40,7 @@ const state = {
       position: { x: 20, y: 22 },
       scale: 0.8,
     },
-    /* {
+    {
       name: 'Turtle',
       image: '/images/turtle.png',
       welcome: {
@@ -49,7 +49,7 @@ const state = {
       inteligence: false,
       position: { x: 50, y: 27 },
       scale: 0.6,
-    }, */
+    },
   ], //  Players
   tiles: [], //  Tiles
   turn: {
