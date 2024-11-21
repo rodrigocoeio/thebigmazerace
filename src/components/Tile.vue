@@ -71,7 +71,7 @@ export default {
       }
 
       this.buildWalls(Phaser);
-      //this.buildTileNumber(Phaser);
+      if (store.configs.showTileNumbers) this.buildTileNumber(Phaser);
     },
 
     buildWalls(Phaser) {

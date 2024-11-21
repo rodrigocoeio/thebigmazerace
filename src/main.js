@@ -3,6 +3,7 @@ import './assets/main.css'
 import Phaser from 'phaser'
 
 import './scripts.js'
+import './keyboard.js'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

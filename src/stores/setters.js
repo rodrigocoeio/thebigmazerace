@@ -164,8 +164,8 @@ export default {
     return neighbors
   },
 
-  getPlayerNextRandomTile(currentTile, lastTile, tiles) {
-    let inteligence = this.configs.inteligence
+  getPlayerNextRandomTile(currentTile, lastTile, tiles, inteligence) {
+    inteligence = inteligence || this.configs.inteligence
     let neighbors = this.findOpenedNeighbors(currentTile, tiles)
 
     // None or only one way available
@@ -174,6 +174,9 @@ export default {
 
     let nextTile = false
     switch (inteligence) {
+      case 'dumbest':
+        nextTile = this.getDumbestNextTile(currentTile, neighbors, lastTile, tiles)
+        break
       case 'dumb':
         nextTile = this.getDumbNextTile(currentTile, neighbors, lastTile, tiles)
         break
@@ -209,21 +212,21 @@ export default {
   },
 
   // Gets random neighbor even last one
-  getDumbNextTile(currentTile, neighbors) {
+  getDumbestNextTile(currentTile, neighbors) {
     let random = Math.floor(Math.random() * neighbors.length)
     let randomNeighbor = neighbors[random]
 
     return randomNeighbor
   },
 
-  // Gets random neighbor avoiding last one
-  getNormalNextTile(currentTile, neighbors, lastTile) {
+  // Gets random neighbor avoinding last one
+  getDumbNextTile(currentTile, neighbors, lastTile) {
     neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
-    return this.getDumbNextTile(currentTile, neighbors, lastTile)
+    return this.getDumbestNextTile(currentTile, neighbors, lastTile)
   },
 
   // Gets neighbor calculation proportion by visited number then sort randomly
-  getSmartNextTile(currentTile, neighbors, lastTile) {
+  getNormalNextTile(currentTile, neighbors, lastTile) {
     let decisions = currentTile.decisions
     neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
 
@@ -238,7 +241,6 @@ export default {
     let visits_proportion_threshold = neighbors.length == 3 ? 33.33 : 50
     let total_visits = decisions.top + decisions.bottom + decisions.left + decisions.right
 
-    //console.log(total_visits)
     neighbors.forEach((n) => {
       let position = n.position
       let decided_times = decisions[position]
@@ -276,23 +278,26 @@ export default {
       return random_number >= n.sorting_numbers.min && random_number <= n.sorting_numbers.max
     })
 
-    console.log(randomNeighbor.position)
-    console.log(neighbors)
-    console.log('____________')
-
     return randomNeighbor
   },
 
-  // Gets the least decided (chosen) neighbor
+  // Gets unvisited first or gets normal next tile
+  getSmartNextTile(currentTile, neighbors, lastTile) {
+    let unvisitedNeighbors = neighbors.filter((n) => n.tile.visited === 0)
+    let unvisitedNeighbor = this.getDumbestNextTile(currentTile, unvisitedNeighbors)
+
+    // Avoid last neighbor
+    neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
+
+    return unvisitedNeighbor
+      ? unvisitedNeighbor
+      : this.getLeastDecidedNeighbor(currentTile, neighbors)
+  },
+
+  // Gets unvisited first or the least decided (chosen) neighbor
+  // Avoids dead ends
   getKickAssNextTile(currentTile, neighbors, lastTile, tiles) {
-    let decisions = currentTile.decisions
-    let times = 0
-    let leastDecidedNeighbor = false
-
-    console.log('_____________')
-    console.log('current tile')
-    console.log(currentTile)
-
+    // Avoid last neighbor
     neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
 
     // Avoid dead ends
@@ -306,6 +311,22 @@ export default {
       }
       return true
     })
+
+    // Try first going unvisited neighbors
+    let unvisitedNeighbors = neighbors.filter((n) => n.tile.visited === 0)
+    let unvisitedNeighbor = this.getDumbestNextTile(currentTile, unvisitedNeighbors)
+    if (unvisitedNeighbor) return unvisitedNeighbor
+
+    // Gets least decided direction neighbor
+    return this.getLeastDecidedNeighbor(currentTile, neighbors)
+  },
+
+  // Gets the least decided direction/neighbor
+  getLeastDecidedNeighbor(currentTile, neighbors) {
+    let leastDecidedNeighbor = false
+    let decisions = currentTile.decisions
+    let times = 0
+
     neighbors.forEach((n) => {
       let decided_times = decisions[n.position]
       if (!leastDecidedNeighbor || n.tile.visited == 0 || decided_times < times) {
@@ -313,9 +334,6 @@ export default {
         times = decided_times
       }
     })
-
-    console.log(leastDecidedNeighbor.position)
-    console.log('____________')
 
     return leastDecidedNeighbor
   },

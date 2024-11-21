@@ -19,6 +19,7 @@
     <input type="number" min="1" max="100" v-model="changeWayEveryNumberOfTiles" />
     <label>Inteligence</label>
     <select v-model="inteligence">
+      <option value="dumbest">Dumbest</option>
       <option value="dumb">Dumb</option>
       <option value="normal">Normal</option>
       <option value="smart">Smart</option>
@@ -60,26 +61,7 @@ export default
         startTime: 0,
         endTime: 0,
         timeInterval: false,
-        players: [
-          {
-            name: "Rabbit",
-            image: "/images/rabbit.png",
-            welcome: {
-              position: { x: 200, y: 450 }
-            },
-            position: { x: 20, y: 20 },
-            scale: 0.8
-          },
-          {
-            name: "Turtle",
-            image: "/images/turtle.png",
-            welcome: {
-              position: { x: 200, y: 450 }
-            },
-            position: { x: 50, y: 25 },
-            scale: 0.6
-          }
-        ]
+        players: store.players
       };
     },
 
@@ -109,15 +91,15 @@ export default
     watch: {
       columns() {
         store.configs.columns = parseInt(this.columns)
-        this.resetMaze()
+        this.rebuildMaze()
       },
       rows() {
         store.configs.rows = parseInt(this.rows)
-        this.resetMaze()
+        this.rebuildMaze()
       },
       changeWayEveryNumberOfTiles() {
         store.configs.changeWayEveryNumberOfTiles = parseInt(this.changeWayEveryNumberOfTiles)
-        this.resetMaze()
+        this.rebuildMaze()
       },
       inteligence() {
         store.configs.inteligence = this.inteligence

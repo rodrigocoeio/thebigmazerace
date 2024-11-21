@@ -47,7 +47,7 @@ export default {
 
   computed: {
     isSelected() {
-      return this.player == store.turn.player;
+      return true;
     },
     selected() {
       return this.isSelected;
@@ -59,26 +59,23 @@ export default {
       this.selectedAnimation();
     },
     moving(moving) {
-      if (!moving && this.currentTile.goal) {
-        /* Finished */
-        this.stop()
-        this.$parent.finishGame(this)
-        return
-      }
-      else
-        if (!moving) {
-          this.lastTile = this.currentTile
-          this.currentTile = this.nextTile
-          this.nextTile = false
-
-          this.tilesStack.push(this.lastTile)
-          this.currentTile.visited++
-          this.moveToNextTile();
+      if (!moving) {
+        if (this.currentTile.goal) {
+          return this.finished()
         }
+
+        this.moveToNextTile();
+      }
     }
   },
 
   methods: {
+    finished() {
+      /* Finished */
+      this.stop()
+      this.$parent.finishGame(this)
+      return
+    },
     start() {
       if (!this.tile) {
         this.tiles = store.tiles.map(tile => {
@@ -122,9 +119,19 @@ export default {
       if (!store.started || this.moving)
         return false
 
+      this.currentTile = this.nextTile ? this.nextTile : this.currentTile
+      this.lastTile = this.currentTile
+      this.nextTile = false
+      this.tilesStack.push(this.lastTile)
+      this.currentTile.visited++
+
+      if (this.currentTile.goal) {
+        return this.finished();
+      }
+
       let lastTile = this.lastTile
       let currentTile = this.currentTile
-      let nextTile = store.getPlayerNextRandomTile(currentTile, lastTile, this.tiles, true);
+      let nextTile = store.getPlayerNextRandomTile(currentTile, lastTile, this.tiles, this.player.inteligence);
 
       if (!nextTile) {
         if (this.tilesStack.length > 0) {
@@ -230,65 +237,6 @@ export default {
           Player.glowTask = null;
         }
       }
-    },
-
-    walkTo(walk_to, speed = 200) {
-      // prevents from player walking to tile that does not exist
-      this.walk_to = (parseInt(walk_to) > (store.tiles.length - 1))
-        ? (store.tiles.length - 1)
-        : parseInt(walk_to);
-      this.walk_speed = speed;
-
-      const next_tile = (this.walk_to > this.player.steps) ? this.player.steps + 1
-        : (this.walk_to < this.player.steps) ? this.player.steps - 1
-          : this.player.steps;
-
-      const log = this.player.name + " is walking to: " + this.walk_to + ", next tile: " + next_tile;
-      dd(log);
-
-      return this.moveTo(next_tile, speed);
-
-    },
-
-    takeCoin(kind) {
-      console.log("Player " + this.player.name + " toke a " + kind + " coin");
-
-      this.player.coins[kind] = typeof this.player.coins[kind] != "number" ?
-        1 :
-        parseInt(this.player.coins[kind]) + 1;
-
-      this.player.points = points[kind] ? this.player.points + points[kind] : this.player.points;
-
-      playAudio('take-coin');
-    },
-    takeTreasure(kind) {
-      console.log("Player " + this.player.name + " toke a " + kind + " treasure");
-
-      this.player.treasures[kind] = typeof this.player.treasures[kind] != "number" ?
-        1 :
-        parseInt(this.player.treasures[kind]) + 1;
-
-      this.player.points = points[kind] ? this.player.points + points[kind] : this.player.points;
-
-      playAudio('take-treasure');
-    },
-    goFoward(steps) {
-      const go_to = this.player.steps + steps;
-
-      console.log(this.player.name + " is going foward " + steps + " steps");
-
-      return this.walkTo(go_to);
-    },
-    goBack(steps) {
-      const go_to = this.player.steps - steps;
-
-      console.log(this.player.name + " is going back " + steps + " steps");
-
-      return this.walkTo(go_to);
-    },
-    startOver() {
-      console.log(this.player.name + " is starting over");
-      this.moveTo(0, 200);
     }
   }
 }

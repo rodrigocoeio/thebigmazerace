@@ -5,18 +5,20 @@ const state = {
   configs: {
     // Game Configs
     width: window.innerWidth,
-    height: window.innerHeight - 27,
-    columns: 15,
-    rows: 10,
+    height: window.innerHeight - 22,
+    columns: 12,
+    rows: 8,
     difficulty: 'easy',
     speed: 150,
 
     // Inteligences
+    // dumbest: Players doesn't remember where they came from, so they will randomly choose a next way
     // dumb: Players doesn't remember where they came from, so they will randomly choose a next way
-    // normal: Players remember where they came from and won't go back
-    // smart: Players remember where they came from, and counts the visits they made to the neighbors and choose randomly proportionaly to the number of visits
-    // kickass: Players remember where they came from, and always choose least visited tiles first or tile with item
-    inteligence: 'smart',
+    // normal: Players won't go back and remember their past decisions so the visits they made to the neighbors and choose randomly proportionaly to the number of visits
+    // smart: Players won't go back and prefer unvisited neighbors first if none unvisited go to the least decision taken
+    // kickass: Players won't go back and prefer unvisited neighbors first if none unvisited go to the least decision taken, avoiding dead ends
+    inteligence: 'normal',
+    showTileNumbers: false,
 
     players: 0,
     menu: true,
@@ -27,7 +29,28 @@ const state = {
   },
   started: false, //  Game Started
   finished: true,
-  players: [], //  Players
+  players: [
+    {
+      name: 'Rabbit',
+      image: '/images/rabbit.png',
+      welcome: {
+        position: { x: 200, y: 450 },
+      },
+      inteligence: false,
+      position: { x: 20, y: 22 },
+      scale: 0.8,
+    },
+    {
+      name: 'Turtle',
+      image: '/images/turtle.png',
+      welcome: {
+        position: { x: 200, y: 450 },
+      },
+      inteligence: false,
+      position: { x: 50, y: 27 },
+      scale: 0.6,
+    },
+  ], //  Players
   tiles: [], //  Tiles
   turn: {
     //  Turn
