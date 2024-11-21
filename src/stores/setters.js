@@ -205,10 +205,11 @@ export default {
   },
 
   filtersLastNeighborOut(neighbors, lastTile) {
-    neighbors = neighbors.filter((n) => {
-      return !lastTile || n.tile.number != lastTile.number
+    if (!lastTile) return neighbors
+
+    return neighbors.filter((n) => {
+      return n.tile.number != lastTile.number
     })
-    return neighbors
   },
 
   // Gets random neighbor even last one
@@ -248,7 +249,6 @@ export default {
         benefited_tile = n
       let visits_proportion = (decided_times * 100) / total_visits
 
-      //console.log(visits_proportion)
       let give_away_proportion =
         visits_proportion && visits_proportion > visits_proportion_threshold
           ? (proportion_tiles * visits_proportion) / 100
@@ -273,7 +273,6 @@ export default {
     })
 
     let random_number = Math.random() * 100
-
     let randomNeighbor = neighbors.find((n) => {
       return random_number >= n.sorting_numbers.min && random_number <= n.sorting_numbers.max
     })

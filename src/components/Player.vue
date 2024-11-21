@@ -119,8 +119,8 @@ export default {
       if (!store.started || this.moving)
         return false
 
-      this.currentTile = this.nextTile ? this.nextTile : this.currentTile
       this.lastTile = this.currentTile
+      this.currentTile = this.nextTile ? this.nextTile : this.currentTile
       this.nextTile = false
       this.tilesStack.push(this.lastTile)
       this.currentTile.visited++
