@@ -4,19 +4,19 @@ const state = {
   components: [],
   configs: {
     // Game Configs
-    width: 1000,
-    height: 450,
-    columns: 6,
-    rows: 6,
+    width: window.innerWidth,
+    height: window.innerHeight - 27,
+    columns: 15,
+    rows: 10,
     difficulty: 'easy',
-    speed: 300,
+    speed: 150,
 
     // Inteligences
     // dumb: Players doesn't remember where they came from, so they will randomly choose a next way
     // normal: Players remember where they came from and won't go back
     // smart: Players remember where they came from, and counts the visits they made to the neighbors and choose randomly proportionaly to the number of visits
     // kickass: Players remember where they came from, and always choose least visited tiles first or tile with item
-    inteligence: 'kickass',
+    inteligence: 'smart',
 
     players: 0,
     menu: true,

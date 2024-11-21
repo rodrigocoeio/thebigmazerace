@@ -25,7 +25,7 @@
       <option value="kickass">KickAss</option>
     </select>
 
-    <button @click="resetMaze">Reset Maze</button>
+    <button @click="rebuildMaze">Rebuild Maze</button>
     <button @click="startGame">Start Game</button>
     <button @click="stopGame">Stop Game</button>
     <button @click="restartGame">Restart Game</button>
@@ -67,18 +67,18 @@ export default
             welcome: {
               position: { x: 200, y: 450 }
             },
-            position: { x: 20, y: 25 },
-            scale: 0.08
+            position: { x: 20, y: 20 },
+            scale: 0.8
           },
-          /* {
-            name: "Fox",
-            image: "/images/fox.png",
+          {
+            name: "Turtle",
+            image: "/images/turtle.png",
             welcome: {
               position: { x: 200, y: 450 }
             },
-            position: { x: 60, y: 25 },
-            scale: 0.06
-          } */
+            position: { x: 50, y: 25 },
+            scale: 0.6
+          }
         ]
       };
     },
@@ -165,7 +165,7 @@ export default
         store.finished = true
         alert(winner.player.name + " has founded the chest in " + this.timeElapsed + "s")
       },
-      resetMaze() {
+      rebuildMaze() {
         this.restartGame()
 
         store.tiles = [];
