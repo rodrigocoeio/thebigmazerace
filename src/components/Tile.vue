@@ -67,7 +67,7 @@ export default {
 
       if (this.goal) {
         this.goalImage = Phaser.add.image(this.x + (this.width / 2), this.y + (this.height / 2), 'tile-goal');
-        this.goalImage.setScale(0.10);
+        this.goalImage.setScale(0.2);
       }
 
       this.buildWalls(Phaser);
