@@ -104,9 +104,8 @@ export default {
           continue
         }
 
-        //console.log('ended')
-        goalTile.goal = true
         currentTile = false
+        goalTile.goal = true
       }
     }
 
@@ -114,22 +113,45 @@ export default {
   },
 
   generateItems() {
-    let store = this
-
     this.items = []
 
-    for (let i = 0; i < 3; i++) {
-      this.configs.items.forEach(function (item) {
-        let tile = store.getRandomTileForItem()
-        tile.item = item
-        let new_item = { ...item, tile: tile.number }
-        store.items.push(new_item)
-      })
+    // Goal Chest Item
+    let goal_tile = this.tiles.find((t) => t.goal)
+    let chest = this.configs.items.find((i) => i.type == 'chest')
+    this.items.push({ number: 1, tile: goal_tile.number, ...chest })
+    goal_tile.item = chest
+
+    // Generate Random Items
+    let randomItemsCount = 9
+    for (let i = 0; i < randomItemsCount; i++) {
+      this.generateItem()
+    }
+
+    console.log(this.items)
+  },
+
+  generateItem() {
+    let tile = this.getRandomTile()
+    let item = this.getRandomItem()
+
+    if (tile && item) {
+      let itemNumber = Date.now()
+      let newItem = { number: itemNumber, tile: tile.number, taken: false, ...item }
+
+      this.items.push(newItem)
+      tile.item = newItem
     }
   },
 
-  getRandomTileForItem() {
-    let tiles = this.tiles.filter((t) => !t.item && !t.goal)
+  getRandomItem() {
+    let items = this.configs.items.filter((item) => item.type != 'chest')
+    let random = Math.floor(Math.random() * items.length)
+
+    return items[random]
+  },
+
+  getRandomTile() {
+    let tiles = this.tiles.filter((t) => !t.item && !t.goal && t.number != 1)
     let random = Math.floor(Math.random() * tiles.length - 1)
 
     return tiles[random]
@@ -137,9 +159,10 @@ export default {
 
   generatePlayers() {
     let store = this
-
+    let playerNumber = 1
     this.configs.players.forEach((player) => {
-      store.players.push({ ...player })
+      store.players.push({ ...player, number: playerNumber })
+      playerNumber++
     })
   },
 
@@ -337,8 +360,7 @@ export default {
 
       // if goal or have items walk into it anyways
       if (myNeighbors.length === 1) {
-        let hasItem = this.items.find((i) => i.tile == currentTile.number)
-        return n.tile.goal || hasItem
+        return n.tile.goal || n.tile.item
       }
       return true
     })

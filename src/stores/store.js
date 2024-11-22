@@ -9,7 +9,7 @@ const state = {
     columns: 12,
     rows: 8,
     difficulty: 'easy',
-    speed: 72,
+    speed: 150,
 
     // Inteligences
     // dumbest: Players doesn't remember where they came from, so they will randomly choose a next way
@@ -27,52 +27,48 @@ const state = {
 
     players: [
       {
+        number: 0,
         name: 'Rabbit',
         image: '/images/rabbit.png',
-        welcome: {
-          position: { x: 200, y: 450 },
-        },
         inteligence: false,
         speed: false,
-        position: { x: 30, y: 30 },
-        scale: 0.9,
       },
       {
+        number: 0,
         name: 'Turtle',
         image: '/images/turtle.png',
-        welcome: {
-          position: { x: 200, y: 450 },
-        },
         inteligence: false,
         speed: false,
-        position: { x: 70, y: 35 },
-        scale: 0.7,
       },
     ],
     items: [
       {
         type: 'speedup',
         image: '/images/speedup.png',
-        position: { x: 50, y: 27 },
-        scale: 0.6,
         limit: 10,
         count: 0,
       },
       {
         type: 'speeddown',
         image: '/images/speeddown.png',
-        position: { x: 50, y: 27 },
-        scale: 0.4,
-        limit: 10,
+        limit: 3,
         count: 0,
       },
       {
         type: 'swirling',
-        image: '/images/swirling.gif',
-        position: { x: 50, y: 27 },
-        scale: 0.12,
+        image: '/images/swirling.png',
         limit: 3,
         count: 0,
+      },
+      /* {
+        type: 'twister',
+        image: '/images/twister.png',
+        limit: 1,
+        count: 0,
+      }, */
+      {
+        type: 'chest',
+        image: '/images/chest.png',
       },
     ],
   },

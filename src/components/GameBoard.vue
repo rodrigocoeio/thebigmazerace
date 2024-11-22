@@ -5,7 +5,9 @@
       :walls="tile.walls" :goal="tile.goal" v-for="tile in tiles"></tile>
     <slot></slot>
 
-    <Item v-for="item in items" :item="item" ref="items"></Item>
+    <Item v-for="item in items" :number="item.number" :tile="item.tile" :name="item.type" :taken="item.taken"
+      :item="item" ref="items">
+    </Item>
     <Player v-for="player in players" :player="player" ref="players"></Player>
   </div>
 
@@ -88,6 +90,9 @@ export default
         var seconds = Math.round(timeDiff, 2);
 
         return seconds
+      },
+      untakenItems() {
+        return this.items.filter(item => !item.taken)
       }
     },
 

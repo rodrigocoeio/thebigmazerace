@@ -22,13 +22,13 @@ export default {
       PhaserGame: false,
       Player: false,
       Shadow: false,
-      shadowDistance: 2,
+      shadowDistance: 3,
       moving: false,
       start_position: false,
       tiles: [],
       tilesStack: [], // walked tiles
       lastTile: false,
-      currentTile: false,
+      currentTile: store.tiles.find(t => t.number === 1),
       nextTile: false,
       item: false
     }
@@ -61,9 +61,8 @@ export default {
     },
     moving(moving) {
       if (!moving) {
-        if (this.currentTile.goal) {
-          return this.finished()
-        }
+        if (this.onFinishMoving && typeof this.onFinishMoving === "function")
+          return this.onFinishMoving()
 
         this.moveToNextTile();
       }
@@ -91,9 +90,12 @@ export default {
           }
         })
 
-        this.currentTile = this.tiles[0]
+        this.currentTile = this.tiles.find(t => t.number === 1)
         this.currentTile.visited = 1
       }
+
+      this.Player.x = this.currentTile.width / 2
+      this.Shadow.x = this.currentTile.width / 2
 
       this.moveToNextTile()
     },
@@ -133,56 +135,102 @@ export default {
 
       // FOUNDED ITEM
       if (!avoidItem) {
-        let foundedItem = store.items.find(i => i.tile == currentTile.number)
-        if (foundedItem) {
-          this.item = { ...foundedItem }
+        let foundedItem = store.items.find(item => item.tile == currentTile.number)
+        if (foundedItem && !foundedItem.taken) {
+          foundedItem.taken = true
+          this.item = foundedItem
+          store.generateItem()
         }
 
         // HAS ITEM
         if (this.item) {
-          this.item.count++
+          let Player = this
 
-          if (this.item.count >= this.item.limit) {
-            this.item = false
-          } else {
-            let Player = this
+          switch (this.item.type) {
+            case "chest":
+              this.finished()
+              break
+            case "speedup":
+              speed = speed * 2
+              break
+            case "speeddown":
+              speed = speed / 2
+              break
+            case "swirling":
+              {
+                let rotateInteval = setInterval(() => {
+                  Player.Player.setOrigin(0.5, 0.5);
+                  Player.Shadow.setOrigin(0.5, 0.5);
+                  Player.Player.angle += 1;
+                  Player.Shadow.angle += 1;
+                }, 0.1)
+                setTimeout(function () {
+                  Player.Player.angle = 0;
+                  Player.Shadow.angle = 0;
+                  Player.item = false
+                  Player.moveToNextTile(true)
+                  clearInterval(rotateInteval)
+                }, this.item.limit * 1000)
+                return false
+              }
+            case "twister":
+              {
+                let randomTile = store.getRandomTile()
+                if (randomTile) {
+                  this.item.count++
 
-            switch (this.item.type) {
-              case "speedup":
-                speed = speed * 2
-                break
-              case "speeddown":
-                speed = speed / 2
-                break
-              case "swirling":
-                {
-                  console.log("swirling")
+                  // Rotate
                   let rotateInteval = setInterval(() => {
                     Player.Player.setOrigin(0.5, 0.5);
                     Player.Shadow.setOrigin(0.5, 0.5);
-                    Player.Player.angle++;
-                    Player.Shadow.angle++;
+                    Player.Player.angle += 3;
+                    Player.Shadow.angle += 3;
                   }, 0.1)
-                  setTimeout(function () {
-                    Player.Player.angle = 0;
-                    Player.Shadow.angle = 0;
-                    Player.item = false
-                    Player.moveToNextTile(true)
-                    clearInterval(rotateInteval)
-                  }, this.item.limit * 1000)
-                  return false
+
+                  let Game = this.$parent
+                  let onFinished = function () {
+                    if (Player.item.count >= Player.item.limit) {
+                      Player.lastTile = Player.currentTile
+                      Player.currentTile = Player.nextTile
+                      Player.nextTile = false
+                      Player.item = false
+                      Player.Player.angle = 0;
+                      Player.Shadow.angle = 0;
+                      clearInterval(rotateInteval)
+                      console.log(Player.lastTile.number)
+                      console.log(Player.currentTile.number)
+                      return Player.moveToNextTile()
+                    } else {
+                      randomTile = store.getRandomTile()
+                      Player.nextTile = randomTile
+                      return this.moveTo(randomTile.number, 300, onFinished)
+                    }
+                  }
+
+                  Player.nextTile = randomTile
+                  return this.moveTo(randomTile.number, 300, onFinished)
                 }
-            }
+
+                return false
+              }
           }
+
+          if (this.item.count >= this.item.limit)
+            this.item = false
+          else
+            this.item.count++
         }
       }
 
+      // Found Chest
       if (this.currentTile.goal) {
         return this.finished();
       }
 
+      // Get Next Tile
       let nextTile = store.getPlayerNextRandomTile(this.currentTile, this.lastTile, this.tiles, this.player.inteligence);
 
+      // If none Next Tile, get last in visited (go back)
       if (!nextTile) {
         if (this.tilesStack.length > 0) {
           nextTile = { tile: this.tilesStack.pop() }
@@ -191,7 +239,7 @@ export default {
 
       if (nextTile) {
         this.nextTile = nextTile.tile
-        this.moveTo(nextTile.tile.number - 1, speed)
+        this.moveTo(nextTile.tile.number, speed)
       }
     },
     preload(PhaserGame) {
@@ -213,10 +261,25 @@ export default {
       shadow.tint = 0x000000;
       shadow.alpha = 0.5;
 
-      if (this.player.scale) {
-        player.setScale(this.player.scale);
-        shadow.setScale(this.player.scale);
-      }
+      // Scale Player
+      let tileHeight = this.currentTile.height
+      let playerHeight = tileHeight / 2
+
+      player.displayHeight = playerHeight
+      player.scaleX = player.scaleY;
+      shadow.displayHeight = playerHeight
+      shadow.scaleX = player.scaleY;
+
+      // Position Player
+      let tileWidth = this.currentTile.width
+
+      // First Tile
+      let playerX = this.currentTile.number === 1 ? (tileWidth / 2 / 2) * this.player.number : tileWidth / 2
+      let playerY = tileHeight / 2
+      player.x = playerX
+      player.y = playerY
+      shadow.x = playerX + this.shadowDistance
+      shadow.y = playerY + this.shadowDistance
 
       this.physics = PhaserGame.physics;
       this.Player = player;
@@ -241,10 +304,10 @@ export default {
       } else { this.moving = false; }
     },
 
-    moveTo(to, speed = 100) {
-      const player_x = this.player.position ? this.player.position.x : 0;
-      const player_y = this.player.position ? this.player.position.y : 0;
-      const tile = store.tiles[to] ? store.tiles[to] : false;
+    moveTo(to, speed = 100, onFinishMoving) {
+      const tile = store.tiles.find(t => t.number == to)
+      const player_x = tile.width / 2
+      const player_y = tile.height / 2
 
       if (tile) {
         this.target = {
@@ -252,6 +315,8 @@ export default {
           y: (tile.y + player_y),
           tile: tile
         };
+
+        this.onFinishMoving = onFinishMoving
 
         this.physics.moveToObject(this.Player, this.target, speed);
         this.physics.moveToObject(this.Shadow, this.target, speed);

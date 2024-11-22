@@ -65,10 +65,10 @@ export default {
         this.backgroundImage = Phaser.add.image(this.x + (this.width / 2) + 10, this.y + (this.height / 2), 'tile-background-' + this.number);
       }
 
-      if (this.goal) {
-        this.goalImage = Phaser.add.image(this.x + (this.width / 2), this.y + (this.height / 2), 'tile-goal');
-        this.goalImage.setScale(0.2);
-      }
+      //if (this.goal) {
+      //  this.goalImage = Phaser.add.image(this.x + (this.width / 2), this.y + (this.height / 2), 'tile-goal');
+      //  this.goalImage.setScale(0.2);
+      // }
 
       this.buildWalls(Phaser);
       if (store.configs.showTileNumbers) this.buildTileNumber(Phaser);

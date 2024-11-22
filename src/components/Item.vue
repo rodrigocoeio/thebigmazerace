@@ -10,7 +10,7 @@ import getStore from "$/store.js";
 let store
 
 export default {
-  props: ['item'],
+  props: ['item', 'taken'],
 
   mixins: objectMixins,
 
@@ -26,6 +26,7 @@ export default {
   },
 
   beforeUnmount() {
+    console.log("unmounting item number: " + this.item.number)
     if (this.Item)
       this.Item.destroy()
 
@@ -38,7 +39,15 @@ export default {
   },
 
   watch: {
+    taken(taken) {
+      if (taken) {
+        if (this.Item)
+          this.Item.destroy()
 
+        if (this.Shadow)
+          this.Shadow.destroy()
+      }
+    }
   },
 
   methods: {
@@ -53,27 +62,24 @@ export default {
 
     create(PhaserGame) {
       let item = this.item
-      let x = this.item.position ? this.item.position.x : 0;
-      let y = this.item.position ? this.item.position.y : 0;
       const tile = store.tiles.find(t => t.number == item.tile)
+      let item_x = tile.x + tile.width / 2
+      let item_y = tile.y + tile.height / 2
 
-      if (tile) {
-        console.log(tile)
-        x = x + tile.x
-        y = y + tile.y
-      }
-
-      const Shadow = PhaserGame.physics.add.sprite((x + this.shadowDistance), (y + this.shadowDistance), this.item.type);
-      const Item = PhaserGame.physics.add.sprite(x, y, this.item.type);
+      const Shadow = PhaserGame.physics.add.sprite((item_x + this.shadowDistance), (item_y + this.shadowDistance), this.item.type);
+      const Item = PhaserGame.physics.add.sprite(item_x, item_y, this.item.type);
 
       Shadow.setOrigin(0.5);
       Shadow.tint = 0x000000;
       Shadow.alpha = 0.5;
 
-      if (this.item.scale) {
-        Item.setScale(this.item.scale);
-        Shadow.setScale(this.item.scale);
-      }
+      // Scale Item
+      let itemHeight = tile.height / 2
+      Item.displayHeight = itemHeight
+      Item.scaleX = Item.scaleY;
+      Shadow.displayHeight = itemHeight
+      Shadow.scaleX = Shadow.scaleY;
+
 
       this.physics = PhaserGame.physics;
       this.Item = Item;
