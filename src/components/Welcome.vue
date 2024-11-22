@@ -54,6 +54,8 @@ export default {
       let configs = store.difficulty_configs[difficulty]
       store.configs = { ...store.configs, ...configs }
       store.started = true
+
+      playAudio("start_game1")
     }
   }
 }

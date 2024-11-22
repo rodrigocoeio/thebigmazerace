@@ -134,7 +134,7 @@ export default
       let Game = this
       setTimeout(function () {
         Game.startGame()
-      }, 1000)
+      }, 3000)
     },
 
     beforeUnmount() {
@@ -164,9 +164,9 @@ export default
         this.endTime = new Date();
         clearInterval(this.timeInterval)
 
-        store.started = false
+        store.started = true
         store.finished = true
-        alert(winner.player.name + " has founded the chest in " + this.timeElapsed + "s")
+        console.info(winner.player.name + " has founded the chest in " + this.timeElapsed + "s")
       },
       rebuildMaze() {
         this.restartGame()

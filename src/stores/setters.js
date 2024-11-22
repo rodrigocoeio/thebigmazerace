@@ -122,7 +122,7 @@ export default {
     goal_tile.item = chest
 
     // Generate Random Items
-    let randomItemsCount = 9
+    let randomItemsCount = this.configs.items_count
     for (let i = 0; i < randomItemsCount; i++) {
       this.generateItem()
     }

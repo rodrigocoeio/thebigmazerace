@@ -7,23 +7,26 @@ const state = {
     easy: {
       columns: 6,
       rows: 6,
-      speed: 72,
-      inteligence: 'normal',
+      speed: 120,
+      inteligence: 'smart',
       changeWayEveryNumberOfTiles: 3,
+      items_count: 9,
     },
     normal: {
-      columns: 10,
-      rows: 10,
-      speed: 72,
-      inteligence: 'normal',
+      columns: 9,
+      rows: 9,
+      speed: 130,
+      inteligence: 'smart',
       changeWayEveryNumberOfTiles: 5,
+      items_count: 18,
     },
     hard: {
       columns: 12,
       rows: 12,
-      speed: 72,
-      inteligence: 'normal',
+      speed: 150,
+      inteligence: 'smart',
       changeWayEveryNumberOfTiles: 7,
+      items_count: 27,
     },
   },
 
@@ -34,8 +37,8 @@ const state = {
     columns: 12,
     rows: 8,
     difficulty: 'easy',
-    speed: 72,
-
+    speed: 120,
+    items_count: 9,
     // Inteligences
     // dumbest: Players doesn't remember where they came from, so they will randomly choose a next way
     // dumb: Players doesn't remember where they came from, so they will randomly choose a next way
@@ -71,7 +74,7 @@ const state = {
       {
         type: 'speedup',
         image: '/images/speedup.png',
-        limit: 10,
+        limit: 6,
         count: 0,
       },
       {

@@ -1,6 +1,6 @@
 <template>
-  <welcome v-if="!store.started"></welcome>
-  <game-board v-if="store.started"></game-board>
+  <welcome v-if="!store.started" @click="playBackgroundMusic"></welcome>
+  <game-board v-if="store.started" @click="playBackgroundMusic"></game-board>
 </template>
 
 <script>
@@ -12,6 +12,16 @@ export default {
   data() {
     return {
       store: getStore()
+    }
+  },
+  mounted() {
+
+  },
+  methods: {
+    playBackgroundMusic() {
+      this.audio = this.audio || playAudio("background_music", "mp3", "music")
+      this.audio.loop = true
+      this.audio.volume = 0.5
     }
   },
   components: {

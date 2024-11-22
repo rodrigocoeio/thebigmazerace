@@ -89,8 +89,8 @@ export default {
         this.currentTile.visited = 1
       }
 
-      this.Player.x = this.currentTile.width / 2
-      this.Shadow.x = this.currentTile.width / 2
+      //this.Player.x = this.currentTile.width / 2
+      //this.Shadow.x = this.currentTile.width / 2
 
       this.moveToNextTile()
     },
@@ -143,16 +143,22 @@ export default {
 
           switch (this.item.type) {
             case "chest":
-              this.finished()
-              break
+              playAudio("finished")
+              return this.finished()
             case "speedup":
+              if (this.item.count == 0)
+                playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type)
               speed = speed * 2
               break
             case "speeddown":
+              if (this.item.count == 0)
+                playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type)
               speed = speed / 2
               break
             case "swirling":
               {
+                if (this.item.count == 0)
+                  playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type)
                 let rotateInteval = setInterval(() => {
                   Player.Player.setOrigin(0.5, 0.5);
                   Player.Shadow.setOrigin(0.5, 0.5);
@@ -170,6 +176,8 @@ export default {
               }
             case "twister":
               {
+                if (this.item.count == 0)
+                  playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type)
                 let randomTile = store.getRandomTile()
                 if (randomTile) {
                   this.item.count++
@@ -182,12 +190,8 @@ export default {
                     Player.Shadow.angle += 3;
                   }, 0.1)
 
-                  let Game = this.$parent
                   let onFinished = function () {
                     if (Player.item.count >= Player.item.limit) {
-                      Player.lastTile = Player.currentTile
-                      Player.currentTile = Player.nextTile
-                      Player.nextTile = false
                       Player.item = false
                       Player.Player.angle = 0;
                       Player.Shadow.angle = 0;
@@ -213,11 +217,6 @@ export default {
           else
             this.item.count++
         }
-      }
-
-      // Found Chest
-      if (this.currentTile.goal) {
-        return this.finished();
       }
 
       // Get Next Tile
