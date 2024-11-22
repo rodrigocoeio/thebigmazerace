@@ -35,7 +35,7 @@ const state = {
         inteligence: false,
         speed: false,
         position: { x: 30, y: 30 },
-        scale: 0.8,
+        scale: 0.9,
       },
       {
         name: 'Turtle',
@@ -46,7 +46,7 @@ const state = {
         inteligence: false,
         speed: false,
         position: { x: 70, y: 35 },
-        scale: 0.6,
+        scale: 0.7,
       },
     ],
     items: [
