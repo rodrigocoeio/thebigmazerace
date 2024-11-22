@@ -33,6 +33,7 @@ export default {
           },
           visited: 0,
           goal: false,
+          item: false,
         })
 
         tileNumber++
@@ -110,6 +111,36 @@ export default {
     }
 
     this.tiles = tiles
+  },
+
+  generateItems() {
+    let store = this
+
+    this.items = []
+
+    for (let i = 0; i < 3; i++) {
+      this.configs.items.forEach(function (item) {
+        let tile = store.getRandomTileForItem()
+        tile.item = item
+        let new_item = { ...item, tile: tile.number }
+        store.items.push(new_item)
+      })
+    }
+  },
+
+  getRandomTileForItem() {
+    let tiles = this.tiles.filter((t) => !t.item && !t.goal)
+    let random = Math.floor(Math.random() * tiles.length - 1)
+
+    return tiles[random]
+  },
+
+  generatePlayers() {
+    let store = this
+
+    this.configs.players.forEach((player) => {
+      store.players.push({ ...player })
+    })
   },
 
   getRandomNotVisitedNeighbor(currentTile, tiles) {
@@ -306,7 +337,8 @@ export default {
 
       // if goal or have items walk into it anyways
       if (myNeighbors.length === 1) {
-        return n.tile.goal
+        let hasItem = this.items.find((i) => i.tile == currentTile.number)
+        return n.tile.goal || hasItem
       }
       return true
     })

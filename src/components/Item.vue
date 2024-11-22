@@ -17,7 +17,7 @@ export default {
   data() {
     store = getStore();
     return {
-
+      shadowDistance: 2
     }
   },
 
@@ -26,7 +26,11 @@ export default {
   },
 
   beforeUnmount() {
+    if (this.Item)
+      this.Item.destroy()
 
+    if (this.Shadow)
+      this.Shadow.destroy()
   },
 
   computed: {
@@ -41,43 +45,51 @@ export default {
     preload(PhaserGame) {
       this.PhaserGame = PhaserGame;
       PhaserGame.load.plugin('rexglowfilterpipelineplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexglowfilterpipelineplugin.min.js', true);
-      PhaserGame.load.image(this.player.name, this.player.image);
+      PhaserGame.load.image(this.item.type, this.item.image);
 
       let image = new Image();
-      image.src = this.player.image;
+      image.src = this.item.image;
     },
 
     create(PhaserGame) {
-      const x = this.player.position ? this.player.position.x : 0;
-      const y = this.player.position ? this.player.position.y : 0;
-      const shadow = PhaserGame.physics.add.sprite(x, y, this.player.name);
-      const player = PhaserGame.physics.add.sprite((x + this.shadowDistance), (y + this.shadowDistance), this.player.name);
+      let item = this.item
+      let x = this.item.position ? this.item.position.x : 0;
+      let y = this.item.position ? this.item.position.y : 0;
+      const tile = store.tiles.find(t => t.number == item.tile)
 
-      shadow.setOrigin(0.5);
-      shadow.tint = 0x000000;
-      shadow.alpha = 0.5;
+      if (tile) {
+        console.log(tile)
+        x = x + tile.x
+        y = y + tile.y
+      }
 
-      if (this.player.scale) {
-        player.setScale(this.player.scale);
-        shadow.setScale(this.player.scale);
+      const Shadow = PhaserGame.physics.add.sprite((x + this.shadowDistance), (y + this.shadowDistance), this.item.type);
+      const Item = PhaserGame.physics.add.sprite(x, y, this.item.type);
+
+      Shadow.setOrigin(0.5);
+      Shadow.tint = 0x000000;
+      Shadow.alpha = 0.5;
+
+      if (this.item.scale) {
+        Item.setScale(this.item.scale);
+        Shadow.setScale(this.item.scale);
       }
 
       this.physics = PhaserGame.physics;
-      this.Player = player;
-      this.Shadow = shadow;
-      this.selectedAnimation();
+      this.Item = Item;
+      this.Shadow = Shadow;
     },
 
     update(PhaserGame) {
-      if (this.target && this.Player.body) {
-        let distance = Phaser.Math.Distance.Between(this.Player.x, this.Player.y, this.target.x, this.target.y);
+      if (this.target && this.Item.body) {
+        let distance = Phaser.Math.Distance.Between(this.Item.x, this.Item.y, this.target.x, this.target.y);
 
-        if (this.Player.body.speed > 0) {
+        if (this.Item.body.speed > 0) {
           this.moving = true;
           //  4 is our distance tolerance, i.e. how close the source can get to the target
           //  before it is considered as being there. The faster it moves, the more tolerance is required.
           if (distance < 6) {
-            this.Player.body.reset(this.target.x, this.target.y);
+            this.Item.body.reset(this.target.x, this.target.y);
             this.Shadow.body.reset((this.target.x + this.shadowDistance), (this.target.y + this.shadowDistance));
             this.target = false;
           }
@@ -86,24 +98,24 @@ export default {
     },
 
     moveTo(to, speed = 100) {
-      const player_x = this.player.position ? this.player.position.x : 0;
-      const player_y = this.player.position ? this.player.position.y : 0;
+      const item_x = this.item.position ? this.item.position.x : 0;
+      const item_y = this.item.position ? this.item.position.y : 0;
       const tile = store.tiles[to] ? store.tiles[to] : false;
 
       if (tile) {
         this.target = {
-          x: (tile.x + player_x),
-          y: (tile.y + player_y),
+          x: (tile.x + item_x),
+          y: (tile.y + item_y),
           tile: tile
         };
 
-        this.physics.moveToObject(this.Player, this.target, speed);
+        this.physics.moveToObject(this.Item, this.target, speed);
         this.physics.moveToObject(this.Shadow, this.target, speed);
 
         return true;
       }
 
-      throw Error("Error while moving player " + this.player.name + " to: " + to + " ( tile " + to + " does not exist )");
+      throw Error("Error while moving item " + this.item.name + " to: " + to + " ( tile " + to + " does not exist )");
     }
   }
 }

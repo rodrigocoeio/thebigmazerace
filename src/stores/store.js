@@ -9,7 +9,7 @@ const state = {
     columns: 12,
     rows: 8,
     difficulty: 'easy',
-    speed: 100,
+    speed: 72,
 
     // Inteligences
     // dumbest: Players doesn't remember where they came from, so they will randomly choose a next way
@@ -19,38 +19,67 @@ const state = {
     // kickass: Players won't go back and prefer unvisited neighbors first if none unvisited go to the least decision taken, avoiding dead ends
     inteligence: 'normal',
     showTileNumbers: false,
-
-    players: 0,
     menu: true,
     sound: true,
     voice: true,
     music: true,
     changeWayEveryNumberOfTiles: 5,
+
+    players: [
+      {
+        name: 'Rabbit',
+        image: '/images/rabbit.png',
+        welcome: {
+          position: { x: 200, y: 450 },
+        },
+        inteligence: false,
+        speed: false,
+        position: { x: 20, y: 22 },
+        scale: 0.8,
+      },
+      {
+        name: 'Turtle',
+        image: '/images/turtle.png',
+        welcome: {
+          position: { x: 200, y: 450 },
+        },
+        inteligence: false,
+        speed: false,
+        position: { x: 50, y: 27 },
+        scale: 0.6,
+      },
+    ],
+    items: [
+      {
+        type: 'speedup',
+        image: '/images/speedup.png',
+        position: { x: 50, y: 27 },
+        scale: 0.6,
+        limit: 10,
+        count: 0,
+      },
+      {
+        type: 'speeddown',
+        image: '/images/speeddown.png',
+        position: { x: 50, y: 27 },
+        scale: 0.4,
+        limit: 10,
+        count: 0,
+      },
+      {
+        type: 'swirling',
+        image: '/images/swirling.gif',
+        position: { x: 50, y: 27 },
+        scale: 0.1,
+        limit: 3,
+        count: 0,
+      },
+    ],
   },
   started: false, //  Game Started
   finished: true,
-  players: [
-    {
-      name: 'Rabbit',
-      image: '/images/rabbit.png',
-      welcome: {
-        position: { x: 200, y: 450 },
-      },
-      inteligence: false,
-      position: { x: 20, y: 22 },
-      scale: 0.8,
-    },
-    {
-      name: 'Turtle',
-      image: '/images/turtle.png',
-      welcome: {
-        position: { x: 200, y: 450 },
-      },
-      inteligence: false,
-      position: { x: 50, y: 27 },
-      scale: 0.6,
-    },
-  ], //  Players
+  players: [], //  Players
+  items: [], // Items
   tiles: [], //  Tiles
   turn: {
     //  Turn

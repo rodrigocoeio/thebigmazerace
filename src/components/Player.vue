@@ -10,7 +10,7 @@ import getStore from "$/store.js";
 let store
 
 export default {
-  props: ['player', 'speed'],
+  props: ['player'],
 
   mixins: objectMixins,
 
@@ -30,6 +30,7 @@ export default {
       lastTile: false,
       currentTile: false,
       nextTile: false,
+      item: false
     }
   },
 
@@ -113,25 +114,74 @@ export default {
       this.Player.body.reset(x, y);
       this.Shadow.body.reset((x + this.shadowDistance), (y + this.shadowDistance));
     },
-    moveToNextTile() {
+    moveToNextTile(avoidItem) {
       store = getStore();
 
       if (!store.started || this.moving)
         return false
 
-      this.lastTile = this.currentTile
-      this.currentTile = this.nextTile ? this.nextTile : this.currentTile
+      let lastTile = this.currentTile
+      let currentTile = this.nextTile ? this.nextTile : this.currentTile
+      this.tilesStack.push(lastTile)
+      currentTile.visited++
+
+      this.lastTile = lastTile
+      this.currentTile = currentTile
       this.nextTile = false
-      this.tilesStack.push(this.lastTile)
-      this.currentTile.visited++
+
+      let speed = this.player.speed ? this.player.speed : store.configs.speed
+
+      // FOUNDED ITEM
+      if (!avoidItem) {
+        let foundedItem = store.items.find(i => i.tile == currentTile.number)
+        if (foundedItem) {
+          this.item = { ...foundedItem }
+        }
+
+        // HAS ITEM
+        if (this.item) {
+          this.item.count++
+
+          if (this.item.count >= this.item.limit) {
+            this.item = false
+          } else {
+            let Player = this
+
+            switch (this.item.type) {
+              case "speedup":
+                speed = speed * 2
+                break
+              case "speeddown":
+                speed = speed / 2
+                break
+              case "swirling":
+                {
+                  console.log("swirling")
+                  let rotateInteval = setInterval(() => {
+                    Player.Player.setOrigin(0.5, 0.5);
+                    Player.Shadow.setOrigin(0.5, 0.5);
+                    Player.Player.angle++;
+                    Player.Shadow.angle++;
+                  }, 0.1)
+                  setTimeout(function () {
+                    Player.Player.angle = 0;
+                    Player.Shadow.angle = 0;
+                    Player.item = false
+                    Player.moveToNextTile(true)
+                    clearInterval(rotateInteval)
+                  }, this.item.limit * 1000)
+                  return false
+                }
+            }
+          }
+        }
+      }
 
       if (this.currentTile.goal) {
         return this.finished();
       }
 
-      let lastTile = this.lastTile
-      let currentTile = this.currentTile
-      let nextTile = store.getPlayerNextRandomTile(currentTile, lastTile, this.tiles, this.player.inteligence);
+      let nextTile = store.getPlayerNextRandomTile(this.currentTile, this.lastTile, this.tiles, this.player.inteligence);
 
       if (!nextTile) {
         if (this.tilesStack.length > 0) {
@@ -141,7 +191,7 @@ export default {
 
       if (nextTile) {
         this.nextTile = nextTile.tile
-        this.moveTo(nextTile.tile.number - 1, this.speed)
+        this.moveTo(nextTile.tile.number - 1, speed)
       }
     },
     preload(PhaserGame) {

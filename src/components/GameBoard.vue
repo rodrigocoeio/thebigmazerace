@@ -5,7 +5,8 @@
       :walls="tile.walls" :goal="tile.goal" v-for="tile in tiles"></tile>
     <slot></slot>
 
-    <Player v-for="player in players" :player="player" :speed="playerSpeed" ref="players"></Player>
+    <Item v-for="item in items" :item="item" ref="items"></Item>
+    <Player v-for="player in players" :player="player" ref="players"></Player>
   </div>
 
   <div class="dev">
@@ -42,6 +43,7 @@ import getStore from "$/store.js";
 import gameMixins from "@/mixins/game-mixins";
 import Tile from "#/Tile.vue";
 import Player from "#/Player.vue";
+import Item from "#/Item.vue";
 let store;
 
 export default
@@ -61,7 +63,8 @@ export default
         startTime: 0,
         endTime: 0,
         timeInterval: false,
-        players: store.players
+        players: store.players,
+        items: store.items
       };
     },
 
@@ -89,6 +92,9 @@ export default
     },
 
     watch: {
+      playerSpeed() {
+        store.configs.speed = this.playerSpeed
+      },
       columns() {
         store.configs.columns = parseInt(this.columns)
         this.rebuildMaze()
@@ -110,6 +116,8 @@ export default
       store = getStore();
       store.generateTiles();
       store.generateMaze();
+      store.generateItems();
+      store.generatePlayers();
     },
 
     mounted() {
@@ -151,9 +159,14 @@ export default
         this.restartGame()
 
         store.tiles = [];
+        store.items = [];
+        store.players = [];
+
         setTimeout(() => {
           store.generateTiles();
           store.generateMaze();
+          store.generateItems();
+          store.generatePlayers();
         }, 10);
       },
       startMusic() {
@@ -198,7 +211,8 @@ export default
 
     components: {
       Tile,
-      Player
+      Player,
+      Item
     }
   }
 </script>
