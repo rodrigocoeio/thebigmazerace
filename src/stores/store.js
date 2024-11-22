@@ -17,7 +17,7 @@ const state = {
     // normal: Players won't go back and remember their past decisions so the visits they made to the neighbors and choose randomly proportionaly to the number of visits
     // smart: Players won't go back and prefer unvisited neighbors first if none unvisited go to the least decision taken
     // kickass: Players won't go back and prefer unvisited neighbors first if none unvisited go to the least decision taken, avoiding dead ends
-    inteligence: 'normal',
+    inteligence: 'smart',
     showTileNumbers: false,
     menu: true,
     sound: true,
@@ -34,7 +34,7 @@ const state = {
         },
         inteligence: false,
         speed: false,
-        position: { x: 20, y: 22 },
+        position: { x: 30, y: 30 },
         scale: 0.8,
       },
       {
@@ -45,7 +45,7 @@ const state = {
         },
         inteligence: false,
         speed: false,
-        position: { x: 50, y: 27 },
+        position: { x: 70, y: 35 },
         scale: 0.6,
       },
     ],
@@ -70,7 +70,7 @@ const state = {
         type: 'swirling',
         image: '/images/swirling.gif',
         position: { x: 50, y: 27 },
-        scale: 0.1,
+        scale: 0.12,
         limit: 3,
         count: 0,
       },
