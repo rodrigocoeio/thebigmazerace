@@ -11,7 +11,7 @@
     <Player v-for="player in players" :player="player" ref="players"></Player>
   </div>
 
-  <div class="dev">
+  <div class="dev" v-if="configs.dev">
     <label>Columns</label>
     <input type="number" min="1" max="12" v-model="columns" />
     <label>Rows</label>
@@ -55,6 +55,7 @@ export default
     data() {
       store = getStore();
       return {
+        configs: store.configs,
         columns: store.configs.columns,
         rows: store.configs.rows,
         changeWayEveryNumberOfTiles: store.configs.changeWayEveryNumberOfTiles,
@@ -118,7 +119,10 @@ export default
     },
 
     created() {
-      store = getStore();
+      store.tiles = [];
+      store.items = [];
+      store.players = [];
+
       store.generateTiles();
       store.generateMaze();
       store.generateItems();
@@ -127,10 +131,14 @@ export default
 
     mounted() {
       //this.startMusic();
+      let Game = this
+      setTimeout(function () {
+        Game.startGame()
+      }, 1000)
     },
 
     beforeUnmount() {
-      this.stopMusic();
+      //this.stopMusic();
     },
 
     methods: {
@@ -198,6 +206,17 @@ export default
         PhaserGame.load.image('board', "/images/background.jpeg");
         PhaserGame.load.image('tile-column', "images/column.png");
         PhaserGame.load.image('tile-row', "images/row.png");
+
+        // Load Items
+        store.configs.items.forEach(item => {
+          PhaserGame.load.image(item.type, item.image);
+
+          let image = new Image();
+          image.src = item.image;
+        })
+
+        // Glow Plugin
+        PhaserGame.load.plugin('rexglowfilterpipelineplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexglowfilterpipelineplugin.min.js', true);
       },
       create(PhaserGame) {
         console.log('board created');

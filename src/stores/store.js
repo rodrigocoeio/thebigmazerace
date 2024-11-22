@@ -2,14 +2,39 @@ const state = {
   Phaser: false, // Phaser Instance
   Game: false, // Game Component
   components: [],
+
+  difficulty_configs: {
+    easy: {
+      columns: 6,
+      rows: 6,
+      speed: 72,
+      inteligence: 'normal',
+      changeWayEveryNumberOfTiles: 3,
+    },
+    normal: {
+      columns: 10,
+      rows: 10,
+      speed: 72,
+      inteligence: 'normal',
+      changeWayEveryNumberOfTiles: 5,
+    },
+    hard: {
+      columns: 12,
+      rows: 12,
+      speed: 72,
+      inteligence: 'normal',
+      changeWayEveryNumberOfTiles: 7,
+    },
+  },
+
   configs: {
     // Game Configs
     width: window.innerWidth,
-    height: window.innerHeight - 22,
+    height: window.innerHeight,
     columns: 12,
     rows: 8,
     difficulty: 'easy',
-    speed: 150,
+    speed: 72,
 
     // Inteligences
     // dumbest: Players doesn't remember where they came from, so they will randomly choose a next way
@@ -23,6 +48,7 @@ const state = {
     sound: true,
     voice: true,
     music: true,
+    dev: false,
     changeWayEveryNumberOfTiles: 5,
 
     players: [

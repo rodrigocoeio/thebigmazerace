@@ -126,8 +126,6 @@ export default {
     for (let i = 0; i < randomItemsCount; i++) {
       this.generateItem()
     }
-
-    console.log(this.items)
   },
 
   generateItem() {
@@ -135,7 +133,7 @@ export default {
     let item = this.getRandomItem()
 
     if (tile && item) {
-      let itemNumber = Date.now()
+      let itemNumber = Date.now() + Math.floor(Math.random() * 9999999)
       let newItem = { number: itemNumber, tile: tile.number, taken: false, ...item }
 
       this.items.push(newItem)

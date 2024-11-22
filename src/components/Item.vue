@@ -17,16 +17,24 @@ export default {
   data() {
     store = getStore();
     return {
-      shadowDistance: 2
+      shadowDistance: 2,
+      glowing: false,
+      Glow: false
     }
   },
 
   mounted() {
-
+    if (this.item.type === "chest") {
+      let Item = this
+      setTimeout(() => {
+        Item.glowing = true
+        Item.glow()
+      }, 500)
+    }
   },
 
   beforeUnmount() {
-    console.log("unmounting item number: " + this.item.number)
+    //console.log("unmounting item number: " + this.item.number)
     if (this.Item)
       this.Item.destroy()
 
@@ -53,13 +61,7 @@ export default {
   methods: {
     preload(PhaserGame) {
       this.PhaserGame = PhaserGame;
-      PhaserGame.load.plugin('rexglowfilterpipelineplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexglowfilterpipelineplugin.min.js', true);
-      PhaserGame.load.image(this.item.type, this.item.image);
-
-      let image = new Image();
-      image.src = this.item.image;
     },
-
     create(PhaserGame) {
       let item = this.item
       const tile = store.tiles.find(t => t.number == item.tile)
@@ -74,7 +76,7 @@ export default {
       Shadow.alpha = 0.5;
 
       // Scale Item
-      let itemHeight = tile.height / 2
+      let itemHeight = this.item.type === "chest" ? tile.height / 1.4 : tile.height / 3
       Item.displayHeight = itemHeight
       Item.scaleX = Item.scaleY;
       Shadow.displayHeight = itemHeight
@@ -122,6 +124,33 @@ export default {
       }
 
       throw Error("Error while moving item " + this.item.name + " to: " + to + " ( tile " + to + " does not exist )");
+    },
+
+    glow() {
+      const Item = this.Item;
+      const PhaserGame = this.PhaserGame;
+      const Between = Phaser.Math.Between;
+      var postFxPlugin = PhaserGame.plugins.get('rexglowfilterpipelineplugin');
+      var pipeline = postFxPlugin.add(Item);
+
+      if (this.glowing) {
+        this.Glow = Item.scene.tweens.add({
+          targets: pipeline,
+          intensity: 0.02,
+          ease: 'Linear',
+          duration: Between(500, 1000),
+          repeat: -1,
+          yoyo: true
+        });
+
+      } else {
+        // Remove postfx pipeline
+        postFxPlugin.remove(Item);
+        if (this.Glow) {
+          this.Glow.stop();
+          this.Glow = null;
+        }
+      }
     }
   }
 }

@@ -5,6 +5,10 @@ let inteligences = ['dumbest', 'dumb', 'normal', 'smart', 'kickass']
 const listenKeyBoardEvents = function (e) {
   let store = getStore()
 
+  if (e.key === 'D') store.configs.dev = !store.configs.dev
+  if (e.key === 'Escape' || e.key === 'Backspace') store.started = false
+  if (e.key === 'Enter') store.started = true
+
   if (!player) {
     let player_number = parseInt(e.key) - 1
     if (store.players[player_number]) {
@@ -22,4 +26,4 @@ const listenKeyBoardEvents = function (e) {
   }
 }
 
-window.addEventListener('keypress', listenKeyBoardEvents)
+window.addEventListener('keydown', listenKeyBoardEvents)

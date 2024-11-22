@@ -22,8 +22,10 @@ export default {
       PhaserGame: false,
       Player: false,
       Shadow: false,
+      Glow: false,
       shadowDistance: 3,
       moving: false,
+      glowing: true,
       start_position: false,
       tiles: [],
       tilesStack: [], // walked tiles
@@ -39,6 +41,11 @@ export default {
   },
 
   beforeUnmount() {
+    if (this.Glow) {
+      this.glowing = false
+      this.glow()
+    }
+
     if (this.Player)
       this.Player.destroy()
 
@@ -46,19 +53,7 @@ export default {
       this.Shadow.destroy()
   },
 
-  computed: {
-    isSelected() {
-      return true;
-    },
-    selected() {
-      return this.isSelected;
-    }
-  },
-
   watch: {
-    selected() {
-      this.selectedAnimation();
-    },
     moving(moving) {
       if (!moving) {
         if (this.onFinishMoving && typeof this.onFinishMoving === "function")
@@ -197,8 +192,6 @@ export default {
                       Player.Player.angle = 0;
                       Player.Shadow.angle = 0;
                       clearInterval(rotateInteval)
-                      console.log(Player.lastTile.number)
-                      console.log(Player.currentTile.number)
                       return Player.moveToNextTile()
                     } else {
                       randomTile = store.getRandomTile()
@@ -244,7 +237,6 @@ export default {
     },
     preload(PhaserGame) {
       this.PhaserGame = PhaserGame;
-      PhaserGame.load.plugin('rexglowfilterpipelineplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexglowfilterpipelineplugin.min.js', true);
       PhaserGame.load.image(this.player.name, this.player.image);
 
       let image = new Image();
@@ -284,7 +276,7 @@ export default {
       this.physics = PhaserGame.physics;
       this.Player = player;
       this.Shadow = shadow;
-      this.selectedAnimation();
+      this.Glow = this.glow();
     },
 
     update(PhaserGame) {
@@ -327,15 +319,15 @@ export default {
       throw Error("Error while moving player " + this.player.name + " to: " + to + " ( tile " + to + " does not exist )");
     },
 
-    selectedAnimation() {
+    glow() {
       const Player = this.Player;
       const PhaserGame = this.PhaserGame;
       const Between = Phaser.Math.Between;
       var postFxPlugin = PhaserGame.plugins.get('rexglowfilterpipelineplugin');
       var pipeline = postFxPlugin.add(Player);
 
-      if (this.selected) {
-        Player.glowTask = Player.scene.tweens.add({
+      if (this.glowing) {
+        this.Glow = Player.scene.tweens.add({
           targets: pipeline,
           intensity: 0.02,
           ease: 'Linear',
@@ -347,9 +339,9 @@ export default {
       } else {
         // Remove postfx pipeline
         postFxPlugin.remove(Player);
-        if (Player.glowTask) {
-          Player.glowTask.stop();
-          Player.glowTask = null;
+        if (this.Glow) {
+          this.Glow.stop();
+          this.Glow = null;
         }
       }
     }
