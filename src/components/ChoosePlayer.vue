@@ -75,6 +75,8 @@ export default {
       player.selected = true
       player.number = parseInt(this.number)
       this.selected = player
+
+      playAudio("selected")
     }
   }
 }

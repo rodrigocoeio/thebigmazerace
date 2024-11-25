@@ -64,6 +64,7 @@ export default {
     difficulty(difficulty) {
       let store = getStore()
       store.configs.difficulty = difficulty
+      playAudio("selected")
     }
   },
   methods: {
@@ -75,6 +76,7 @@ export default {
       store.started = true
 
       playAudio("start_game1", "mp3", "voice")
+      playAudio("selected")
     }
   },
   components: {
