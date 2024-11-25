@@ -130,19 +130,14 @@ export default
     },
 
     mounted() {
-      //this.startMusic();
       let Game = this
       setTimeout(function () {
-        Game.startGame()
+        Game.startPlayers()
       }, 3000)
     },
 
-    beforeUnmount() {
-      //this.stopMusic();
-    },
-
     methods: {
-      startGame() {
+      startPlayers() {
         store.stoped = false;
         this.startTime = new Date();
         this.$refs.players.forEach(player => player.start());
@@ -151,8 +146,6 @@ export default
         this.timeInterval = setInterval(() => {
           Game.endTime = new Date()
         })
-
-        console.log("Game Started")
       },
       stopGame() {
         store.stoped = true;
@@ -184,23 +177,7 @@ export default
           store.generatePlayers();
         }, 10);
       },
-      startMusic() {
-        if (this.music) {
-          if (!this.background_audio)
-            // eslint-disable-next-line no-undef
-            this.background_audio = playAudio('board-background2', "mp3", "voice");
 
-          this.background_audio.volume = 0.1;
-          this.background_audio.loop = true;
-          this.background_audio.play();
-        }
-      },
-      stopMusic() {
-        if (this.background_audio) {
-          this.background_audio.pause();
-          this.background_audio = false;
-        }
-      },
       preload(PhaserGame) {
         // Background
         PhaserGame.load.image('board', "/images/background.jpeg");

@@ -1,4 +1,13 @@
 export default {
+  startGame() {
+    console.log('Game Started!')
+    this.started = true
+  },
+  quitGame() {
+    this.started = false
+    if (this.voice) this.voice.pause()
+  },
+
   generateTiles() {
     const tiles = []
     const configs = this.configs
@@ -142,23 +151,47 @@ export default {
   },
 
   getRandomItem() {
-    let items = this.configs.items.filter((item) => item.type != 'chest')
+    let items = this.configs.items.filter((item) => {
+      if (item.type == 'swirling') {
+        let swirlings = this.items.filter((i) => i.type == item.type && !i.taken)
+        let maxSwirlings = this.configs.max_swirlings
+
+        return swirlings.length < maxSwirlings
+      }
+
+      if (item.type == 'twister') {
+        let twisters = this.items.filter((i) => i.type == item.type && !i.taken)
+        let maxTwisters = this.configs.max_twisters
+
+        return twisters.length < maxTwisters
+      }
+      return item.type != 'chest'
+    })
     let random = Math.floor(Math.random() * items.length)
 
     return items[random]
   },
 
-  getRandomTile() {
-    let tiles = this.tiles.filter((t) => !t.item && !t.goal && t.number != 1)
-    let random = Math.floor(Math.random() * tiles.length - 1)
+  getRandomTile(withItem, tiles) {
+    tiles = tiles ? tiles : this.tiles
+    tiles = tiles.filter((t) => !t.goal && t.number != 1)
+    if (!withItem) tiles = tiles.filter((t) => !t.item)
+    let random = Math.floor(Math.random() * tiles.length)
 
-    return tiles[random]
+    let randomTile = tiles[random]
+
+    if (!randomTile) {
+      console.log('Could not get random tile ' + random)
+      console.log(this.tiles)
+      console.log(tiles)
+    }
+
+    return randomTile
   },
 
   generatePlayers() {
     let store = this
 
-    console.log(this.configs.players)
     this.configs.players.forEach((player) => {
       if (player.selected) {
         store.players.push({ ...player })
@@ -245,9 +278,10 @@ export default {
         break
     }
 
-    if (nextTile) {
+    if (nextTile && currentTile.decisions) {
       //console.log(nextTile.position)
       //console.log(currentTile.decisions[nextTile.position])
+      //console.log(currentTile)
       currentTile.decisions[nextTile.position]++
     }
 
@@ -377,11 +411,11 @@ export default {
   // Gets the least decided direction/neighbor
   getLeastDecidedNeighbor(currentTile, neighbors) {
     let leastDecidedNeighbor = false
-    let decisions = currentTile.decisions
+    let decisions = currentTile.decisions ? currentTile.decisions : {}
     let times = 0
 
     neighbors.forEach((n) => {
-      let decided_times = decisions[n.position]
+      let decided_times = decisions[n.position] ? decisions[n.position] : 0
       if (!leastDecidedNeighbor || n.tile.visited == 0 || decided_times < times) {
         leastDecidedNeighbor = n
         times = decided_times

@@ -9,24 +9,30 @@ const state = {
       rows: 6,
       speed: 120,
       inteligence: 'smart',
-      changeWayEveryNumberOfTiles: 3,
-      items_count: 9,
+      changeWayEveryNumberOfTiles: 5,
+      items_count: 15,
+      max_swirlings: 2,
+      max_twisters: 2,
     },
     normal: {
       columns: 9,
       rows: 9,
       speed: 130,
       inteligence: 'smart',
-      changeWayEveryNumberOfTiles: 5,
-      items_count: 18,
+      changeWayEveryNumberOfTiles: 7,
+      items_count: 25,
+      max_swirlings: 3,
+      max_twisters: 3,
     },
     hard: {
       columns: 12,
       rows: 12,
       speed: 150,
       inteligence: 'smart',
-      changeWayEveryNumberOfTiles: 7,
-      items_count: 27,
+      changeWayEveryNumberOfTiles: 10,
+      items_count: 40,
+      max_swirlings: 4,
+      max_twisters: 4,
     },
   },
 
@@ -39,6 +45,8 @@ const state = {
     difficulty: 'easy',
     speed: 120,
     items_count: 9,
+    max_swirlings: 2,
+    max_twisters: 2,
     // Inteligences
     // dumbest: Players doesn't remember where they came from, so they will randomly choose a next way
     // dumb: Players doesn't remember where they came from, so they will randomly choose a next way
@@ -95,6 +103,22 @@ const state = {
         speed: false,
         selected: false,
       },
+      {
+        number: 0,
+        name: 'Dinosaur',
+        image: '/images/dinosaur.png',
+        inteligence: false,
+        speed: false,
+        selected: false,
+      },
+      {
+        number: 0,
+        name: 'Unicorn',
+        image: '/images/unicorn.png',
+        inteligence: false,
+        speed: false,
+        selected: false,
+      },
     ],
     items: [
       {
@@ -115,12 +139,12 @@ const state = {
         limit: 3,
         count: 0,
       },
-      /* {
+      {
         type: 'twister',
         image: '/images/twister.png',
-        limit: 3,
+        limit: 1,
         count: 0,
-      }, */
+      },
       {
         type: 'chest',
         image: '/images/chest.png',

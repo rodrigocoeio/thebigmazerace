@@ -17,11 +17,9 @@ GameMixins.push({
   },
 
   beforeUnmount() {
-    console.log('unmounting')
     this.destroy()
 
     if (this.Phaser && !this.destroyed) {
-      console.log('destroying')
       this.Phaser.destroy(true)
       this.Phaser = false
       this.destroyed = true

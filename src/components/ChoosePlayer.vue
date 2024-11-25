@@ -28,7 +28,7 @@ export default {
   data() {
     let store = getStore()
     let playerNumber = this.number
-    let selected = store.players.find(player => player.number === playerNumber && player.selected)
+    let selected = store.configs.players.find(player => player.number == parseInt(playerNumber) && player.selected)
 
     return {
       selected: selected,
@@ -58,7 +58,12 @@ export default {
     },
     selectFirst() {
       let first = this.players.find(player => !player.selected)
-      this.select(first)
+      if (first) {
+        first.selected = true
+        first.number = parseInt(this.number)
+        this.selected = first
+      }
+
     },
     select(player) {
       if (player.selected)

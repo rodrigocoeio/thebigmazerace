@@ -5,9 +5,9 @@ let inteligences = ['dumbest', 'dumb', 'normal', 'smart', 'kickass']
 const listenKeyBoardEvents = function (e) {
   let store = getStore()
 
-  if (e.key === 'D') store.configs.dev = !store.configs.dev
-  if (e.key === 'Escape' || e.key === 'Backspace') store.started = false
-  if (e.key === 'Enter') store.started = true
+  if (e.key.toUpperCase() === 'D') store.configs.dev = !store.configs.dev
+  if (e.key === 'Escape' || e.key === 'Backspace') store.quitGame()
+  if (e.key === 'Enter') store.startGame()
 
   if (!player) {
     let player_number = parseInt(e.key) - 1

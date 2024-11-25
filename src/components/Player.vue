@@ -56,10 +56,7 @@ export default {
   watch: {
     moving(moving) {
       if (!moving) {
-        if (this.onFinishMoving && typeof this.onFinishMoving === "function")
-          return this.onFinishMoving()
-
-        this.moveToNextTile();
+        this.reachedTile()
       }
     }
   },
@@ -111,12 +108,7 @@ export default {
       this.Player.body.reset(x, y);
       this.Shadow.body.reset((x + this.shadowDistance), (y + this.shadowDistance));
     },
-    moveToNextTile(avoidItem) {
-      store = getStore();
-
-      if (!store.started || this.moving)
-        return false
-
+    reachedTile() {
       let lastTile = this.currentTile
       let currentTile = this.nextTile ? this.nextTile : this.currentTile
       this.tilesStack.push(lastTile)
@@ -126,96 +118,41 @@ export default {
       this.currentTile = currentTile
       this.nextTile = false
 
+      if (this.item)
+        this.item.count++
+
+      if (this.item.count >= this.item.limit)
+        this.item = false
+
+      this.getItem()
+
+      if (this.onFinishMoving && typeof this.onFinishMoving === "function")
+        return this.onFinishMoving()
+
+      this.moveToNextTile();
+    },
+
+    moveToNextTile() {
+      store = getStore();
+
+      if (!store.started || this.moving)
+        return false
+
       let speed = this.player.speed ? this.player.speed : store.configs.speed
 
-      // FOUNDED ITEM
-      if (!avoidItem) {
-        let foundedItem = store.items.find(item => item.tile == currentTile.number)
-        if (foundedItem && !foundedItem.taken) {
-          foundedItem.taken = true
-          this.item = foundedItem
-          store.generateItem()
-        }
-
-        // HAS ITEM
-        if (this.item) {
-          let Player = this
-
-          switch (this.item.type) {
-            case "chest":
-              playAudio("finished", "mp3", "mp3", "voice")
-              return this.finished()
-            case "speedup":
-              if (this.item.count == 0)
-                playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
-              speed = speed * 2
-              break
-            case "speeddown":
-              if (this.item.count == 0)
-                playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
-              speed = speed / 2
-              break
-            case "swirling":
-              {
-                if (this.item.count == 0)
-                  playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
-                let rotateInteval = setInterval(() => {
-                  Player.Player.setOrigin(0.5, 0.5);
-                  Player.Shadow.setOrigin(0.5, 0.5);
-                  Player.Player.angle += 1;
-                  Player.Shadow.angle += 1;
-                }, 0.1)
-                setTimeout(function () {
-                  Player.Player.angle = 0;
-                  Player.Shadow.angle = 0;
-                  Player.item = false
-                  Player.moveToNextTile(true)
-                  clearInterval(rotateInteval)
-                }, this.item.limit * 1000)
-                return false
-              }
-            case "twister":
-              {
-                if (this.item.count == 0)
-                  playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
-                let randomTile = store.getRandomTile()
-                if (randomTile) {
-                  this.item.count++
-
-                  // Rotate
-                  let rotateInteval = setInterval(() => {
-                    Player.Player.setOrigin(0.5, 0.5);
-                    Player.Shadow.setOrigin(0.5, 0.5);
-                    Player.Player.angle += 3;
-                    Player.Shadow.angle += 3;
-                  }, 0.1)
-
-                  let onFinished = function () {
-                    if (Player.item.count >= Player.item.limit) {
-                      Player.item = false
-                      Player.Player.angle = 0;
-                      Player.Shadow.angle = 0;
-                      clearInterval(rotateInteval)
-                      return Player.moveToNextTile()
-                    } else {
-                      randomTile = store.getRandomTile()
-                      Player.nextTile = randomTile
-                      return this.moveTo(randomTile.number, 300, onFinished)
-                    }
-                  }
-
-                  Player.nextTile = randomTile
-                  return this.moveTo(randomTile.number, 300, onFinished)
-                }
-
-                return false
-              }
-          }
-
-          if (this.item.count >= this.item.limit)
-            this.item = false
-          else
-            this.item.count++
+      // Has Item
+      if (this.item) {
+        switch (this.item.type) {
+          case "speedup":
+            speed = speed * 2
+            break
+          case "speeddown":
+            speed = speed / 2
+            break
+          case "swirling":
+            return false
+          case "twister":
+            return false
         }
       }
 
@@ -229,11 +166,112 @@ export default {
         }
       }
 
+      // If Next Tile
       if (nextTile) {
         this.nextTile = nextTile.tile
         this.moveTo(nextTile.tile.number, speed)
       }
     },
+
+    // Get Item
+    getItem() {
+      let currentTile = this.currentTile;
+
+      let foundedItem = store.items.find(item => item.tile == currentTile.number && !item.taken)
+      if (foundedItem) {
+        foundedItem.taken = true
+        this.item = foundedItem
+        store.generateItem()
+
+        let foundedItemTile = store.tiles.find(tile => tile.number == foundedItem.tile)
+        foundedItemTile.item = false
+
+        let Player = this
+        switch (this.item.type) {
+          case "chest":
+            playAudio("finished", "mp3", "mp3", "voice")
+            return this.finished()
+          case "speedup":
+            if (this.item.count == 0)
+              playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
+            break
+          case "speeddown":
+            if (this.item.count == 0)
+              playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
+            break
+          case "swirling":
+            this.swirling();
+            break;
+          case "twister":
+            this.twister();
+            break;
+        }
+      }
+    },
+
+    swirling() {
+      let Player = this
+
+      if (Player.item.count == 0)
+        playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
+      let rotateInteval = setInterval(() => {
+        Player.Player.setOrigin(0.5, 0.5);
+        Player.Shadow.setOrigin(0.5, 0.5);
+        Player.Player.angle += 3;
+        Player.Shadow.angle += 3;
+      }, 0.1)
+      setTimeout(function () {
+        Player.Player.angle = 0;
+        Player.Shadow.angle = 0;
+        Player.item = false;
+        Player.moveToNextTile(true);
+        clearInterval(rotateInteval);
+      }, this.item.limit * 1000)
+      return false
+    },
+    twister() {
+      let Player = this
+      let store = getStore()
+
+      if (Player.item.count == 0)
+        playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
+
+      console.log(this.player.name + " got a TWISTERR")
+
+      let randomTile = store.getRandomTile()
+
+      if (randomTile) {
+        // Rotate
+        let rotateInteval = setInterval(() => {
+          Player.Player.setOrigin(0.5, 0.5);
+          Player.Shadow.setOrigin(0.5, 0.5);
+          Player.Player.angle += 5;
+          Player.Shadow.angle += 5;
+        }, 0.1)
+
+        let onFinished = function () {
+          if (Player.item.count < Player.item.limit) {
+            randomTile = store.getRandomTile()
+            Player.nextTile = randomTile
+            Player.item.count++
+            return this.moveTo(randomTile.number, 300, onFinished)
+          }
+
+          Player.item = false
+          Player.Player.angle = 0;
+          Player.Shadow.angle = 0;
+          clearInterval(rotateInteval)
+          return Player.moveToNextTile()
+        }
+
+        Player.nextTile = randomTile
+        return this.moveTo(randomTile.number, 500, onFinished)
+      }
+
+      return false
+    },
+
+
     preload(PhaserGame) {
       this.PhaserGame = PhaserGame;
       PhaserGame.load.image(this.player.name, this.player.image);

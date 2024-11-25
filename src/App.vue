@@ -15,10 +15,7 @@ export default {
   },
   watch: {
     started() {
-      if (this.started)
-        this.audio.volume = 0.1
-      else
-        this.audio.volume = 0.7
+      if (this.audio) this.audio.volume = this.started ? 0.1 : 0.7
     }
   },
   mounted() {
@@ -29,7 +26,7 @@ export default {
       if (!this.audio) {
         this.audio = this.audio || playAudio("background_music", "mp3", "music")
         this.audio.loop = true
-        this.audio.volume = 0.7
+        this.audio.volume = this.started ? 0.1 : 0.7
       }
     }
   },

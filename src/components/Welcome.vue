@@ -39,7 +39,7 @@
           </option>
         </select> -->
 
-        <button class="StartGame" @click="startGame">
+        <button class="StartGame" :disabled="false" @click="startGame">
           Start Game
         </button>
       </div>
@@ -54,6 +54,7 @@ import store from '@/stores/store';
 import ChoosePlayer from "./ChoosePlayer.vue"
 
 export default {
+  props: ["canStart"],
   data() {
     let store = getStore()
     return {
@@ -73,7 +74,7 @@ export default {
       let difficulty = this.difficulty
       let configs = store.difficulty_configs[difficulty]
       store.configs = { ...store.configs, ...configs }
-      store.started = true
+      store.startGame()
 
       playAudio("start_game1", "mp3", "voice")
       playAudio("selected")
