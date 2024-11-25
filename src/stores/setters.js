@@ -157,10 +157,12 @@ export default {
 
   generatePlayers() {
     let store = this
-    let playerNumber = 1
+
+    console.log(this.configs.players)
     this.configs.players.forEach((player) => {
-      store.players.push({ ...player, number: playerNumber })
-      playerNumber++
+      if (player.selected) {
+        store.players.push({ ...player })
+      }
     })
   },
 

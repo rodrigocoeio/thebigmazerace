@@ -1,6 +1,6 @@
 <template>
-  <welcome v-if="!store.started" @click="playBackgroundMusic"></welcome>
-  <game-board v-if="store.started" @click="playBackgroundMusic"></game-board>
+  <welcome v-if="!started" @click="playBackgroundMusic"></welcome>
+  <game-board v-if="started" @click="playBackgroundMusic"></game-board>
 </template>
 
 <script>
@@ -10,8 +10,15 @@ import getStore from "$/store"
 
 export default {
   data() {
-    return {
-      store: getStore()
+    let store = getStore()
+    return store
+  },
+  watch: {
+    started() {
+      if (this.started)
+        this.audio.volume = 0.1
+      else
+        this.audio.volume = 0.7
     }
   },
   mounted() {
@@ -19,9 +26,11 @@ export default {
   },
   methods: {
     playBackgroundMusic() {
-      this.audio = this.audio || playAudio("background_music", "mp3", "music")
-      this.audio.loop = true
-      this.audio.volume = 0.5
+      if (!this.audio) {
+        this.audio = this.audio || playAudio("background_music", "mp3", "music")
+        this.audio.loop = true
+        this.audio.volume = 0.7
+      }
     }
   },
   components: {

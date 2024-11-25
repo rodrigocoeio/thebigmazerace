@@ -29,6 +29,14 @@ window.playAudio = (audio_name, extension = 'mp3', type = 'sound') => {
   let src = '/audios/' + audio_name + '.' + extension
   var audio = new Audio(src)
   audio.play()
+  console.log(store.configs[type])
   audio.muted = !store.configs[type]
+
+  if (type == 'voice') {
+    if (store.voice) store.voice.pause()
+
+    store.voice = audio
+  }
+
   return audio
 }

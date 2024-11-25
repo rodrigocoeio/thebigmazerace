@@ -143,7 +143,7 @@ export default
 
     methods: {
       startGame() {
-        store.started = true;
+        store.stoped = false;
         this.startTime = new Date();
         this.$refs.players.forEach(player => player.start());
 
@@ -151,9 +151,11 @@ export default
         this.timeInterval = setInterval(() => {
           Game.endTime = new Date()
         })
+
+        console.log("Game Started")
       },
       stopGame() {
-        store.started = false;
+        store.stoped = true;
         clearInterval(this.timeInterval)
       },
       restartGame() {
@@ -186,12 +188,10 @@ export default
         if (this.music) {
           if (!this.background_audio)
             // eslint-disable-next-line no-undef
-            this.background_audio = playAudio('board-background2');
+            this.background_audio = playAudio('board-background2', "mp3", "voice");
 
-          this.background_audio.volume = 0.5;
+          this.background_audio.volume = 0.1;
           this.background_audio.loop = true;
-
-
           this.background_audio.play();
         }
       },

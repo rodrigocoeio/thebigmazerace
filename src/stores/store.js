@@ -61,6 +61,7 @@ const state = {
         image: '/images/rabbit.png',
         inteligence: false,
         speed: false,
+        selected: false,
       },
       {
         number: 0,
@@ -68,6 +69,31 @@ const state = {
         image: '/images/turtle.png',
         inteligence: false,
         speed: false,
+        selected: false,
+      },
+      {
+        number: 0,
+        name: 'Cat',
+        image: '/images/cat.png',
+        inteligence: false,
+        speed: false,
+        selected: false,
+      },
+      {
+        number: 0,
+        name: 'Fox',
+        image: '/images/fox.png',
+        inteligence: false,
+        speed: false,
+        selected: false,
+      },
+      {
+        number: 0,
+        name: 'Dog',
+        image: '/images/dog.png',
+        inteligence: false,
+        speed: false,
+        selected: false,
       },
     ],
     items: [
@@ -92,7 +118,7 @@ const state = {
       /* {
         type: 'twister',
         image: '/images/twister.png',
-        limit: 1,
+        limit: 3,
         count: 0,
       }, */
       {
@@ -102,22 +128,12 @@ const state = {
     ],
   },
   started: false, //  Game Started
+  stoped: false,
   finished: true,
   players: [], //  Players
   items: [], // Items
   tiles: [], //  Tiles
-  turn: {
-    //  Turn
-    turn: 1,
-    started: false,
-    moved: false,
-    completed: false,
-    rule: false,
-    steps: false,
-    player_number: false,
-    player: false,
-  },
-  turns: [],
+  voice: false,
 }
 
 import getters from './getters'

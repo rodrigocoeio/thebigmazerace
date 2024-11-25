@@ -7,14 +7,31 @@
       </div>
 
       <div class="Controls">
-        <select v-model="difficulty">
-          <option value="" disabled>
-            Choose a difficulty
-          </option>
-          <option value="easy">Easy</option>
-          <option value="normal">Normal</option>
-          <option value="hard">Hard</option>
-        </select>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <label>Difficulty</label>
+                <select v-model="difficulty">
+                  <option value="" disabled>
+                    Choose a difficulty
+                  </option>
+                  <option value="easy">Easy</option>
+                  <option value="normal">Normal</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </td>
+              <td>
+                <label>Player 1</label>
+                <choose-player number="1"></choose-player>
+              </td>
+              <td>
+                <label>Player 2</label>
+                <choose-player number="2"></choose-player>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
         <!-- <select class="pleaseSelectCategory">
           <option value="" disabled>
@@ -34,6 +51,7 @@
 <script>
 import getStore from '$/store'
 import store from '@/stores/store';
+import ChoosePlayer from "./ChoosePlayer.vue"
 
 export default {
   data() {
@@ -44,6 +62,7 @@ export default {
   },
   watch: {
     difficulty(difficulty) {
+      let store = getStore()
       store.configs.difficulty = difficulty
     }
   },
@@ -55,8 +74,11 @@ export default {
       store.configs = { ...store.configs, ...configs }
       store.started = true
 
-      playAudio("start_game1")
+      playAudio("start_game1", "mp3", "voice")
     }
+  },
+  components: {
+    ChoosePlayer
   }
 }
 </script>
@@ -93,9 +115,9 @@ export default {
   font-size: 24px;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   margin: 0 auto;
-  margin-bottom: 15px;
   cursor: pointer;
   border: 3px solid black;
+  height: 100px;
 }
 
 .Controls select:hover {

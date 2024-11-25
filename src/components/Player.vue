@@ -143,22 +143,22 @@ export default {
 
           switch (this.item.type) {
             case "chest":
-              playAudio("finished")
+              playAudio("finished", "mp3", "mp3", "voice")
               return this.finished()
             case "speedup":
               if (this.item.count == 0)
-                playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type)
+                playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
               speed = speed * 2
               break
             case "speeddown":
               if (this.item.count == 0)
-                playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type)
+                playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
               speed = speed / 2
               break
             case "swirling":
               {
                 if (this.item.count == 0)
-                  playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type)
+                  playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
                 let rotateInteval = setInterval(() => {
                   Player.Player.setOrigin(0.5, 0.5);
                   Player.Shadow.setOrigin(0.5, 0.5);
@@ -177,7 +177,7 @@ export default {
             case "twister":
               {
                 if (this.item.count == 0)
-                  playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type)
+                  playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
                 let randomTile = store.getRandomTile()
                 if (randomTile) {
                   this.item.count++
