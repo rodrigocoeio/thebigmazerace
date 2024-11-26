@@ -37,7 +37,7 @@
     Time: {{ timeElapsed }}s
   </div>
 
-  <div id="game-canvas"></div>
+  <div id="game-canvas" @click="quitGameIfFinished"></div>
 </template>
 
 <script>
@@ -136,9 +136,13 @@ export default
       }, 3000)
     },
 
+    beforeUnmount() {
+      clearInterval(this.timeInterval)
+    },
+
     methods: {
       startPlayers() {
-        store.stoped = false;
+        store.stopped = false;
         this.startTime = new Date();
         this.$refs.players.forEach(player => player.start());
 
@@ -148,7 +152,8 @@ export default
         })
       },
       stopGame() {
-        store.stoped = true;
+        store.stopped = true;
+        this.endTime = new Date();
         clearInterval(this.timeInterval)
       },
       restartGame() {
@@ -156,8 +161,7 @@ export default
         this.$refs.players.forEach($player => $player.restart())
       },
       finishGame(winner) {
-        this.endTime = new Date();
-        clearInterval(this.timeInterval)
+        this.stopGame()
 
         store.started = true
         store.finished = true
@@ -176,6 +180,13 @@ export default
           store.generateItems();
           store.generatePlayers();
         }, 10);
+      },
+      quitGameIfFinished() {
+        console.log("Quit Game")
+        let store = getStore()
+        if (store.finished) {
+          store.quitGame()
+        }
       },
 
       preload(PhaserGame) {

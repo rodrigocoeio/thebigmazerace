@@ -2,9 +2,13 @@ export default {
   startGame() {
     console.log('Game Started!')
     this.started = true
+    this.finished = false
+    this.stopped = false
   },
   quitGame() {
     this.started = false
+    this.finished = false
+    this.stopped = false
     if (this.voice) this.voice.pause()
   },
 

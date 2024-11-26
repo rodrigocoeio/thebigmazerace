@@ -7,7 +7,10 @@ const listenKeyBoardEvents = function (e) {
 
   if (e.key.toUpperCase() === 'D') store.configs.dev = !store.configs.dev
   if (e.key === 'Escape' || e.key === 'Backspace') store.quitGame()
-  if (e.key === 'Enter') store.startGame()
+  if (e.key === 'Enter') {
+    if (store.finished) store.quitGame()
+    else store.startGame()
+  }
 
   if (!player) {
     let player_number = parseInt(e.key) - 1

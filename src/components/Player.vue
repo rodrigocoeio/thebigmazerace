@@ -38,6 +38,12 @@ export default {
 
   mounted() {
     this.player.Component = this;
+
+    /* let Player = this
+    setTimeout(function () {
+      if (Player.player.number == 1)
+        Player.foundChest()
+    }, 5000) */
   },
 
   beforeUnmount() {
@@ -135,7 +141,7 @@ export default {
     moveToNextTile() {
       store = getStore();
 
-      if (!store.started || this.moving)
+      if (!store.started || this.moving || store.stopped)
         return false
 
       let speed = this.player.speed ? this.player.speed : store.configs.speed
@@ -175,13 +181,13 @@ export default {
 
     // Get Item
     getItem() {
+      let store = getStore()
       let currentTile = this.currentTile;
 
       let foundedItem = store.items.find(item => item.tile == currentTile.number && !item.taken)
       if (foundedItem) {
         foundedItem.taken = true
         this.item = foundedItem
-        store.generateItem()
 
         let foundedItemTile = store.tiles.find(tile => tile.number == foundedItem.tile)
         foundedItemTile.item = false
@@ -189,7 +195,7 @@ export default {
         let Player = this
         switch (this.item.type) {
           case "chest":
-            playAudio("finished", "mp3", "mp3", "voice")
+            this.foundChest()
             return this.finished()
           case "speedup":
             if (this.item.count == 0)
@@ -206,7 +212,58 @@ export default {
             this.twister();
             break;
         }
+
+        if (!store.finished)
+          store.generateItem()
       }
+    },
+
+    foundChest() {
+      let store = getStore()
+
+      if (store.voice) {
+        store.voice.pause()
+        store.voice = false
+      }
+
+      playAudio("take_chest")
+      playAudio("finished", "mp3", "voice")
+
+      this.$parent.finishGame(this)
+      this.finishedScreen()
+    },
+
+    finishedScreen() {
+      const store = getStore()
+      const width = store.configs.width
+      const height = store.configs.height
+
+      const overlay = this.PhaserGame.add.renderTexture(width / 2, height / 2, width, height);
+      overlay.fill(0x000000, 0.5);
+
+      const x = store.configs.width / 2
+      const y = store.configs.height / 2 - 50
+      const shadow = this.PhaserGame.physics.add.sprite(x - 100, y, this.player.name + "_big");
+      const player = this.PhaserGame.physics.add.sprite((x - 100 + this.shadowDistance), (y + this.shadowDistance), this.player.name + "_big");
+
+      const chest_x = x + 150
+      const chest_y = y + 120
+      const chest_shadow = this.PhaserGame.physics.add.sprite(chest_x, chest_y, "chest_open");
+      const chest = this.PhaserGame.physics.add.sprite((chest_x + this.shadowDistance), (chest_y + this.shadowDistance), "chest_open");
+
+      shadow.setOrigin(0.5);
+      shadow.tint = 0x000000;
+      shadow.alpha = 0.5;
+
+      chest_shadow.setOrigin(0.5);
+      chest_shadow.tint = 0x000000;
+      chest_shadow.alpha = 0.5;
+
+      const text_y = chest_y + 80
+      const text_x = x - 300
+      const finishedText = "The " + this.player.name + " has found the chest!"
+      const text = this.PhaserGame.add.text(text_x, text_y, finishedText, { font: "600 48px Poppins", color: "white" });
+      text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 1);
     },
 
     swirling() {
@@ -275,6 +332,8 @@ export default {
     preload(PhaserGame) {
       this.PhaserGame = PhaserGame;
       PhaserGame.load.image(this.player.name, this.player.image);
+      PhaserGame.load.image(this.player.name + "_big", this.player.image_big);
+      PhaserGame.load.image("chest_open", "/images/chest_open.png");
 
       let image = new Image();
       image.src = this.player.image;
