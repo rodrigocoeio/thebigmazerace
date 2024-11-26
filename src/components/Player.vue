@@ -198,12 +198,16 @@ export default {
             this.foundChest()
             return this.finished()
           case "speedup":
-            if (this.item.count == 0)
-              playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
+            if (this.item.count == 0) {
+              let audioNumber = Math.floor(Math.random() * 3) + 1
+              playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
+            }
             break
           case "speeddown":
-            if (this.item.count == 0)
-              playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
+            if (this.item.count == 0) {
+              let audioNumber = Math.floor(Math.random() * 3) + 1
+              playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
+            }
             break
           case "swirling":
             this.swirling();
@@ -226,8 +230,9 @@ export default {
         store.voice = false
       }
 
+      let audioNumber = Math.floor(Math.random() * 2) + 1
       playAudio("take_chest")
-      playAudio("finished", "mp3", "voice")
+      playAudio("finished" + audioNumber, "mp3", "voice")
 
       this.$parent.finishGame(this)
       this.finishedScreen()
@@ -269,8 +274,11 @@ export default {
     swirling() {
       let Player = this
 
-      if (Player.item.count == 0)
-        playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
+      if (Player.item.count == 0) {
+        let audioNumber = Math.floor(Math.random() * 3) + 1
+        playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
+      }
+
       let rotateInteval = setInterval(() => {
         Player.Player.setOrigin(0.5, 0.5);
         Player.Shadow.setOrigin(0.5, 0.5);
@@ -290,8 +298,10 @@ export default {
       let Player = this
       let store = getStore()
 
-      if (Player.item.count == 0)
-        playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type, "mp3", "voice")
+      if (Player.item.count == 0) {
+        let audioNumber = Math.floor(Math.random() * 3) + 1
+        playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
+      }
 
       console.log(this.player.name + " got a TWISTERR")
 

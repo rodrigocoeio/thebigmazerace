@@ -76,7 +76,8 @@ export default {
       store.configs = { ...store.configs, ...configs }
       store.startGame()
 
-      playAudio("start_game1", "mp3", "voice")
+      let audioNumber = Math.floor(Math.random() * 2) + 1
+      playAudio("start_game" + audioNumber, "mp3", "voice")
       playAudio("selected")
     }
   },
