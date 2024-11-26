@@ -2,7 +2,7 @@
 <template>
   <div class="GameBoard">
     <tile :number="tile.number" :x="tile.x" :y="tile.y" :image="tile.image" :width="tile.width" :height="tile.height"
-      :walls="tile.walls" :goal="tile.goal" v-for="tile in tiles"></tile>
+      :walls="tile.walls" :goal="tile.goal" v-for="tile in tiles" ref="tiles"></tile>
     <slot></slot>
 
     <Item v-for="item in items" :number="item.number" :tile="item.tile" :name="item.type" :taken="item.taken"

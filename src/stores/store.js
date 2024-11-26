@@ -13,6 +13,7 @@ const state = {
       items_count: 15,
       max_swirlings: 1,
       max_twisters: 1,
+      max_bombs: 2,
     },
     normal: {
       columns: 9,
@@ -23,6 +24,7 @@ const state = {
       items_count: 25,
       max_swirlings: 2,
       max_twisters: 2,
+      max_bombs: 4,
     },
     hard: {
       columns: 12,
@@ -33,6 +35,7 @@ const state = {
       items_count: 40,
       max_swirlings: 3,
       max_twisters: 3,
+      max_bombs: 6,
     },
   },
 
@@ -47,6 +50,7 @@ const state = {
     items_count: 9,
     max_swirlings: 2,
     max_twisters: 2,
+    max_bombs: 2,
     // Inteligences
     // dumbest: Players doesn't remember where they came from, so they will randomly choose a next way
     // dumb: Players doesn't remember where they came from, so they will randomly choose a next way
@@ -149,6 +153,12 @@ const state = {
       {
         type: 'twister',
         image: '/images/twister.png',
+        limit: 1,
+        count: 0,
+      },
+      {
+        type: 'bomb',
+        image: '/images/bomb.png',
         limit: 1,
         count: 0,
       },

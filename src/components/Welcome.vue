@@ -71,14 +71,7 @@ export default {
   methods: {
     startGame() {
       let store = getStore()
-      let difficulty = this.difficulty
-      let configs = store.difficulty_configs[difficulty]
-      store.configs = { ...store.configs, ...configs }
       store.startGame()
-
-      let audioNumber = Math.floor(Math.random() * 2) + 1
-      playAudio("start_game" + audioNumber, "mp3", "voice")
-      playAudio("selected")
     }
   },
   components: {

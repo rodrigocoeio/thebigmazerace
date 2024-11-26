@@ -215,6 +215,9 @@ export default {
           case "twister":
             this.twister();
             break;
+          case "bomb":
+            this.bomb();
+            break;
         }
 
         if (!store.finished)
@@ -336,6 +339,44 @@ export default {
       }
 
       return false
+    },
+
+    bomb() {
+      let store = getStore()
+
+      playAudio("explosion")
+
+      // Remove a wall
+      // Get tile component
+      let currentTile = this.currentTile
+      let $tile = this.$parent.$refs.tiles.find($t => {
+        return $t.number === currentTile.number
+      })
+
+      if (currentTile) {
+        let neighbors = store.findClosedNeighbors(currentTile)
+
+        if (neighbors.length > 0) {
+          let random = Math.floor(Math.random() * neighbors.length)
+          let neighbor = neighbors[random]
+
+          currentTile.walls[neighbor.position] = false
+          switch (neighbor.position) {
+            case "top":
+              neighbor.tile.walls.bottom = false;
+              break;
+            case "bottom":
+              neighbor.tile.walls.top = false;
+              break;
+            case "left":
+              neighbor.tile.walls.right = false;
+              break;
+            case "right":
+              neighbor.tile.walls.left = false;
+              break;
+          }
+        }
+      }
     },
 
 

@@ -4,12 +4,26 @@ export default {
     this.started = true
     this.finished = false
     this.stopped = false
+    this.voice = false
+
+    let difficulty = this.configs.difficulty
+    let configs = this.difficulty_configs[difficulty]
+    this.configs = { ...this.configs, ...configs }
+
+    console.log(difficulty)
+
+    let audioNumber = Math.floor(Math.random() * 2) + 1
+    playAudio('start_game' + audioNumber, 'mp3', 'voice')
+    playAudio('selected')
   },
   quitGame() {
     this.started = false
     this.finished = false
     this.stopped = false
-    if (this.voice) this.voice.pause()
+    if (this.voice) {
+      this.voice.pause()
+      this.voice = false
+    }
   },
 
   generateTiles() {
@@ -169,6 +183,13 @@ export default {
 
         return twisters.length < maxTwisters
       }
+
+      if (item.type == 'bomb') {
+        let bombs = this.items.filter((i) => i.type == item.type && !i.taken)
+        let maxBombs = this.configs.max_bombs
+
+        return bombs.length < maxBombs
+      }
       return item.type != 'chest'
     })
     let random = Math.floor(Math.random() * items.length)
@@ -255,6 +276,13 @@ export default {
     return neighbors
   },
 
+  // Filters only closed walls neighbors
+  findClosedNeighbors(currentTile, tiles) {
+    let neighbors = this.findNeighbors(currentTile, tiles)
+    neighbors = neighbors.filter((n) => currentTile.walls[n.position])
+    return neighbors
+  },
+
   getPlayerNextRandomTile(currentTile, lastTile, tiles, inteligence) {
     inteligence = inteligence || this.configs.inteligence
     let neighbors = this.findOpenedNeighbors(currentTile, tiles)
@@ -321,6 +349,13 @@ export default {
   // Gets neighbor calculation proportion by visited number then sort randomly
   getNormalNextTile(currentTile, neighbors, lastTile) {
     let decisions = currentTile.decisions
+      ? currentTile.decisions
+      : {
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+        }
     neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
 
     // calcs % proportions to sort tiles

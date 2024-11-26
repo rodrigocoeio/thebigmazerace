@@ -23,6 +23,21 @@ export default {
     }
   },
 
+  watch: {
+    "walls.top": function (open) {
+      if (!open) this.topWall.destroy();
+    },
+    "walls.bottom": function (open) {
+      if (!open) this.bottomWall.destroy();
+    },
+    "walls.left": function (open) {
+      if (!open) this.leftWall.destroy();
+    },
+    "walls.right": function (open) {
+      if (!open) this.rightWall.destroy();
+    }
+  },
+
   mixins: objectMixins,
 
   mounted() {
