@@ -170,7 +170,7 @@ export default {
       let nextTile = store.getPlayerNextRandomTile(this.currentTile, this.lastTile, this.tiles, this.inteligence);
 
       // Avoid Chest
-      if (nextTile.tile.goal && this.player.avoidChest) {
+      if (nextTile && nextTile.tile.goal && this.player.avoidChest) {
         nextTile = false
         console.log("Player " + this.player.number + " has avoided the chest!")
       }
