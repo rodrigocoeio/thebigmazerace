@@ -345,15 +345,16 @@ export default {
     },
 
     dizzy() {
+      let Player = this
       let Dizzy = this.Dizzy
       let player = this.player
-      let inteligence = player.inteligence
+      Player.inteligence = player.inteligence || store.configs.inteligence
 
       Dizzy.visible = true
       player.inteligence = "dumbest"
       setTimeout(function () {
         Dizzy.visible = false
-        player.inteligence = inteligence
+        player.inteligence = Player.inteligence
       }, 5000)
     },
 
