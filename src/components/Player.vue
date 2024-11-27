@@ -32,7 +32,8 @@ export default {
       lastTile: false,
       currentTile: store.tiles.find(t => t.number === 1),
       nextTile: false,
-      item: false
+      item: false,
+      effect: false
     }
   },
 
@@ -294,6 +295,7 @@ export default {
         Player.item = false;
         Player.moveToNextTile(true);
         clearInterval(rotateInteval);
+        Player.dizzy();
       }, this.item.limit * 1000)
       return false
     },
@@ -331,6 +333,7 @@ export default {
           Player.Player.angle = 0;
           Player.Shadow.angle = 0;
           clearInterval(rotateInteval)
+          Player.dizzy();
           return Player.moveToNextTile()
         }
 
@@ -339,6 +342,19 @@ export default {
       }
 
       return false
+    },
+
+    dizzy() {
+      let Dizzy = this.Dizzy
+      let player = this.player
+      let inteligence = player.inteligence
+
+      Dizzy.visible = true
+      player.inteligence = "dumbest"
+      setTimeout(function () {
+        Dizzy.visible = false
+        player.inteligence = inteligence
+      }, 5000)
     },
 
     bomb() {
@@ -384,6 +400,7 @@ export default {
       this.PhaserGame = PhaserGame;
       PhaserGame.load.image(this.player.name, this.player.image);
       PhaserGame.load.image(this.player.name + "_big", this.player.image_big);
+      PhaserGame.load.image("dizzy", "/images/dizzy.png");
       PhaserGame.load.image("chest_open", "/images/chest_open.png");
 
       let image = new Image();
@@ -393,8 +410,9 @@ export default {
     create(PhaserGame) {
       const x = this.player.position ? this.player.position.x : 0;
       const y = this.player.position ? this.player.position.y : 0;
-      const shadow = PhaserGame.physics.add.sprite(x, y, this.player.name);
-      const player = PhaserGame.physics.add.sprite((x + this.shadowDistance), (y + this.shadowDistance), this.player.name);
+      const shadow = PhaserGame.physics.add.sprite((x + this.shadowDistance), (y + this.shadowDistance), this.player.name);
+      const player = PhaserGame.physics.add.sprite(x, y, this.player.name);
+      const dizzySprite = PhaserGame.physics.add.sprite(x, y, "dizzy");
 
       shadow.setOrigin(0.5);
       shadow.tint = 0x000000;
@@ -408,6 +426,8 @@ export default {
       player.scaleX = player.scaleY;
       shadow.displayHeight = playerHeight
       shadow.scaleX = player.scaleY;
+      dizzySprite.displayHeight = playerHeight
+      dizzySprite.scaleX = dizzySprite.scaleY;
 
       // Position Player
       let tileWidth = this.currentTile.width
@@ -419,11 +439,16 @@ export default {
       player.y = playerY
       shadow.x = playerX + this.shadowDistance
       shadow.y = playerY + this.shadowDistance
+      dizzySprite.x = playerX + this.shadowDistance
+      dizzySprite.y = playerY + this.shadowDistance
+
+      dizzySprite.visible = false
 
       this.physics = PhaserGame.physics;
       this.Player = player;
       this.Shadow = shadow;
-      this.Glow = this.glow();
+      this.Dizzy = dizzySprite;
+      //this.Glow = this.glow();
     },
 
     update(PhaserGame) {
@@ -436,6 +461,7 @@ export default {
           //  before it is considered as being there. The faster it moves, the more tolerance is required.
           if (distance < 6) {
             this.Player.body.reset(this.target.x, this.target.y);
+            this.Dizzy.body.reset(this.target.x, this.target.y);
             this.Shadow.body.reset((this.target.x + this.shadowDistance), (this.target.y + this.shadowDistance));
             this.target = false;
           }
@@ -459,6 +485,7 @@ export default {
 
         this.physics.moveToObject(this.Player, this.target, speed);
         this.physics.moveToObject(this.Shadow, this.target, speed);
+        this.physics.moveToObject(this.Dizzy, this.target, speed);
 
         return true;
       }

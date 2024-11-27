@@ -11,9 +11,9 @@ const state = {
       inteligence: 'smart',
       changeWayEveryNumberOfTiles: 5,
       items_count: 15,
-      max_swirlings: 1,
-      max_twisters: 1,
-      max_bombs: 2,
+      max_swirlings: 20,
+      max_twisters: 20,
+      max_bombs: 20,
     },
     normal: {
       columns: 9,
@@ -22,9 +22,9 @@ const state = {
       inteligence: 'smart',
       changeWayEveryNumberOfTiles: 7,
       items_count: 25,
-      max_swirlings: 2,
-      max_twisters: 2,
-      max_bombs: 4,
+      max_swirlings: 20,
+      max_twisters: 20,
+      max_bombs: 40,
     },
     hard: {
       columns: 12,
@@ -33,9 +33,9 @@ const state = {
       inteligence: 'smart',
       changeWayEveryNumberOfTiles: 10,
       items_count: 40,
-      max_swirlings: 3,
-      max_twisters: 3,
-      max_bombs: 6,
+      max_swirlings: 30,
+      max_twisters: 30,
+      max_bombs: 60,
     },
   },
 
@@ -153,7 +153,7 @@ const state = {
       {
         type: 'twister',
         image: '/images/twister.png',
-        limit: 1,
+        limit: 5,
         count: 0,
       },
       {
