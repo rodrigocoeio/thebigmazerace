@@ -219,7 +219,7 @@ export default {
 
     this.configs.players.forEach((player) => {
       if (player.selected) {
-        store.players.push({ ...player })
+        store.players.push({ avoidChest: false, ...player })
       }
     })
   },

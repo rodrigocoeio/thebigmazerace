@@ -33,12 +33,15 @@ export default {
       currentTile: store.tiles.find(t => t.number === 1),
       nextTile: false,
       item: false,
-      effect: false
+      effect: false,
+      inteligence: false
     }
   },
 
   mounted() {
     this.player.Component = this;
+    this.inteligence = this.player.inteligence || store.configs.inteligence
+    window["player" + this.player.number] = this
 
     /* let Player = this
     setTimeout(function () {
@@ -164,7 +167,13 @@ export default {
       }
 
       // Get Next Tile
-      let nextTile = store.getPlayerNextRandomTile(this.currentTile, this.lastTile, this.tiles, this.player.inteligence);
+      let nextTile = store.getPlayerNextRandomTile(this.currentTile, this.lastTile, this.tiles, this.inteligence);
+
+      // Avoid Chest
+      if (nextTile.tile.goal && this.player.avoidChest) {
+        nextTile = false
+        console.log("Player " + this.player.number + " has avoided the chest!")
+      }
 
       // If none Next Tile, get last in visited (go back)
       if (!nextTile) {
@@ -283,7 +292,10 @@ export default {
         playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
       }
 
-      let rotateInteval = setInterval(() => {
+      if (this.rotateInteval)
+        clearInterval(this.rotateInteval)
+
+      this.rotateInteval = setInterval(() => {
         Player.Player.setOrigin(0.5, 0.5);
         Player.Shadow.setOrigin(0.5, 0.5);
         Player.Player.angle += 3;
@@ -294,7 +306,7 @@ export default {
         Player.Shadow.angle = 0;
         Player.item = false;
         Player.moveToNextTile(true);
-        clearInterval(rotateInteval);
+        clearInterval(Player.rotateInteval);
         Player.dizzy();
       }, this.item.limit * 1000)
       return false
@@ -314,7 +326,10 @@ export default {
 
       if (randomTile) {
         // Rotate
-        let rotateInteval = setInterval(() => {
+        if (this.rotateInteval)
+          clearInterval(this.rotateInteval)
+
+        this.rotateInteval = setInterval(() => {
           Player.Player.setOrigin(0.5, 0.5);
           Player.Shadow.setOrigin(0.5, 0.5);
           Player.Player.angle += 5;
@@ -332,7 +347,7 @@ export default {
           Player.item = false
           Player.Player.angle = 0;
           Player.Shadow.angle = 0;
-          clearInterval(rotateInteval)
+          clearInterval(Player.rotateInteval)
           Player.dizzy();
           return Player.moveToNextTile()
         }
@@ -345,17 +360,21 @@ export default {
     },
 
     dizzy() {
+      if (this.dizzy_timeout)
+        clearTimeout(this.dizzy_timeout)
+
       let Player = this
       let Dizzy = this.Dizzy
       let player = this.player
-      Player.inteligence = player.inteligence || store.configs.inteligence
 
       Dizzy.visible = true
-      player.inteligence = "dumbest"
-      setTimeout(function () {
+      this.inteligence = "dumbest"
+      this.dizzy_timeout = setTimeout(function () {
         Dizzy.visible = false
-        player.inteligence = Player.inteligence
-      }, 5000)
+        console.log(player.inteligence)
+        Player.inteligence = player.inteligence
+        Player.dizzy_timeout = false
+      }, store.configs.dizzy_seconds * 1000)
     },
 
     bomb() {
@@ -453,21 +472,65 @@ export default {
     },
 
     update(PhaserGame) {
-      if (this.target && this.Player.body) {
-        let distance = Phaser.Math.Distance.Between(this.Player.x, this.Player.y, this.target.x, this.target.y);
+      this.isOutOfScreenFix()
 
+      if (this.target && this.Player.body) {
         if (this.Player.body.speed > 0) {
+          let distance = Phaser.Math.Distance.Between(this.Player.x, this.Player.y, this.target.x, this.target.y);
           this.moving = true;
+
           //  4 is our distance tolerance, i.e. how close the source can get to the target
           //  before it is considered as being there. The faster it moves, the more tolerance is required.
-          if (distance < 6) {
+          if (distance < 8 || store.configs.instant_mode) {
             this.Player.body.reset(this.target.x, this.target.y);
             this.Dizzy.body.reset(this.target.x, this.target.y);
             this.Shadow.body.reset((this.target.x + this.shadowDistance), (this.target.y + this.shadowDistance));
             this.target = false;
+            this.distance = 0
+          } else {
+            this.distance = distance
           }
+
+          //console.log(this.player.name + " is moving, distance: " + distance)
         } else { this.moving = false; this.target = false; }
       } else { this.moving = false; }
+    },
+
+    isOutOfScreenFix() {
+      let position = this.Player.body.position
+      let mazeWidth = store.configs.width
+      let mazeHeight = store.configs.height
+      let isOutOfScreen = position.x < 0 || position.y < 0 || position.x > mazeWidth || position.y > mazeHeight
+
+      if (isOutOfScreen) {
+        this.moving = false;
+        this.target = false;
+        this.Player.body.speed = 0
+        this.Dizzy.body.speed = 0
+        this.Shadow.body.speed = 0
+
+        const tile = this.currentTile
+        const player_x = tile.width / 2
+        const player_y = tile.height / 2
+
+        if (tile) {
+          this.target = {
+            x: (tile.x + player_x),
+            y: (tile.y + player_y),
+            tile: tile
+          };
+
+          this.Player.body.reset(this.target.x, this.target.y);
+          this.Dizzy.body.reset(this.target.x, this.target.y);
+          this.Shadow.body.reset((this.target.x + this.shadowDistance), (this.target.y + this.shadowDistance));
+
+          this.moveToNextTile()
+        }
+
+        console.log(this.player.name + " got out of screen")
+      }
+
+      return isOutOfScreen
     },
 
     moveTo(to, speed = 100, onFinishMoving) {

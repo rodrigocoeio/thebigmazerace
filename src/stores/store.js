@@ -51,6 +51,8 @@ const state = {
     max_swirlings: 2,
     max_twisters: 2,
     max_bombs: 2,
+    dizzy_seconds: 3,
+
     // Inteligences
     // dumbest: Players doesn't remember where they came from, so they will randomly choose a next way
     // dumb: Players doesn't remember where they came from, so they will randomly choose a next way
@@ -65,6 +67,7 @@ const state = {
     music: true,
     dev: false,
     changeWayEveryNumberOfTiles: 5,
+    instant_mode: false, // Instant movement, for testing purposes
 
     players: [
       {

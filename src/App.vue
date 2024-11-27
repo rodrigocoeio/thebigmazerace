@@ -19,7 +19,8 @@ export default {
     }
   },
   mounted() {
-
+    let store = getStore()
+    window.store = store
   },
   methods: {
     playBackgroundMusic() {

@@ -21,6 +21,14 @@ const listenKeyBoardEvents = function (e) {
       player = false
     }
   } else {
+    if (e.key == 0) {
+      player.avoidChest = player.avoidChest ? false : true
+      if (player.avoidChest) console.log('Player ' + player.number + ' is avoiding the chest!')
+      else console.log('Player ' + player.number + ' stopped avoinding the chest!')
+      player = false
+      return
+    }
+
     if (inteligences[e.key]) {
       player.inteligence = inteligences[e.key]
       console.log(player.name + ' is now on ' + player.inteligence + ' mode')
