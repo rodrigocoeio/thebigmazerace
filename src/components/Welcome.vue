@@ -3,7 +3,7 @@
     <div class="Welcome">
       <div class="Logo">
         <img src="/images/logotipo.jpg" height="200" />
-        <h1>The Big Maze Race</h1>
+        <h1>The Big aMAZEing Race</h1>
       </div>
 
       <div class="Controls">

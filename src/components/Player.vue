@@ -367,6 +367,8 @@ export default {
       let Dizzy = this.Dizzy
       let player = this.player
 
+      playAudio("dizzy", "mp3", "voice")
+
       Dizzy.visible = true
       this.inteligence = "dumbest"
       this.dizzy_timeout = setTimeout(function () {
@@ -379,8 +381,28 @@ export default {
 
     bomb() {
       let store = getStore()
-
+      let random = Math.floor(Math.random() * 3) + 1
+      playAudio("bomb" + random, "mp3", "voice")
       playAudio("explosion")
+
+      const explosion = this.PhaserGame.physics.add.sprite(0, 0, "explosion");
+
+      // Scale Explosion
+      let tileWidth = this.currentTile.width
+      let tileHeight = this.currentTile.height
+
+      let explosionHeight = tileHeight / 2
+      explosion.displayHeight = explosionHeight
+      explosion.scaleX = explosion.scaleY;
+
+      // Position Explosion
+      explosion.x = this.currentTile.x + tileWidth / 2
+      explosion.y = this.currentTile.y + tileHeight / 2
+
+      // Remove explosion
+      setTimeout(function () {
+        explosion.destroy()
+      }, 300)
 
       // Remove a wall
       // Get tile component
@@ -422,6 +444,7 @@ export default {
       PhaserGame.load.image(this.player.name + "_big", this.player.image_big);
       PhaserGame.load.image("dizzy", "/images/dizzy.png");
       PhaserGame.load.image("chest_open", "/images/chest_open.png");
+      PhaserGame.load.image("explosion", "/images/explosion.png");
 
       let image = new Image();
       image.src = this.player.image;
