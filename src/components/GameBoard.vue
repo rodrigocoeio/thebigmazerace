@@ -11,31 +11,7 @@
     <Player v-for="player in players" :player="player" ref="players"></Player>
   </div>
 
-  <div class="dev" v-if="configs.dev">
-    <label>Columns</label>
-    <input type="number" min="1" max="12" v-model="columns" />
-    <label>Rows</label>
-    <input type="number" min="1" max="12" v-model="rows" />
-    <label>Speed</label>
-    <input type="number" min="100" max="500" v-model="playerSpeed" />
-    <label>Change Way Every</label>
-    <input type="number" min="1" max="100" v-model="changeWayEveryNumberOfTiles" />
-    <label>Inteligence</label>
-    <select v-model="inteligence">
-      <option value="dumbest">Dumbest</option>
-      <option value="dumb">Dumb</option>
-      <option value="normal">Normal</option>
-      <option value="smart">Smart</option>
-      <option value="kickass">KickAss</option>
-    </select>
-
-    <button @click="rebuildMaze">Rebuild Maze</button>
-    <button @click="startGame">Start Game</button>
-    <button @click="stopGame">Stop Game</button>
-    <button @click="restartGame">Restart Game</button>
-
-    Time: {{ timeElapsed }}s
-  </div>
+  <dev v-if="configs.dev"></dev>
 
   <div id="game-canvas" @click="quitGameIfFinished"></div>
 </template>
@@ -46,6 +22,7 @@ import gameMixins from "@/mixins/game-mixins";
 import Tile from "#/Tile.vue";
 import Player from "#/Player.vue";
 import Item from "#/Item.vue";
+import Dev from "#/Dev.vue";
 let store;
 
 export default
@@ -56,18 +33,14 @@ export default
       store = getStore();
       return {
         configs: store.configs,
-        columns: store.configs.columns,
-        rows: store.configs.rows,
-        changeWayEveryNumberOfTiles: store.configs.changeWayEveryNumberOfTiles,
         board: false,
         background_audio: false,
-        playerSpeed: store.configs.speed,
         inteligence: store.configs.inteligence,
         startTime: 0,
         endTime: 0,
         timeInterval: false,
         players: store.players,
-        items: store.items
+        items: store.items,
       };
     },
 
@@ -97,27 +70,6 @@ export default
       }
     },
 
-    watch: {
-      playerSpeed() {
-        store.configs.speed = this.playerSpeed
-      },
-      columns() {
-        store.configs.columns = parseInt(this.columns)
-        this.rebuildMaze()
-      },
-      rows() {
-        store.configs.rows = parseInt(this.rows)
-        this.rebuildMaze()
-      },
-      changeWayEveryNumberOfTiles() {
-        store.configs.changeWayEveryNumberOfTiles = parseInt(this.changeWayEveryNumberOfTiles)
-        this.rebuildMaze()
-      },
-      inteligence() {
-        store.configs.inteligence = this.inteligence
-      }
-    },
-
     created() {
       store.tiles = [];
       store.items = [];
@@ -134,10 +86,23 @@ export default
       setTimeout(function () {
         Game.startPlayers()
       }, 3000)
+
+      // Refresh one item every x seconds
+      if (this.configs.refresh_items_seconds) {
+        this.itemRefresher = setInterval(function () {
+          let item = store.items.find(i => !i.taken && i.type != "chest")
+
+          if (item) {
+            item.taken = true
+            store.generateItem()
+          }
+        }, this.configs.refresh_items_seconds * 1000)
+      }
     },
 
     beforeUnmount() {
       clearInterval(this.timeInterval)
+      clearInterval(this.itemRefresher)
     },
 
     methods: {
@@ -224,7 +189,8 @@ export default
     components: {
       Tile,
       Player,
-      Item
+      Item,
+      Dev
     }
   }
 </script>

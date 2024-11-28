@@ -24,14 +24,14 @@ export default {
   },
 
   mounted() {
-    /* if (this.item.type === "chest") {
+    if (this.item.type === "chest") {
       let Item = this
 
       setTimeout(() => {
         Item.glowing = true
         Item.glow()
       }, 500)
-    } */
+    }
   },
 
   beforeUnmount() {
@@ -71,6 +71,9 @@ export default {
 
       const Shadow = PhaserGame.physics.add.sprite((item_x + this.shadowDistance), (item_y + this.shadowDistance), this.item.type);
       const Item = PhaserGame.physics.add.sprite(item_x, item_y, this.item.type);
+
+      Item.depth = 0.9
+      Shadow.depth = 0.9
 
       Shadow.setOrigin(0.5);
       Shadow.tint = 0x000000;

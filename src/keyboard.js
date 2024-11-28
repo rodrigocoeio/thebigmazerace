@@ -5,11 +5,29 @@ let inteligences = ['dumbest', 'dumb', 'normal', 'smart', 'kickass']
 const listenKeyBoardEvents = function (e) {
   let store = getStore()
 
+  console.log(e.key + ' key pressed!')
+
+  // Open Dev Mode
   if (e.key.toUpperCase() === 'D') store.configs.dev = !store.configs.dev
+
+  // Quits Game
   if (e.key === 'Escape' || e.key === 'Backspace') store.quitGame()
+
+  // Starts Game
   if (e.key === 'Enter') {
     if (store.finished) store.quitGame()
     else store.startGame()
+  }
+
+  // Speeds UP
+  if (e.key == '+') {
+    let newSpeed = store.configs.speed + 10
+    store.configs.speed = newSpeed < 500 ? newSpeed : 500
+  }
+  // Speeds Down
+  if (e.key == '-') {
+    let newSpeed = store.configs.speed - 10
+    store.configs.speed = newSpeed > 50 ? newSpeed : 50
   }
 
   if (!player) {

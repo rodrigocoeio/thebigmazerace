@@ -68,6 +68,7 @@ const state = {
     dev: false,
     changeWayEveryNumberOfTiles: 5,
     instant_mode: false, // Instant movement, for testing purposes
+    refresh_items_seconds: false, // Refresh one item every x seconds
 
     players: [
       {
@@ -148,15 +149,15 @@ const state = {
         count: 0,
       },
       {
-        type: 'swirling',
-        image: '/images/swirling.png',
-        limit: 3,
+        type: 'swirl',
+        image: '/images/swirl.png',
+        limit: 2,
         count: 0,
       },
       {
         type: 'twister',
         image: '/images/twister.png',
-        limit: 5,
+        limit: 2,
         count: 0,
       },
       {

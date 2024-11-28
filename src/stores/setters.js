@@ -283,9 +283,11 @@ export default {
     return neighbors
   },
 
-  getPlayerNextRandomTile(currentTile, lastTile, tiles, inteligence) {
+  getPlayerNextRandomTile(currentTile, lastTile, tiles, inteligence, avoidChest) {
     inteligence = inteligence || this.configs.inteligence
     let neighbors = this.findOpenedNeighbors(currentTile, tiles)
+
+    if (avoidChest) neighbors = neighbors.filter((n) => !n.tile.goal)
 
     // None or only one way available
     if (neighbors.length === 0) return false

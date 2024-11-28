@@ -18,6 +18,7 @@ export default {
     store = getStore();
     const Game = this.$parent.Game;
     return {
+      name: this.player.name,
       Game: Game,
       PhaserGame: false,
       Player: false,
@@ -159,7 +160,7 @@ export default {
           case "speeddown":
             speed = speed / 2
             break
-          case "swirling":
+          case "swirl":
             return false
           case "twister":
             return false
@@ -167,13 +168,7 @@ export default {
       }
 
       // Get Next Tile
-      let nextTile = store.getPlayerNextRandomTile(this.currentTile, this.lastTile, this.tiles, this.inteligence);
-
-      // Avoid Chest
-      if (nextTile && nextTile.tile.goal && this.player.avoidChest) {
-        nextTile = false
-        console.log("Player " + this.player.number + " has avoided the chest!")
-      }
+      let nextTile = store.getPlayerNextRandomTile(this.currentTile, this.lastTile, this.tiles, this.inteligence, this.player.avoidChest);
 
       // If none Next Tile, get last in visited (go back)
       if (!nextTile) {
@@ -219,8 +214,8 @@ export default {
               playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
             }
             break
-          case "swirling":
-            this.swirling();
+          case "swirl":
+            this.swirl();
             break;
           case "twister":
             this.twister();
@@ -282,9 +277,15 @@ export default {
       const finishedText = "The " + this.player.name + " has found the chest!"
       const text = this.PhaserGame.add.text(text_x, text_y, finishedText, { font: "600 48px Poppins", color: "white" });
       text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 1);
+
+      overlay.depth = 1.9
+      player.depth = 2
+      shadow.depth = 2
+      chest.depth = 2
+      text.depth = 2
     },
 
-    swirling() {
+    swirl() {
       let Player = this
 
       if (Player.item.count == 0) {
@@ -292,25 +293,19 @@ export default {
         playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
       }
 
-      if (this.rotateInteval)
-        clearInterval(this.rotateInteval)
+      this.stopRotating(this.swirling)
+      this.swirling = this.rotate()
 
-      this.rotateInteval = setInterval(() => {
-        Player.Player.setOrigin(0.5, 0.5);
-        Player.Shadow.setOrigin(0.5, 0.5);
-        Player.Player.angle += 3;
-        Player.Shadow.angle += 3;
-      }, 0.1)
       setTimeout(function () {
-        Player.Player.angle = 0;
-        Player.Shadow.angle = 0;
         Player.item = false;
-        Player.moveToNextTile(true);
-        clearInterval(Player.rotateInteval);
+        Player.stopRotating(Player.swirling)
         Player.dizzy();
+        Player.moveToNextTile(true);
       }, this.item.limit * 1000)
+
       return false
     },
+
     twister() {
       let Player = this
       let store = getStore()
@@ -320,46 +315,68 @@ export default {
         playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
       }
 
-      console.log(this.player.name + " got a TWISTERR")
+      //console.log(this.player.name + " got a TWISTERR")
 
-      let randomTile = store.getRandomTile()
+      let randomTile = store.getRandomTile(true)
 
       if (randomTile) {
         // Rotate
-        if (this.rotateInteval)
-          clearInterval(this.rotateInteval)
+        this.stopRotating(this.twisting)
+        this.twisting = Player.rotate(1, 5)
+        this.twister_item = { ...this.item }
 
-        this.rotateInteval = setInterval(() => {
-          Player.Player.setOrigin(0.5, 0.5);
-          Player.Shadow.setOrigin(0.5, 0.5);
-          Player.Player.angle += 5;
-          Player.Shadow.angle += 5;
-        }, 0.1)
-
+        const speed = store.configs.speed
         let onFinished = function () {
-          if (Player.item.count < Player.item.limit) {
-            randomTile = store.getRandomTile()
+          console.log(Player.name + " - twisting - " + Player.twister_item.count)
+
+          if (Player.item && Player.twister_item.count <= Player.twister_item.limit) {
+            randomTile = store.getRandomTile(true)
             Player.nextTile = randomTile
-            Player.item.count++
-            return this.moveTo(randomTile.number, 300, onFinished)
+            Player.twister_item.count++
+            return this.moveTo(randomTile.number, speed * 3, onFinished)
           }
 
+          Player.twister_item = false
           Player.item = false
-          Player.Player.angle = 0;
-          Player.Shadow.angle = 0;
-          clearInterval(Player.rotateInteval)
+          Player.stopRotating(Player.twisting)
           Player.dizzy();
           return Player.moveToNextTile()
         }
 
         Player.nextTile = randomTile
-        return this.moveTo(randomTile.number, 500, onFinished)
+        return this.moveTo(randomTile.number, speed * 3, onFinished)
       }
 
       return false
     },
 
+    rotate(interval, angle) {
+      const Player = this
+      interval = interval ? interval : 1
+      angle = angle ? angle : 5
+
+      return setInterval(() => {
+        Player.Player.setOrigin(0.5, 0.5);
+        Player.Shadow.setOrigin(0.5, 0.5);
+        Player.Player.angle += angle;
+        Player.Shadow.angle += angle;
+      }, interval)
+    },
+    stopRotating(rotating) {
+      if (rotating) {
+        this.Player.angle = 0;
+        this.Shadow.angle = 0;
+
+        clearInterval(rotating)
+        rotating = false
+      }
+
+      return rotating
+    },
+
     dizzy() {
+      let store = getStore()
+
       if (this.dizzy_timeout)
         clearTimeout(this.dizzy_timeout)
 
@@ -373,8 +390,8 @@ export default {
       this.inteligence = "dumbest"
       this.dizzy_timeout = setTimeout(function () {
         Dizzy.visible = false
-        console.log(player.inteligence)
-        Player.inteligence = player.inteligence
+        Player.inteligence = player.inteligence ? player.inteligence : store.configs.inteligence
+        console.log(Player.player.name + " - " + Player.inteligence)
         Player.dizzy_timeout = false
       }, store.configs.dizzy_seconds * 1000)
     },
@@ -457,6 +474,10 @@ export default {
       const shadow = PhaserGame.physics.add.sprite((x + this.shadowDistance), (y + this.shadowDistance), this.player.name);
       const player = PhaserGame.physics.add.sprite(x, y, this.player.name);
       const dizzySprite = PhaserGame.physics.add.sprite(x, y, "dizzy");
+
+      player.depth = 1
+      shadow.depth = 1
+      dizzySprite.depth = 1
 
       shadow.setOrigin(0.5);
       shadow.tint = 0x000000;
