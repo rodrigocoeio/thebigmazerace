@@ -383,7 +383,8 @@ export default {
       let store = getStore()
       let random = Math.floor(Math.random() * 3) + 1
       playAudio("bomb" + random, "mp3", "voice")
-      playAudio("explosion")
+      let bombSound = playAudio("explosion")
+      bombSound.volume = 0.4
 
       const explosion = this.PhaserGame.physics.add.sprite(0, 0, "explosion");
 
