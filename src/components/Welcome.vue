@@ -22,6 +22,16 @@
                 </select>
               </td>
               <td>
+                <label>Mode</label>
+                <select v-model="mode">
+                  <option value="" disabled>
+                    Choose a mode
+                  </option>
+                  <option value="chest">Find the Chest</option>
+                  <option value="key">Find the Key/Chest</option>
+                </select>
+              </td>
+              <td>
                 <label>Player 1</label>
                 <choose-player number="1"></choose-player>
               </td>
@@ -50,7 +60,6 @@
 
 <script>
 import getStore from '$/store'
-import store from '@/stores/store';
 import ChoosePlayer from "./ChoosePlayer.vue"
 
 export default {
@@ -58,7 +67,8 @@ export default {
   data() {
     let store = getStore()
     return {
-      difficulty: store.configs.difficulty
+      difficulty: store.configs.difficulty,
+      mode: store.configs.mode
     }
   },
   watch: {
@@ -66,7 +76,12 @@ export default {
       let store = getStore()
       store.configs.difficulty = difficulty
       playAudio("selected")
-    }
+    },
+    mode(mode) {
+      let store = getStore()
+      store.configs.mode = mode
+      playAudio("selected")
+    },
   },
   methods: {
     startGame() {

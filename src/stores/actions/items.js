@@ -9,10 +9,12 @@ export default {
     goal_tile.item = chest
 
     // Key Item
-    let key_tile = this.getRandomTile()
-    let key = this.configs.items.find((i) => i.type == 'key')
-    this.items.push({ number: 2, tile: key_tile.number, ...key })
-    key_tile.item = key
+    if (this.configs.mode === 'key') {
+      let key_tile = this.getRandomTile()
+      let key = this.configs.items.find((i) => i.type == 'key')
+      this.items.push({ number: 2, tile: key_tile.number, ...key })
+      key_tile.item = key
+    }
 
     // Generate Random Items
     let randomItemsCount = this.configs.items_count

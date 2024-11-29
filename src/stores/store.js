@@ -17,45 +17,6 @@ const state = {
   voice: false,
   music: false,
 
-  difficulty_configs: {
-    easy: {
-      columns: 6,
-      rows: 6,
-      speed: 120,
-      inteligence: 'smart',
-      changeWayEveryNumberOfTiles: 5,
-      items_count: 15,
-      max_swirlings: 20,
-      max_twisters: 20,
-      max_bombs: 20,
-      twister_golden_after_seconds: 60, // Special Twister Appears after x seconds ( takes the player to the chest )
-    },
-    normal: {
-      columns: 9,
-      rows: 9,
-      speed: 130,
-      inteligence: 'smart',
-      changeWayEveryNumberOfTiles: 7,
-      items_count: 25,
-      max_swirlings: 20,
-      max_twisters: 20,
-      max_bombs: 40,
-      twister_golden_after_seconds: 90, // Special Twister Appears after x seconds ( takes the player to the chest )
-    },
-    hard: {
-      columns: 12,
-      rows: 12,
-      speed: 150,
-      inteligence: 'smart',
-      changeWayEveryNumberOfTiles: 10,
-      items_count: 40,
-      max_swirlings: 30,
-      max_twisters: 30,
-      max_bombs: 60,
-      twister_golden_after_seconds: 120, // Special Twister Appears after x seconds ( takes the player to the chest )
-    },
-  },
-
   configs: {
     // Game Configs
     width: window.innerWidth,
@@ -63,6 +24,7 @@ const state = {
     columns: 12,
     rows: 8,
     difficulty: 'easy',
+    mode: 'chest', // Chest Mode  / Key Mode
     speed: 120,
     items_count: 9,
     max_swirlings: 2,
@@ -87,7 +49,7 @@ const state = {
     instant_mode: false, // Instant movement, for testing purposes
     refresh_items_seconds: false, // Refresh one item every x seconds
     twister_golden_after_seconds: 0, // Special Twister Appears after x seconds ( takes the player to the chest )
-
+    detect_players_touch_seconds: 2, // Detect that players have touch after x seconds ( used in stole key mode)
     players: [
       {
         number: 0,
@@ -199,6 +161,45 @@ const state = {
         image: '/images/chest.png',
       },
     ],
+  },
+
+  difficulty_configs: {
+    easy: {
+      columns: 6,
+      rows: 6,
+      speed: 120,
+      inteligence: 'smart',
+      changeWayEveryNumberOfTiles: 5,
+      items_count: 15,
+      max_swirlings: 3,
+      max_twisters: 3,
+      max_bombs: 5,
+      twister_golden_after_seconds: 60, // Special Twister Appears after x seconds ( takes the player to the chest )
+    },
+    normal: {
+      columns: 9,
+      rows: 9,
+      speed: 130,
+      inteligence: 'smart',
+      changeWayEveryNumberOfTiles: 7,
+      items_count: 25,
+      max_swirlings: 5,
+      max_twisters: 5,
+      max_bombs: 10,
+      twister_golden_after_seconds: 90, // Special Twister Appears after x seconds ( takes the player to the chest )
+    },
+    hard: {
+      columns: 12,
+      rows: 12,
+      speed: 150,
+      inteligence: 'smart',
+      changeWayEveryNumberOfTiles: 10,
+      items_count: 40,
+      max_swirlings: 7,
+      max_twisters: 7,
+      max_bombs: 15,
+      twister_golden_after_seconds: 120, // Special Twister Appears after x seconds ( takes the player to the chest )
+    },
   },
 }
 

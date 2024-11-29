@@ -8,6 +8,7 @@ export default (configs, gameComponent, objectComponents) => {
     height: window.innerHeight,
     backgroundColor: '#fffcbd',
     powerPreference: 'high-performance',
+    pixelArt: true,
     //resolution: 3,
     physics: {
       default: 'arcade',

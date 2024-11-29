@@ -26,7 +26,7 @@ export default {
       Glow: false,
       shadowDistance: 5,
       moving: false,
-      glowing: true,
+      glowing: false,
       start_position: false,
       tiles: [],
       tilesStack: [], // walked tiles
@@ -54,9 +54,16 @@ export default {
 
     if (this.Player)
       this.Player.destroy()
-
     if (this.Shadow)
       this.Shadow.destroy()
+    if (this.Dizzy)
+      this.Dizzy.destroy()
+    if (this.Fire)
+      this.Fire.destroy()
+    if (this.Mud)
+      this.Mud.destroy()
+    if (this.Key)
+      this.Key.destroy()
   },
 
   watch: {
@@ -66,7 +73,8 @@ export default {
       }
     },
     hasKey(hasKey) {
-      this.Key.visible = hasKey
+      if (this.Key)
+        this.Key.visible = hasKey
     }
   },
 
@@ -270,7 +278,8 @@ export default {
     },
 
     foundChest() {
-      if (!this.hasKey) {
+      let store = getStore()
+      if (store.configs.mode == "key" && !this.hasKey) {
         this.item.taken = false
         return false
       }
@@ -283,9 +292,7 @@ export default {
       playAudio("finished" + audioNumber, "mp3", "voice")
 
       this.hasKey = false
-      let store = getStore()
       store.finishGame(this)
-
     },
 
     swirl() {
@@ -361,26 +368,35 @@ export default {
       }
 
       let goToTile = false
-      let keyItem = store.items.find(item => item.type == "key" && !item.taken)
 
-      // Key Item on the Map then go to the key tile
-      if (keyItem)
-        goToTile = store.tiles.find(tile => tile.number == keyItem.tile)
 
-      // Already Have the Key go to the chest tile
-      else if (this.hasKey)
-        goToTile = store.tiles.find(tile => tile.goal)
+      // Key Mode
+      if (store.configs.mode == "key") {
+        let keyItem = store.items.find(item => item.type == "key" && !item.taken)
 
-      // If key is with other player, go to player
-      else {
-        switch (this.player.number) {
-          case 1:
-            goToTile = player2.nextTile
-            break;
-          case 2:
-            goToTile = player1.nextTile
-            break
+        // Key Item on the Map then go to the key tile
+        if (keyItem)
+          goToTile = store.tiles.find(tile => tile.number == keyItem.tile)
+
+        // Already Have the Key go to the chest tile
+        else if (this.hasKey)
+          goToTile = store.tiles.find(tile => tile.goal)
+
+        // If key is with other player, go to player
+        else {
+          switch (this.player.number) {
+            case 1:
+              goToTile = player2.nextTile
+              break;
+            case 2:
+              goToTile = player1.nextTile
+              break
+          }
         }
+
+        // Chest Mode
+      } else {
+        goToTile = store.tiles.find(tile => tile.goal)
       }
 
       if (goToTile) {
@@ -604,17 +620,17 @@ export default {
       this.Mud = mudSprite;
       this.Fire = fireSprite;
       this.Key = keySprite;
-      //this.Glow = this.glow();
+      this.Glow = this.glow();
 
-      // Collider
-      if (this.player.number == 2) {
+      // Collider stolle key on key mode
+      if (store.configs.mode == "key" && this.player.number == 2) {
         let lastTouched = new Date()
         Scene.physics.add.overlap(player1.Player, player, function (args) {
           let lastTouchedSeconds = Math.round((new Date() - lastTouched) / 1000, 2)
 
-          if (lastTouchedSeconds > 1) {
+          // Detect touch every x second
+          if (lastTouchedSeconds >= store.configs.detect_players_touch_seconds) {
             lastTouched = new Date()
-            console.log("Players Touched!")
 
             // Stole Key
             if (player1.hasKey) {
@@ -673,6 +689,7 @@ export default {
         this.Fire.body.speed = 0
         this.Mud.body.speed = 0
         this.Shadow.body.speed = 0
+        this.Key.body.speed = 0
 
         const tile = this.currentTile
         const player_x = tile.width / 2
@@ -721,7 +738,8 @@ export default {
           this.physics.moveToObject(this.Mud, this.target, speed);
         if (this.Fire.visible)
           this.physics.moveToObject(this.Fire, this.target, speed);
-        this.physics.moveToObject(this.Key, this.target, speed);
+        if (store.configs.mode == "key")
+          this.physics.moveToObject(this.Key, this.target, speed);
 
         this.moving = true
         this.onFinishMoving = onFinishMoving
@@ -735,12 +753,13 @@ export default {
     glow() {
       const Player = this.Player;
       const Scene = this.Scene;
-      const Between = Phaser.Math.Between;
-      var postFxPlugin = Scene.plugins.get('rexglowfilterpipelineplugin');
-      var pipeline = postFxPlugin.add(Player);
 
       if (this.glowing) {
-        this.Glow = Player.scene.tweens.add({
+        const Between = Phaser.Math.Between;
+        var postFxPlugin = Scene.plugins.get('rexglowfilterpipelineplugin');
+        var pipeline = postFxPlugin.add(Player);
+
+        return Player.scene.tweens.add({
           targets: pipeline,
           intensity: 0.02,
           ease: 'Linear',
@@ -751,11 +770,13 @@ export default {
 
       } else {
         // Remove postfx pipeline
-        postFxPlugin.remove(Player);
         if (this.Glow) {
+          postFxPlugin.remove(Player);
           this.Glow.stop();
           this.Glow = null;
         }
+
+        return false
       }
     }
   }
