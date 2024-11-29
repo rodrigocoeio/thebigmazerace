@@ -22,7 +22,12 @@ const listenKeyBoardEvents = function (e) {
   // Pauses Game
   if (e.key === ' ') {
     store.paused = !store.paused
-    if (store.paused) console.log('Game Paused!')
+    if (store.paused) {
+      console.log('Game Paused!')
+      store.Scene.sys.pause()
+    } else {
+      store.Scene.sys.resume()
+    }
   }
 
   // Speeds UP

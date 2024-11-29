@@ -117,7 +117,6 @@ export default
 
     methods: {
       startPlayers() {
-        store.paused = false;
         this.$refs.players.forEach(player => player.start());
 
         let Game = this
@@ -159,37 +158,37 @@ export default
         }
       },
 
-      preload(PhaserGame) {
-        this.PhaserGame = PhaserGame
+      preload(Scene) {
+        this.Scene = Scene
 
         // Background
-        PhaserGame.load.image('board', "/images/background.jpeg");
-        PhaserGame.load.image('tile-column', "images/column.png");
-        PhaserGame.load.image('tile-row', "images/row.png");
+        Scene.load.image('board', "/images/background.jpeg");
+        Scene.load.image('tile-column', "images/column.png");
+        Scene.load.image('tile-row', "images/row.png");
 
         // Load Items
         store.configs.items.forEach(item => {
-          PhaserGame.load.image(item.type, item.image);
+          Scene.load.image(item.type, item.image);
 
           let image = new Image();
           image.src = item.image;
         })
 
         // Glow Plugin
-        PhaserGame.load.plugin('rexglowfilterpipelineplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexglowfilterpipelineplugin.min.js', true);
+        Scene.load.plugin('rexglowfilterpipelineplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexglowfilterpipelineplugin.min.js', true);
       },
 
-      create(PhaserGame) {
-        this.PhaserGame = PhaserGame
+      create(Scene) {
+        this.Scene = Scene
 
         // Board
-        this.board = PhaserGame.add.image(store.configs.width / 2, store.configs.height / 2, 'board');
+        this.board = Scene.add.image(store.configs.width / 2, store.configs.height / 2, 'board');
         //this.board.setAlpha(0.8);
       },
-      update(PhaserGame) {
+      update(Scene) {
 
       },
-      destroy(PhaserGame) {
+      destroy(Scene) {
         if (this.board)
           this.board.destroy();
       },
@@ -201,14 +200,14 @@ export default
           const width = store.configs.width
           const height = store.configs.height
 
-          const overlay = this.PhaserGame.add.renderTexture(width / 2, height / 2, width, height);
+          const overlay = this.Scene.add.renderTexture(width / 2, height / 2, width, height);
           overlay.fill(0x000000, 0.3);
 
           const text_x = width / 2
           const text_y = height / 2
 
           const pausedText = "Paused"
-          const text = this.PhaserGame.add.text(text_x, text_y, pausedText, { font: "600 48px Poppins", color: "white" });
+          const text = this.Scene.add.text(text_x, text_y, pausedText, { font: "600 48px Poppins", color: "white" });
           text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 1);
           text.setOrigin(0.5, 0.5);
 
@@ -228,19 +227,19 @@ export default
         const height = this.configs.height
         const winner = this.winner
 
-        const overlay = this.PhaserGame.add.renderTexture(width / 2, height / 2, width, height);
+        const overlay = this.Scene.add.renderTexture(width / 2, height / 2, width, height);
         overlay.fill(0x000000, 0.5);
 
         const shadowDistance = 30
         const x = this.configs.width / 2
         const y = this.configs.height / 2 - 50
-        const shadow = this.PhaserGame.physics.add.sprite(x - 100, y, winner.player.name + "_big");
-        const player = this.PhaserGame.physics.add.sprite((x - 100 + shadowDistance), (y + shadowDistance), winner.player.name + "_big");
+        const shadow = this.Scene.physics.add.sprite(x - 100, y, winner.player.name + "_big");
+        const player = this.Scene.physics.add.sprite((x - 100 + shadowDistance), (y + shadowDistance), winner.player.name + "_big");
 
         const chest_x = x + 150
         const chest_y = y + 120
-        const chest_shadow = this.PhaserGame.physics.add.sprite(chest_x, chest_y, "chest_open");
-        const chest = this.PhaserGame.physics.add.sprite((chest_x + shadowDistance), (chest_y + shadowDistance), "chest_open");
+        const chest_shadow = this.Scene.physics.add.sprite(chest_x, chest_y, "chest_open");
+        const chest = this.Scene.physics.add.sprite((chest_x + shadowDistance), (chest_y + shadowDistance), "chest_open");
 
         shadow.setOrigin(0.5);
         shadow.tint = 0x000000;
@@ -253,7 +252,7 @@ export default
         const text_y = chest_y + 80
         const text_x = x - 300
         const finishedText = "The " + winner.player.name + " has found the chest!"
-        const text = this.PhaserGame.add.text(text_x, text_y, finishedText, { font: "600 48px Poppins", color: "white" });
+        const text = this.Scene.add.text(text_x, text_y, finishedText, { font: "600 48px Poppins", color: "white" });
         text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 1);
 
         overlay.depth = 1.9

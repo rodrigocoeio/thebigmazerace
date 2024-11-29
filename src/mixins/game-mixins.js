@@ -27,13 +27,13 @@ GameMixins.push({
   },
 
   methods: {
-    preload(PhaserGame) {},
+    preload(Scene) {},
 
-    create(PhaserGame) {},
+    create(Scene) {},
 
-    update(PhaserGame) {},
+    update(Scene) {},
 
-    render(PhaserGame) {},
+    render(Scene) {},
 
     destroy() {},
   },

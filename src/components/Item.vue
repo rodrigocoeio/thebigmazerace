@@ -60,17 +60,17 @@ export default {
   },
 
   methods: {
-    preload(PhaserGame) {
-      this.PhaserGame = PhaserGame;
+    preload(Scene) {
+      this.Scene = Scene;
     },
-    create(PhaserGame) {
+    create(Scene) {
       let item = this.item
       const tile = store.tiles.find(t => t.number == item.tile)
       let item_x = tile.x + tile.width / 2
       let item_y = tile.y + tile.height / 2
 
-      const Shadow = PhaserGame.physics.add.sprite((item_x + this.shadowDistance), (item_y + this.shadowDistance), this.item.type);
-      const Item = PhaserGame.physics.add.sprite(item_x, item_y, this.item.type);
+      const Shadow = Scene.physics.add.sprite((item_x + this.shadowDistance), (item_y + this.shadowDistance), this.item.type);
+      const Item = Scene.physics.add.sprite(item_x, item_y, this.item.type);
 
       Item.depth = 0.9
       Shadow.depth = 0.9
@@ -87,12 +87,12 @@ export default {
       Shadow.scaleX = Shadow.scaleY;
 
 
-      this.physics = PhaserGame.physics;
+      this.physics = Scene.physics;
       this.Item = Item;
       this.Shadow = Shadow;
     },
 
-    update(PhaserGame) {
+    update(Scene) {
       if (this.target && this.Item.body) {
         let distance = Phaser.Math.Distance.Between(this.Item.x, this.Item.y, this.target.x, this.target.y);
 
@@ -132,9 +132,9 @@ export default {
 
     glow() {
       const Item = this.Item;
-      const PhaserGame = this.PhaserGame;
+      const Scene = this.Scene;
       const Between = Phaser.Math.Between;
-      var postFxPlugin = PhaserGame.plugins.get('rexglowfilterpipelineplugin');
+      var postFxPlugin = Scene.plugins.get('rexglowfilterpipelineplugin');
       var pipeline = postFxPlugin.add(Item);
 
       if (this.glowing) {

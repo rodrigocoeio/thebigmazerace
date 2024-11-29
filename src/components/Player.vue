@@ -20,7 +20,7 @@ export default {
     return {
       name: this.player.name,
       Game: Game,
-      PhaserGame: false,
+      Scene: false,
       Player: false,
       Shadow: false,
       Glow: false,
@@ -252,9 +252,7 @@ export default {
 
     foundChest() {
       this.stopsVoice()
-      this.stopRotating(this.swirling)
-      this.stopRotating(this.twisting)
-      this.stopRotating(this.twisting_golden)
+      this.stopsAllRotation()
 
       let audioNumber = Math.floor(Math.random() * 2) + 1
       playAudio("take_chest")
@@ -365,6 +363,7 @@ export default {
       Player.Player.setOrigin(0.5, 0.5);
       Player.Shadow.setOrigin(0.5, 0.5);
       return setInterval(() => {
+        if (store.paused) return false
         Player.Player.angle += angle;
         Player.Shadow.angle += angle;
       }, interval)
@@ -380,6 +379,12 @@ export default {
       }
 
       return rotating
+    },
+
+    stopsAllRotation() {
+      this.stopRotating(this.swirling)
+      this.stopRotating(this.twisting)
+      this.stopRotating(this.twisting_golden)
     },
 
     dizzy() {
@@ -411,7 +416,7 @@ export default {
       let bombSound = playAudio("explosion")
       bombSound.volume = 0.4
 
-      const explosion = this.PhaserGame.physics.add.sprite(0, 0, "explosion");
+      const explosion = this.Scene.physics.add.sprite(0, 0, "explosion");
 
       // Scale Explosion
       let tileWidth = this.currentTile.width
@@ -460,28 +465,28 @@ export default {
       }
     },
 
-    preload(PhaserGame) {
-      this.PhaserGame = PhaserGame;
-      PhaserGame.load.image(this.player.name, this.player.image);
-      PhaserGame.load.image(this.player.name + "_big", this.player.image_big);
-      PhaserGame.load.image("mud", "/images/mud.png");
-      PhaserGame.load.image("fire", "/images/fire.png");
-      PhaserGame.load.image("dizzy", "/images/dizzy.png");
-      PhaserGame.load.image("chest_open", "/images/chest_open.png");
-      PhaserGame.load.image("explosion", "/images/explosion.png");
+    preload(Scene) {
+      this.Scene = Scene;
+      Scene.load.image(this.player.name, this.player.image);
+      Scene.load.image(this.player.name + "_big", this.player.image_big);
+      Scene.load.image("mud", "/images/mud.png");
+      Scene.load.image("fire", "/images/fire.png");
+      Scene.load.image("dizzy", "/images/dizzy.png");
+      Scene.load.image("chest_open", "/images/chest_open.png");
+      Scene.load.image("explosion", "/images/explosion.png");
 
       let image = new Image();
       image.src = this.player.image;
     },
 
-    create(PhaserGame) {
+    create(Scene) {
       const x = this.player.position ? this.player.position.x : 0;
       const y = this.player.position ? this.player.position.y : 0;
-      const shadow = PhaserGame.physics.add.sprite((x + this.shadowDistance), (y + this.shadowDistance), this.player.name);
-      const player = PhaserGame.physics.add.sprite(x, y, this.player.name);
-      const dizzySprite = PhaserGame.physics.add.sprite(x, y, "dizzy");
-      const mudSprite = PhaserGame.physics.add.sprite(x, y, "mud");
-      const fireSprite = PhaserGame.physics.add.sprite(x, y, "fire");
+      const shadow = Scene.physics.add.sprite((x + this.shadowDistance), (y + this.shadowDistance), this.player.name);
+      const player = Scene.physics.add.sprite(x, y, this.player.name);
+      const dizzySprite = Scene.physics.add.sprite(x, y, "dizzy");
+      const mudSprite = Scene.physics.add.sprite(x, y, "mud");
+      const fireSprite = Scene.physics.add.sprite(x, y, "fire");
 
       player.depth = 1
       shadow.depth = 1
@@ -530,7 +535,7 @@ export default {
       fireSprite.visible = false
       mudSprite.alpha = 0.7
 
-      this.physics = PhaserGame.physics;
+      this.physics = Scene.physics;
       this.Player = player;
       this.Shadow = shadow;
       this.Dizzy = dizzySprite;
@@ -539,7 +544,7 @@ export default {
       //this.Glow = this.glow();
     },
 
-    update(PhaserGame) {
+    update(Scene) {
       this.isOutOfScreenFix()
 
       if (this.target && this.Player.body) {
@@ -633,9 +638,9 @@ export default {
 
     glow() {
       const Player = this.Player;
-      const PhaserGame = this.PhaserGame;
+      const Scene = this.Scene;
       const Between = Phaser.Math.Between;
-      var postFxPlugin = PhaserGame.plugins.get('rexglowfilterpipelineplugin');
+      var postFxPlugin = Scene.plugins.get('rexglowfilterpipelineplugin');
       var pipeline = postFxPlugin.add(Player);
 
       if (this.glowing) {

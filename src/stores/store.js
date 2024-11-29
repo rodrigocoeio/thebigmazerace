@@ -1,5 +1,6 @@
 const state = {
   Phaser: false, // Phaser Instance
+  Scene: false, // Phaser Scene Instance
   Game: false, // Game Component
   components: [],
 
