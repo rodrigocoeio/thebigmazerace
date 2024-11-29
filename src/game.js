@@ -8,7 +8,7 @@ export default (configs, gameComponent, objectComponents) => {
     height: window.innerHeight,
     backgroundColor: '#fffcbd',
     powerPreference: 'high-performance',
-    pixelArt: true,
+    //pixelArt: true,
     //resolution: 3,
     physics: {
       default: 'arcade',
@@ -16,12 +16,12 @@ export default (configs, gameComponent, objectComponents) => {
                 gravity: { y: 200 }
             } */
       arcade: {
-        tileBias: 8,
+        //tileBias: 8,
         debug: false,
         gravity: false,
       },
       render: {
-        pixelArt: true,
+        //pixelArt: true,
       },
     },
     scene: {
