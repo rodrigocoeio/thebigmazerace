@@ -332,7 +332,7 @@ export default {
       if (randomTile) {
         // Rotate
         this.stopRotating(this.twisting)
-        this.twisting = Player.rotate(1, 5)
+        this.twisting = Player.rotate()
         this.twister_item = { ...this.item }
 
         const speed = store.configs.speed
@@ -402,7 +402,7 @@ export default {
       if (goToTile) {
         // Rotate
         this.stopRotating(this.twisting_golden)
-        this.twisting_golden = Player.rotate(1, 5)
+        this.twisting_golden = Player.rotate()
         this.twister_item = { ...this.item }
 
         const speed = store.configs.speed
@@ -428,8 +428,8 @@ export default {
 
     rotate(interval, angle) {
       const Player = this
-      interval = interval ? interval : 1
-      angle = angle ? angle : 5
+      interval = interval ? interval : 25
+      angle = angle ? angle : 30
 
       Player.Player.setOrigin(0.5, 0.5);
       Player.Shadow.setOrigin(0.5, 0.5);
