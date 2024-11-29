@@ -67,6 +67,13 @@ export default
           })
         }
       },
+      started(started) {
+        if (!started) {
+          this.$refs.players.forEach($player => {
+            $player.stopsAllRotation()
+          })
+        }
+      },
       finished(finished) {
         if (finished) {
           this.$refs.players.forEach($player => {

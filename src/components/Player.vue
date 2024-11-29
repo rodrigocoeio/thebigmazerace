@@ -304,7 +304,7 @@ export default {
       }
 
       this.stopRotating(this.swirling)
-      this.swirling = this.rotate()
+      this.swirling = this.rotate(10, 50)
 
       setTimeout(function () {
         Player.item = false;
@@ -426,7 +426,7 @@ export default {
       return false
     },
 
-    rotate(interval, angle) {
+    rotate(angle, interval) {
       const Player = this
       interval = interval ? interval : 30
       angle = angle ? angle : 35
