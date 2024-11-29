@@ -16,7 +16,7 @@ const listenKeyBoardEvents = function (e) {
   // Starts Game
   if (e.key === 'Enter') {
     if (store.finished) store.quitGame()
-    else store.startGame()
+    else if (!store.started) store.startGame()
   }
 
   // Pauses Game
