@@ -6,6 +6,8 @@ export default {
     this.finished = false
     this.paused = false
     this.winner = false
+    this.voice = false
+    this.music = false
 
     let difficulty = this.configs.difficulty
     let configs = this.difficulty_configs[difficulty]

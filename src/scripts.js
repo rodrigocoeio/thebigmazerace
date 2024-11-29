@@ -27,6 +27,7 @@ import getStore from '$/store.js'
 window.playAudio = (audio_name, extension = 'mp3', type = 'sound') => {
   let store = getStore()
   let onEnded = function () {}
+  let onError = function () {}
   let src = '/audios/' + audio_name + '.' + extension
   var audio = new Audio(src)
 
@@ -36,6 +37,7 @@ window.playAudio = (audio_name, extension = 'mp3', type = 'sound') => {
     onEnded = function () {
       store.voice = false
     }
+    onError = onEnded
 
     store.voice = audio
   }
@@ -43,6 +45,7 @@ window.playAudio = (audio_name, extension = 'mp3', type = 'sound') => {
   audio.play()
   audio.muted = !store.configs[type]
   audio.onended = onEnded
+  audio.onerror = onError
 
   return audio
 }
