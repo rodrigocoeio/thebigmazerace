@@ -1,9 +1,11 @@
 export default {
   startGame() {
     console.log('Game Started!')
+
     this.started = true
     this.finished = false
     this.paused = false
+    this.winner = false
 
     let difficulty = this.configs.difficulty
     let configs = this.difficulty_configs[difficulty]
@@ -13,13 +15,30 @@ export default {
     playAudio('start_game' + audioNumber, 'mp3', 'voice')
 
     this.startsMusic()
+
+    this.startTime = new Date()
   },
   quitGame() {
+    console.log('Game Quited!')
+
     this.started = false
     this.finished = false
     this.paused = false
+    this.winner = false
 
     this.stopsVoice()
+    this.stopsMusic()
+  },
+  finishGame(winner) {
+    console.log('Game Finished!')
+    console.info(winner.player.name + ' has founded the chest in ' + this.getTimeElapsed() + 's')
+
+    this.finishedTime = new Date()
+    this.started = true
+    this.paused = true
+    this.finished = true
+    this.winner = winner
+
     this.stopsMusic()
   },
   startsMusic() {
@@ -40,5 +59,18 @@ export default {
       this.voice.pause()
       this.voice = false
     }
+  },
+  getTimeElapsed() {
+    if (!this.startTime) return 0
+
+    let timeDiff = new Date() - this.startTime //in ms
+
+    // strip the ms
+    timeDiff /= 1000
+
+    // get seconds
+    let seconds = Math.round(timeDiff, 2)
+
+    return seconds
   },
 }

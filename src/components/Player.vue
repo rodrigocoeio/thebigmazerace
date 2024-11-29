@@ -24,7 +24,7 @@ export default {
       Player: false,
       Shadow: false,
       Glow: false,
-      shadowDistance: 3,
+      shadowDistance: 5,
       moving: false,
       glowing: true,
       start_position: false,
@@ -136,8 +136,11 @@ export default {
       if (this.item)
         this.item.count++
 
-      if (this.item.count >= this.item.limit)
+      if (this.item.count >= this.item.limit) {
+        this.Fire.visible = false
+        this.Mud.visible = false
         this.item = false
+      }
 
       this.getItem()
 
@@ -168,7 +171,12 @@ export default {
             return false
           case "twister":
             return false
+          case "twister_golden":
+            return false
         }
+      } else {
+        this.Fire.visible = false
+        this.Mud.visible = false
       }
 
       // Get Next Tile
@@ -201,6 +209,9 @@ export default {
         let foundedItemTile = store.tiles.find(tile => tile.number == foundedItem.tile)
         foundedItemTile.item = false
 
+        this.Mud.visible = false
+        this.Fire.visible = false
+
         let Player = this
         switch (this.item.type) {
           case "chest":
@@ -210,12 +221,14 @@ export default {
             if (this.item.count == 0) {
               let audioNumber = Math.floor(Math.random() * 3) + 1
               playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
+              this.Fire.visible = true
             }
             break
           case "speeddown":
             if (this.item.count == 0) {
               let audioNumber = Math.floor(Math.random() * 3) + 1
               playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
+              this.Mud.visible = true
             }
             break
           case "swirl":
@@ -223,6 +236,9 @@ export default {
             break;
           case "twister":
             this.twister();
+            break;
+          case "twister_golden":
+            this.twister_golden();
             break;
           case "bomb":
             this.bomb();
@@ -236,12 +252,16 @@ export default {
 
     foundChest() {
       this.stopsVoice()
+      this.stopRotating(this.swirling)
+      this.stopRotating(this.twisting)
+      this.stopRotating(this.twisting_golden)
 
       let audioNumber = Math.floor(Math.random() * 2) + 1
       playAudio("take_chest")
       playAudio("finished" + audioNumber, "mp3", "voice")
 
-      this.$parent.finishGame(this)
+      let store = getStore()
+      store.finishGame(this)
     },
 
     swirl() {
@@ -286,8 +306,6 @@ export default {
 
         const speed = store.configs.speed
         let onFinished = function () {
-          console.log(Player.name + " - twisting - " + Player.twister_item.count)
-
           if (Player.item && Player.twister_item.count <= Player.twister_item.limit) {
             randomTile = store.getRandomTile(true)
             Player.nextTile = randomTile
@@ -309,14 +327,44 @@ export default {
       return false
     },
 
+    twister_golden() {
+      let Player = this
+      let store = getStore()
+
+      if (Player.item.count == 0) {
+        let audioNumber = Math.floor(Math.random() * 3) + 1
+        playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
+      }
+
+      let chestTile = store.tiles.find(tile => tile.goal)
+
+      if (chestTile) {
+        // Rotate
+        this.stopRotating(this.twisting_golden)
+        this.twisting_golden = Player.rotate(1, 5)
+        this.twister_item = { ...this.item }
+
+        const speed = store.configs.speed
+        let onFinished = function () {
+          Player.twister_item = false
+          Player.item = false
+        }
+
+        Player.nextTile = chestTile
+        return this.moveTo(chestTile.number, speed * 3, onFinished)
+      }
+
+      return false
+    },
+
     rotate(interval, angle) {
       const Player = this
       interval = interval ? interval : 1
       angle = angle ? angle : 5
 
+      Player.Player.setOrigin(0.5, 0.5);
+      Player.Shadow.setOrigin(0.5, 0.5);
       return setInterval(() => {
-        Player.Player.setOrigin(0.5, 0.5);
-        Player.Shadow.setOrigin(0.5, 0.5);
         Player.Player.angle += angle;
         Player.Shadow.angle += angle;
       }, interval)
@@ -369,7 +417,7 @@ export default {
       let tileWidth = this.currentTile.width
       let tileHeight = this.currentTile.height
 
-      let explosionHeight = tileHeight / 1.5
+      let explosionHeight = tileHeight / 1.2
       explosion.displayHeight = explosionHeight
       explosion.scaleX = explosion.scaleY;
 
@@ -416,6 +464,8 @@ export default {
       this.PhaserGame = PhaserGame;
       PhaserGame.load.image(this.player.name, this.player.image);
       PhaserGame.load.image(this.player.name + "_big", this.player.image_big);
+      PhaserGame.load.image("mud", "/images/mud.png");
+      PhaserGame.load.image("fire", "/images/fire.png");
       PhaserGame.load.image("dizzy", "/images/dizzy.png");
       PhaserGame.load.image("chest_open", "/images/chest_open.png");
       PhaserGame.load.image("explosion", "/images/explosion.png");
@@ -430,10 +480,14 @@ export default {
       const shadow = PhaserGame.physics.add.sprite((x + this.shadowDistance), (y + this.shadowDistance), this.player.name);
       const player = PhaserGame.physics.add.sprite(x, y, this.player.name);
       const dizzySprite = PhaserGame.physics.add.sprite(x, y, "dizzy");
+      const mudSprite = PhaserGame.physics.add.sprite(x, y, "mud");
+      const fireSprite = PhaserGame.physics.add.sprite(x, y, "fire");
 
       player.depth = 1
       shadow.depth = 1
       dizzySprite.depth = 1
+      mudSprite.depth = 1
+      fireSprite.depth = 0.9
 
       shadow.setOrigin(0.5);
       shadow.tint = 0x000000;
@@ -441,7 +495,7 @@ export default {
 
       // Scale Player
       let tileHeight = this.currentTile.height
-      let playerHeight = tileHeight / 2
+      let playerHeight = tileHeight / 1.5
 
       player.displayHeight = playerHeight
       player.scaleX = player.scaleY;
@@ -449,6 +503,10 @@ export default {
       shadow.scaleX = player.scaleY;
       dizzySprite.displayHeight = playerHeight
       dizzySprite.scaleX = dizzySprite.scaleY;
+      mudSprite.displayHeight = playerHeight
+      mudSprite.scaleX = dizzySprite.scaleY;
+      fireSprite.displayHeight = playerHeight
+      fireSprite.scaleX = dizzySprite.scaleY;
 
       // Position Player
       let tileWidth = this.currentTile.width
@@ -462,13 +520,22 @@ export default {
       shadow.y = playerY + this.shadowDistance
       dizzySprite.x = playerX + this.shadowDistance
       dizzySprite.y = playerY + this.shadowDistance
+      mudSprite.x = playerX + this.shadowDistance
+      mudSprite.y = playerY + this.shadowDistance
+      fireSprite.x = playerX + this.shadowDistance
+      fireSprite.y = playerY + this.shadowDistance
 
       dizzySprite.visible = false
+      mudSprite.visible = false
+      fireSprite.visible = false
+      mudSprite.alpha = 0.7
 
       this.physics = PhaserGame.physics;
       this.Player = player;
       this.Shadow = shadow;
       this.Dizzy = dizzySprite;
+      this.Mud = mudSprite;
+      this.Fire = fireSprite;
       //this.Glow = this.glow();
     },
 
@@ -485,6 +552,8 @@ export default {
           if (distance < 8 || store.configs.instant_mode) {
             this.Player.body.reset(this.target.x, this.target.y);
             this.Dizzy.body.reset(this.target.x, this.target.y);
+            this.Mud.body.reset(this.target.x, this.target.y);
+            this.Fire.body.reset(this.target.x, this.target.y);
             this.Shadow.body.reset((this.target.x + this.shadowDistance), (this.target.y + this.shadowDistance));
             this.target = false;
             this.distance = 0
@@ -523,6 +592,8 @@ export default {
 
           this.Player.body.reset(this.target.x, this.target.y);
           this.Dizzy.body.reset(this.target.x, this.target.y);
+          this.Fire.body.reset(this.target.x, this.target.y);
+          this.Mud.body.reset(this.target.x, this.target.y);
           this.Shadow.body.reset((this.target.x + this.shadowDistance), (this.target.y + this.shadowDistance));
 
           this.moveToNextTile()
@@ -551,6 +622,8 @@ export default {
         this.physics.moveToObject(this.Player, this.target, speed);
         this.physics.moveToObject(this.Shadow, this.target, speed);
         this.physics.moveToObject(this.Dizzy, this.target, speed);
+        this.physics.moveToObject(this.Mud, this.target, speed);
+        this.physics.moveToObject(this.Fire, this.target, speed);
 
         return true;
       }

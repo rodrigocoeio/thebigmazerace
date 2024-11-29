@@ -3,6 +3,19 @@ const state = {
   Game: false, // Game Component
   components: [],
 
+  started: false, //  Game Started
+  startTime: false,
+  currentTime: false,
+  paused: false,
+  finished: false,
+  finishedTime: false,
+  winner: false,
+  players: [], //  Players
+  items: [], // Items
+  tiles: [], //  Tiles
+  voice: false,
+  music: false,
+
   difficulty_configs: {
     easy: {
       columns: 6,
@@ -69,6 +82,7 @@ const state = {
     changeWayEveryNumberOfTiles: 5,
     instant_mode: false, // Instant movement, for testing purposes
     refresh_items_seconds: false, // Refresh one item every x seconds
+    twister_golden_after_seconds: 0, // Special Twister Appears after x seconds ( takes the player to the chest )
 
     players: [
       {
@@ -161,6 +175,12 @@ const state = {
         count: 0,
       },
       {
+        type: 'twister_golden',
+        image: '/images/twister_golden.png',
+        limit: 1,
+        count: 0,
+      },
+      {
         type: 'bomb',
         image: '/images/bomb.png',
         limit: 1,
@@ -172,14 +192,6 @@ const state = {
       },
     ],
   },
-  started: false, //  Game Started
-  paused: false,
-  finished: false,
-  players: [], //  Players
-  items: [], // Items
-  tiles: [], //  Tiles
-  voice: false,
-  music: false,
 }
 
 import getters from './getters'

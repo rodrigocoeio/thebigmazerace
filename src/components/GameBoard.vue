@@ -35,21 +35,20 @@ export default
       return {
         board: false,
         background_audio: false,
-        inteligence: store.configs.inteligence,
-        startTime: 0,
-        endTime: 0,
         timeInterval: false
       };
     },
 
     computed: {
       timeElapsed() {
-        var timeDiff = this.endTime - this.startTime; //in ms
+        let now = new Date()
+        let timeDiff = now - this.startTime; //in ms
+
         // strip the ms
         timeDiff /= 1000;
 
         // get seconds
-        var seconds = Math.round(timeDiff, 2);
+        let seconds = Math.round(timeDiff, 2);
 
         return seconds
       },
@@ -74,6 +73,10 @@ export default
           if (store.music)
             store.music.volume = 0.7
         }
+      },
+      finished(finished) {
+        if (finished)
+          this.finishedScreen()
       }
     },
 
@@ -115,35 +118,22 @@ export default
     methods: {
       startPlayers() {
         store.paused = false;
-        this.startTime = new Date();
         this.$refs.players.forEach(player => player.start());
 
         let Game = this
         this.timeInterval = setInterval(() => {
-          Game.endTime = new Date()
+          Game.currentTime = new Date()
         })
       },
 
       stopGame() {
         store.paused = true;
-        this.endTime = new Date();
         clearInterval(this.timeInterval)
       },
 
       restartGame() {
         this.stopGame()
         this.$refs.players.forEach($player => $player.restart())
-      },
-
-      finishGame(winner) {
-        this.stopGame()
-        this.stopsMusic()
-
-        store.started = true
-        store.finished = true
-        console.info(winner.player.name + " has founded the chest in " + this.timeElapsed + "s")
-
-        this.finishedScreen(winner)
       },
 
       rebuildMaze() {
@@ -190,6 +180,8 @@ export default
       },
 
       create(PhaserGame) {
+        this.PhaserGame = PhaserGame
+
         // Board
         this.board = PhaserGame.add.image(store.configs.width / 2, store.configs.height / 2, 'board');
         //this.board.setAlpha(0.8);
@@ -231,17 +223,17 @@ export default
         }
       },
 
-      finishedScreen(winner) {
-        const store = getStore()
-        const width = store.configs.width
-        const height = store.configs.height
+      finishedScreen() {
+        const width = this.configs.width
+        const height = this.configs.height
+        const winner = this.winner
 
         const overlay = this.PhaserGame.add.renderTexture(width / 2, height / 2, width, height);
         overlay.fill(0x000000, 0.5);
 
         const shadowDistance = 30
-        const x = store.configs.width / 2
-        const y = store.configs.height / 2 - 50
+        const x = this.configs.width / 2
+        const y = this.configs.height / 2 - 50
         const shadow = this.PhaserGame.physics.add.sprite(x - 100, y, winner.player.name + "_big");
         const player = this.PhaserGame.physics.add.sprite((x - 100 + shadowDistance), (y + shadowDistance), winner.player.name + "_big");
 

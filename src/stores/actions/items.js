@@ -44,6 +44,10 @@ export default {
         return twisters.length < maxTwisters
       }
 
+      if (item.type == 'twister_golden') {
+        return this.getTimeElapsed() >= this.configs.twister_golden_after_seconds
+      }
+
       if (item.type == 'bomb') {
         let bombs = this.items.filter((i) => i.type == item.type && !i.taken)
         let maxBombs = this.configs.max_bombs

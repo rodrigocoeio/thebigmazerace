@@ -17,7 +17,7 @@ export default {
   data() {
     store = getStore();
     return {
-      shadowDistance: 2,
+      shadowDistance: 5,
       glowing: false,
       Glow: false
     }
@@ -80,7 +80,7 @@ export default {
       Shadow.alpha = 0.5;
 
       // Scale Item
-      let itemHeight = this.item.type === "chest" ? tile.height / 1.4 : tile.height / 3
+      let itemHeight = this.item.type === "chest" ? tile.height / 1.5 : tile.height / 2
       Item.displayHeight = itemHeight
       Item.scaleX = Item.scaleY;
       Shadow.displayHeight = itemHeight
