@@ -428,8 +428,8 @@ export default {
 
     rotate(interval, angle) {
       const Player = this
-      interval = interval ? interval : 25
-      angle = angle ? angle : 30
+      interval = interval ? interval : 30
+      angle = angle ? angle : 35
 
       Player.Player.setOrigin(0.5, 0.5);
       Player.Shadow.setOrigin(0.5, 0.5);
