@@ -9,7 +9,7 @@ export default (configs, gameComponent, objectComponents) => {
     backgroundColor: '#fffcbd',
     powerPreference: 'high-performance',
     //pixelArt: true,
-    //resolution: 3,
+    resolution: 3,
     physics: {
       default: 'arcade',
       /* arcade: {

@@ -68,8 +68,12 @@ export default
         }
       },
       finished(finished) {
-        if (finished)
+        if (finished) {
+          this.$refs.players.forEach($player => {
+            $player.stopsAllRotation()
+          })
           this.finishedScreen()
+        }
       }
     },
 
