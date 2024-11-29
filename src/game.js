@@ -14,6 +14,14 @@ export default (configs, gameComponent, objectComponents) => {
       /* arcade: {
                 gravity: { y: 200 }
             } */
+      arcade: {
+        tileBias: 8,
+        debug: false,
+        gravity: false,
+      },
+      render: {
+        pixelArt: true,
+      },
     },
     scene: {
       preload() {
