@@ -24,14 +24,14 @@ export default {
   },
 
   mounted() {
-    /* if (this.item.type === "chest") {
+    if (this.item.type === "chest") {
       let Item = this
 
       setTimeout(() => {
         Item.glowing = true
         Item.glow()
       }, 500)
-    } */
+    }
   },
 
   beforeUnmount() {

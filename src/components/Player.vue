@@ -495,6 +495,7 @@ export default {
       let explosionHeight = tileHeight / 1.2
       explosion.displayHeight = explosionHeight
       explosion.scaleX = explosion.scaleY;
+      explosion.depth = 1.1
 
       // Position Explosion
       explosion.x = this.currentTile.x + tileWidth / 2
@@ -503,7 +504,7 @@ export default {
       // Remove explosion
       setTimeout(function () {
         explosion.destroy()
-      }, 300)
+      }, 500)
 
       // Remove a wall
       // Get tile component
