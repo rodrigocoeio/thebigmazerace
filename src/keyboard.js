@@ -19,14 +19,26 @@ const listenKeyBoardEvents = function (e) {
     else if (!store.started) store.startGame()
   }
 
+  // Starts/Stops Music
+  if (e.key.toLowerCase() === 'm') {
+    if (store.music) store.stopsMusic()
+    else if (store.started && !store.finished) store.startsMusic()
+  }
+
   // Pauses Game
   if (e.key === ' ') {
-    store.paused = !store.paused
-    if (store.paused) {
-      console.log('Game Paused!')
-      store.Scene.sys.pause()
-    } else {
-      store.Scene.sys.resume()
+    if (!store.finished) {
+      store.paused = !store.paused
+
+      if (store.paused) {
+        console.log('Game Paused!')
+        store.stopsVoice()
+        store.Scene.sys.pause()
+        if (store.music) store.music.volume = 0
+      } else {
+        store.Scene.sys.resume()
+        if (store.music) store.music.volume = 0.2
+      }
     }
   }
 

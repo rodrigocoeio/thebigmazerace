@@ -62,16 +62,9 @@ export default
         this.pausedScreen()
 
         if (!paused) {
-          if (store.music)
-            store.music.volume = 0.2
-
           this.$refs.players.forEach($player => {
             $player.moveToNextTile()
           })
-        }
-        else {
-          if (store.music)
-            store.music.volume = 0.7
         }
       },
       finished(finished) {

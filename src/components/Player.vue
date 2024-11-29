@@ -191,6 +191,15 @@ export default {
 
       // If Next Tile
       if (nextTile) {
+        let position = nextTile.position
+        if (position == "left") {
+          this.Player.setFlipX(true);
+          this.Shadow.setFlipX(true);
+        } else if (position == "right") {
+          this.Player.setFlipX(false);
+          this.Shadow.setFlipX(false);
+        }
+
         this.nextTile = nextTile.tile
         this.moveTo(nextTile.tile.number, speed)
       }
