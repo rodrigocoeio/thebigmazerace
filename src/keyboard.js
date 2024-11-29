@@ -19,6 +19,12 @@ const listenKeyBoardEvents = function (e) {
     else store.startGame()
   }
 
+  // Pauses Game
+  if (e.key === ' ') {
+    store.paused = !store.paused
+    if (store.paused) console.log('Game Paused!')
+  }
+
   // Speeds UP
   if (e.key == '+') {
     let newSpeed = store.configs.speed + 10

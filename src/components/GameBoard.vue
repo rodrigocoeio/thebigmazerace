@@ -31,30 +31,18 @@ export default
 
     data() {
       store = getStore();
+
       return {
-        configs: store.configs,
         board: false,
         background_audio: false,
         inteligence: store.configs.inteligence,
         startTime: 0,
         endTime: 0,
-        timeInterval: false,
-        players: store.players,
-        items: store.items,
+        timeInterval: false
       };
     },
 
     computed: {
-      tiles() {
-        store = getStore();
-        return store.tiles;
-      },
-      sound() {
-        return store.configs.sound;
-      },
-      music() {
-        return store.configs.music;
-      },
       timeElapsed() {
         var timeDiff = this.endTime - this.startTime; //in ms
         // strip the ms
@@ -67,6 +55,25 @@ export default
       },
       untakenItems() {
         return this.items.filter(item => !item.taken)
+      }
+    },
+
+    watch: {
+      paused(paused) {
+        this.pausedScreen()
+
+        if (!paused) {
+          if (store.music)
+            store.music.volume = 0.2
+
+          this.$refs.players.forEach($player => {
+            $player.moveToNextTile()
+          })
+        }
+        else {
+          if (store.music)
+            store.music.volume = 0.7
+        }
       }
     },
 
@@ -107,7 +114,7 @@ export default
 
     methods: {
       startPlayers() {
-        store.stopped = false;
+        store.paused = false;
         this.startTime = new Date();
         this.$refs.players.forEach(player => player.start());
 
@@ -116,22 +123,29 @@ export default
           Game.endTime = new Date()
         })
       },
+
       stopGame() {
-        store.stopped = true;
+        store.paused = true;
         this.endTime = new Date();
         clearInterval(this.timeInterval)
       },
+
       restartGame() {
         this.stopGame()
         this.$refs.players.forEach($player => $player.restart())
       },
+
       finishGame(winner) {
         this.stopGame()
+        this.stopsMusic()
 
         store.started = true
         store.finished = true
         console.info(winner.player.name + " has founded the chest in " + this.timeElapsed + "s")
+
+        this.finishedScreen(winner)
       },
+
       rebuildMaze() {
         this.restartGame()
 
@@ -146,6 +160,7 @@ export default
           store.generatePlayers();
         }, 10);
       },
+
       quitGameIfFinished() {
         console.log("Quit Game")
         let store = getStore()
@@ -155,6 +170,8 @@ export default
       },
 
       preload(PhaserGame) {
+        this.PhaserGame = PhaserGame
+
         // Background
         PhaserGame.load.image('board', "/images/background.jpeg");
         PhaserGame.load.image('tile-column', "images/column.png");
@@ -171,8 +188,8 @@ export default
         // Glow Plugin
         PhaserGame.load.plugin('rexglowfilterpipelineplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexglowfilterpipelineplugin.min.js', true);
       },
+
       create(PhaserGame) {
-        console.log('board created');
         // Board
         this.board = PhaserGame.add.image(store.configs.width / 2, store.configs.height / 2, 'board');
         //this.board.setAlpha(0.8);
@@ -183,7 +200,76 @@ export default
       destroy(PhaserGame) {
         if (this.board)
           this.board.destroy();
-      }
+      },
+
+      pausedScreen() {
+        const store = getStore()
+
+        if (store.paused && !store.finished) {
+          const width = store.configs.width
+          const height = store.configs.height
+
+          const overlay = this.PhaserGame.add.renderTexture(width / 2, height / 2, width, height);
+          overlay.fill(0x000000, 0.3);
+
+          const text_x = width / 2
+          const text_y = height / 2
+
+          const pausedText = "Paused"
+          const text = this.PhaserGame.add.text(text_x, text_y, pausedText, { font: "600 48px Poppins", color: "white" });
+          text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 1);
+          text.setOrigin(0.5, 0.5);
+
+          overlay.depth = 1.9
+          text.depth = 2
+
+          this.pausedOverlay = overlay
+          this.pausedText = text
+        } else if (this.pausedOverlay) {
+          this.pausedOverlay.destroy()
+          this.pausedText.destroy()
+        }
+      },
+
+      finishedScreen(winner) {
+        const store = getStore()
+        const width = store.configs.width
+        const height = store.configs.height
+
+        const overlay = this.PhaserGame.add.renderTexture(width / 2, height / 2, width, height);
+        overlay.fill(0x000000, 0.5);
+
+        const shadowDistance = 30
+        const x = store.configs.width / 2
+        const y = store.configs.height / 2 - 50
+        const shadow = this.PhaserGame.physics.add.sprite(x - 100, y, winner.player.name + "_big");
+        const player = this.PhaserGame.physics.add.sprite((x - 100 + shadowDistance), (y + shadowDistance), winner.player.name + "_big");
+
+        const chest_x = x + 150
+        const chest_y = y + 120
+        const chest_shadow = this.PhaserGame.physics.add.sprite(chest_x, chest_y, "chest_open");
+        const chest = this.PhaserGame.physics.add.sprite((chest_x + shadowDistance), (chest_y + shadowDistance), "chest_open");
+
+        shadow.setOrigin(0.5);
+        shadow.tint = 0x000000;
+        shadow.alpha = 0.5;
+
+        chest_shadow.setOrigin(0.5);
+        chest_shadow.tint = 0x000000;
+        chest_shadow.alpha = 0.5;
+
+        const text_y = chest_y + 80
+        const text_x = x - 300
+        const finishedText = "The " + winner.player.name + " has found the chest!"
+        const text = this.PhaserGame.add.text(text_x, text_y, finishedText, { font: "600 48px Poppins", color: "white" });
+        text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 1);
+
+        overlay.depth = 1.9
+        player.depth = 2
+        shadow.depth = 2
+        chest.depth = 2
+        text.depth = 2
+      },
     },
 
     components: {

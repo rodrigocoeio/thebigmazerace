@@ -73,12 +73,6 @@ export default {
   },
 
   methods: {
-    finished() {
-      /* Finished */
-      this.stop()
-      this.$parent.finishGame(this)
-      return
-    },
     start() {
       if (!this.tile) {
         this.tiles = store.tiles.map(tile => {
@@ -119,6 +113,16 @@ export default {
       this.Player.body.reset(x, y);
       this.Shadow.body.reset((x + this.shadowDistance), (y + this.shadowDistance));
     },
+
+    stopsVoice() {
+      let store = getStore()
+
+      if (store.voice) {
+        store.voice.pause()
+        store.voice = false
+      }
+    },
+
     reachedTile() {
       let lastTile = this.currentTile
       let currentTile = this.nextTile ? this.nextTile : this.currentTile
@@ -146,7 +150,7 @@ export default {
     moveToNextTile() {
       store = getStore();
 
-      if (!store.started || this.moving || store.stopped)
+      if (!store.started || this.moving || store.paused)
         return false
 
       let speed = this.player.speed ? this.player.speed : store.configs.speed
@@ -201,7 +205,7 @@ export default {
         switch (this.item.type) {
           case "chest":
             this.foundChest()
-            return this.finished()
+            return
           case "speedup":
             if (this.item.count == 0) {
               let audioNumber = Math.floor(Math.random() * 3) + 1
@@ -231,58 +235,13 @@ export default {
     },
 
     foundChest() {
-      let store = getStore()
-
-      if (store.voice) {
-        store.voice.pause()
-        store.voice = false
-      }
+      this.stopsVoice()
 
       let audioNumber = Math.floor(Math.random() * 2) + 1
       playAudio("take_chest")
       playAudio("finished" + audioNumber, "mp3", "voice")
 
       this.$parent.finishGame(this)
-      this.finishedScreen()
-    },
-
-    finishedScreen() {
-      const store = getStore()
-      const width = store.configs.width
-      const height = store.configs.height
-
-      const overlay = this.PhaserGame.add.renderTexture(width / 2, height / 2, width, height);
-      overlay.fill(0x000000, 0.5);
-
-      const x = store.configs.width / 2
-      const y = store.configs.height / 2 - 50
-      const shadow = this.PhaserGame.physics.add.sprite(x - 100, y, this.player.name + "_big");
-      const player = this.PhaserGame.physics.add.sprite((x - 100 + this.shadowDistance), (y + this.shadowDistance), this.player.name + "_big");
-
-      const chest_x = x + 150
-      const chest_y = y + 120
-      const chest_shadow = this.PhaserGame.physics.add.sprite(chest_x, chest_y, "chest_open");
-      const chest = this.PhaserGame.physics.add.sprite((chest_x + this.shadowDistance), (chest_y + this.shadowDistance), "chest_open");
-
-      shadow.setOrigin(0.5);
-      shadow.tint = 0x000000;
-      shadow.alpha = 0.5;
-
-      chest_shadow.setOrigin(0.5);
-      chest_shadow.tint = 0x000000;
-      chest_shadow.alpha = 0.5;
-
-      const text_y = chest_y + 80
-      const text_x = x - 300
-      const finishedText = "The " + this.player.name + " has found the chest!"
-      const text = this.PhaserGame.add.text(text_x, text_y, finishedText, { font: "600 48px Poppins", color: "white" });
-      text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 1);
-
-      overlay.depth = 1.9
-      player.depth = 2
-      shadow.depth = 2
-      chest.depth = 2
-      text.depth = 2
     },
 
     swirl() {
@@ -362,6 +321,7 @@ export default {
         Player.Shadow.angle += angle;
       }, interval)
     },
+
     stopRotating(rotating) {
       if (rotating) {
         this.Player.angle = 0;
@@ -409,7 +369,7 @@ export default {
       let tileWidth = this.currentTile.width
       let tileHeight = this.currentTile.height
 
-      let explosionHeight = tileHeight / 2
+      let explosionHeight = tileHeight / 1.5
       explosion.displayHeight = explosionHeight
       explosion.scaleX = explosion.scaleY;
 
@@ -425,9 +385,6 @@ export default {
       // Remove a wall
       // Get tile component
       let currentTile = this.currentTile
-      let $tile = this.$parent.$refs.tiles.find($t => {
-        return $t.number === currentTile.number
-      })
 
       if (currentTile) {
         let neighbors = store.findClosedNeighbors(currentTile)
@@ -454,7 +411,6 @@ export default {
         }
       }
     },
-
 
     preload(PhaserGame) {
       this.PhaserGame = PhaserGame;

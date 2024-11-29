@@ -70,6 +70,8 @@ export default {
   },
   methods: {
     startGame() {
+      playAudio('selected')
+
       let store = getStore()
       store.startGame()
     }

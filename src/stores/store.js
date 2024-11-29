@@ -173,16 +173,17 @@ const state = {
     ],
   },
   started: false, //  Game Started
-  stopped: false,
+  paused: false,
   finished: false,
   players: [], //  Players
   items: [], // Items
   tiles: [], //  Tiles
   voice: false,
+  music: false,
 }
 
 import getters from './getters'
-import setters from './setters'
+import actions from './actions'
 
 import { defineStore } from 'pinia'
 
@@ -190,7 +191,7 @@ const getStore = defineStore({
   id: 'game',
   state: () => state,
   getters: getters,
-  actions: setters,
+  actions: actions,
 })
 
 let store
