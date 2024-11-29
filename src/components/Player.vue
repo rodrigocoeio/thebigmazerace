@@ -304,7 +304,7 @@ export default {
       }
 
       this.stopRotating(this.swirling)
-      this.swirling = this.rotate(10, 50)
+      this.swirling = this.rotate(9, 50)
 
       setTimeout(function () {
         Player.item = false;

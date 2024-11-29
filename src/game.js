@@ -9,14 +9,14 @@ export default (configs, gameComponent, objectComponents) => {
     backgroundColor: '#fffcbd',
     powerPreference: 'high-performance',
     //pixelArt: true,
-    resolution: 3,
+    resolution: 100,
     physics: {
       default: 'arcade',
       /* arcade: {
                 gravity: { y: 200 }
             } */
       arcade: {
-        //tileBias: 8,
+        tileBias: 8,
         debug: false,
         gravity: false,
       },
