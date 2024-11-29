@@ -8,6 +8,12 @@ export default {
     this.items.push({ number: 1, tile: goal_tile.number, ...chest })
     goal_tile.item = chest
 
+    // Key Item
+    let key_tile = this.getRandomTile()
+    let key = this.configs.items.find((i) => i.type == 'key')
+    this.items.push({ number: 2, tile: key_tile.number, ...key })
+    key_tile.item = key
+
     // Generate Random Items
     let randomItemsCount = this.configs.items_count
     for (let i = 0; i < randomItemsCount; i++) {
@@ -54,7 +60,7 @@ export default {
 
         return bombs.length < maxBombs
       }
-      return item.type != 'chest'
+      return item.type != 'chest' && item.type != 'key'
     })
     let random = Math.floor(Math.random() * items.length)
 

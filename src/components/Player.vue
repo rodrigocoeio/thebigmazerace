@@ -35,7 +35,8 @@ export default {
       nextTile: false,
       item: false,
       effect: false,
-      inteligence: false
+      inteligence: false,
+      hasKey: false
     }
   },
 
@@ -43,12 +44,6 @@ export default {
     this.player.Component = this;
     this.inteligence = this.player.inteligence || store.configs.inteligence
     window["player" + this.player.number] = this
-
-    /* let Player = this
-    setTimeout(function () {
-      if (Player.player.number == 1)
-        Player.foundChest()
-    }, 5000) */
   },
 
   beforeUnmount() {
@@ -69,6 +64,9 @@ export default {
       if (!moving) {
         this.reachedTile()
       }
+    },
+    hasKey(hasKey) {
+      this.Key.visible = hasKey
     }
   },
 
@@ -223,6 +221,9 @@ export default {
 
         let Player = this
         switch (this.item.type) {
+          case "key":
+            this.foundKey()
+            return
           case "chest":
             this.foundChest()
             return
@@ -259,7 +260,21 @@ export default {
       }
     },
 
+    foundKey() {
+      store.stopsVoice()
+
+      let audioNumber = Math.floor(Math.random() * 2) + 1
+      playAudio("key", "wav")
+      playAudio(this.player.name.toLowerCase() + "_key" + audioNumber, "mp3", "voice")
+      this.hasKey = true
+    },
+
     foundChest() {
+      if (!this.hasKey) {
+        this.item.taken = false
+        return false
+      }
+
       this.stopsVoice()
       this.stopsAllRotation()
 
@@ -267,8 +282,10 @@ export default {
       playAudio("take_chest")
       playAudio("finished" + audioNumber, "mp3", "voice")
 
+      this.hasKey = false
       let store = getStore()
       store.finishGame(this)
+
     },
 
     swirl() {
@@ -343,9 +360,30 @@ export default {
         playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
       }
 
-      let chestTile = store.tiles.find(tile => tile.goal)
+      let goToTile = false
+      let keyItem = store.items.find(item => item.type == "key" && !item.taken)
 
-      if (chestTile) {
+      // Key Item on the Map then go to the key tile
+      if (keyItem)
+        goToTile = store.tiles.find(tile => tile.number == keyItem.tile)
+
+      // Already Have the Key go to the chest tile
+      else if (this.hasKey)
+        goToTile = store.tiles.find(tile => tile.goal)
+
+      // If key is with other player, go to player
+      else {
+        switch (this.player.number) {
+          case 1:
+            goToTile = player2.nextTile
+            break;
+          case 2:
+            goToTile = player1.nextTile
+            break
+        }
+      }
+
+      if (goToTile) {
         // Rotate
         this.stopRotating(this.twisting_golden)
         this.twisting_golden = Player.rotate(1, 5)
@@ -355,10 +393,18 @@ export default {
         let onFinished = function () {
           Player.twister_item = false
           Player.item = false
+
+          if (Player.currentTile.number === goToTile.number) {
+            console.log(Player.player.name + " finished twisting golden" + Player.currentTile.number)
+            Player.stopRotating(Player.twisting_golden)
+            Player.dizzy();
+            return Player.moveToNextTile()
+          }
         }
 
-        Player.nextTile = chestTile
-        return this.moveTo(chestTile.number, speed * 3, onFinished)
+        console.log(this.player.name + " twisting golden" + goToTile.number)
+        Player.nextTile = goToTile
+        return this.moveTo(goToTile.number, speed * 3, onFinished)
       }
 
       return false
@@ -413,7 +459,6 @@ export default {
       this.dizzy_timeout = setTimeout(function () {
         Dizzy.visible = false
         Player.inteligence = player.inteligence ? player.inteligence : store.configs.inteligence
-        console.log(Player.player.name + " - " + Player.inteligence)
         Player.dizzy_timeout = false
       }, store.configs.dizzy_seconds * 1000)
     },
@@ -483,6 +528,7 @@ export default {
       Scene.load.image("dizzy", "/images/dizzy.png");
       Scene.load.image("chest_open", "/images/chest_open.png");
       Scene.load.image("explosion", "/images/explosion.png");
+      Scene.load.image("hasKey", "/images/hasKey.png");
 
       let image = new Image();
       image.src = this.player.image;
@@ -496,12 +542,14 @@ export default {
       const dizzySprite = Scene.physics.add.sprite(x, y, "dizzy");
       const mudSprite = Scene.physics.add.sprite(x, y, "mud");
       const fireSprite = Scene.physics.add.sprite(x, y, "fire");
+      const keySprite = Scene.physics.add.sprite(x, y, "hasKey");
 
       player.depth = 1
       shadow.depth = 1
       dizzySprite.depth = 1
       mudSprite.depth = 1
       fireSprite.depth = 0.9
+      keySprite.depth = 1.1
 
       shadow.setOrigin(0.5);
       shadow.tint = 0x000000;
@@ -521,6 +569,8 @@ export default {
       mudSprite.scaleX = dizzySprite.scaleY;
       fireSprite.displayHeight = playerHeight
       fireSprite.scaleX = dizzySprite.scaleY;
+      keySprite.displayHeight = playerHeight
+      keySprite.scaleX = dizzySprite.scaleY;
 
       // Position Player
       let tileWidth = this.currentTile.width
@@ -538,10 +588,13 @@ export default {
       mudSprite.y = playerY + this.shadowDistance
       fireSprite.x = playerX + this.shadowDistance
       fireSprite.y = playerY + this.shadowDistance
+      keySprite.x = playerX + this.shadowDistance
+      keySprite.y = playerY + this.shadowDistance
 
       dizzySprite.visible = false
       mudSprite.visible = false
       fireSprite.visible = false
+      keySprite.visible = this.hasKey
       mudSprite.alpha = 0.7
 
       this.physics = Scene.physics;
@@ -550,7 +603,32 @@ export default {
       this.Dizzy = dizzySprite;
       this.Mud = mudSprite;
       this.Fire = fireSprite;
+      this.Key = keySprite;
       //this.Glow = this.glow();
+
+      // Collider
+      if (this.player.number == 2) {
+        let lastTouched = new Date()
+        Scene.physics.add.overlap(player1.Player, player, function (args) {
+          let lastTouchedSeconds = Math.round((new Date() - lastTouched) / 1000, 2)
+
+          if (lastTouchedSeconds > 1) {
+            lastTouched = new Date()
+            console.log("Players Touched!")
+
+            // Stole Key
+            if (player1.hasKey) {
+              player1.hasKey = false
+              player2.foundKey()
+            }
+            else
+              if (player2.hasKey) {
+                player2.hasKey = false
+                player1.foundKey()
+              }
+          }
+        });
+      }
     },
 
     update(Scene) {
@@ -568,6 +646,7 @@ export default {
             this.Dizzy.body.reset(this.target.x, this.target.y);
             this.Mud.body.reset(this.target.x, this.target.y);
             this.Fire.body.reset(this.target.x, this.target.y);
+            this.Key.body.reset(this.target.x, this.target.y);
             this.Shadow.body.reset((this.target.x + this.shadowDistance), (this.target.y + this.shadowDistance));
             this.target = false;
             this.distance = 0
@@ -591,6 +670,8 @@ export default {
         this.target = false;
         this.Player.body.speed = 0
         this.Dizzy.body.speed = 0
+        this.Fire.body.speed = 0
+        this.Mud.body.speed = 0
         this.Shadow.body.speed = 0
 
         const tile = this.currentTile
@@ -608,6 +689,7 @@ export default {
           this.Dizzy.body.reset(this.target.x, this.target.y);
           this.Fire.body.reset(this.target.x, this.target.y);
           this.Mud.body.reset(this.target.x, this.target.y);
+          this.Key.body.reset(this.target.x, this.target.y);
           this.Shadow.body.reset((this.target.x + this.shadowDistance), (this.target.y + this.shadowDistance));
 
           this.moveToNextTile()
@@ -631,13 +713,18 @@ export default {
           tile: tile
         };
 
-        this.onFinishMoving = onFinishMoving
-
         this.physics.moveToObject(this.Player, this.target, speed);
         this.physics.moveToObject(this.Shadow, this.target, speed);
-        this.physics.moveToObject(this.Dizzy, this.target, speed);
-        this.physics.moveToObject(this.Mud, this.target, speed);
-        this.physics.moveToObject(this.Fire, this.target, speed);
+        if (this.Dizzy.visible)
+          this.physics.moveToObject(this.Dizzy, this.target, speed);
+        if (this.Mud.visible)
+          this.physics.moveToObject(this.Mud, this.target, speed);
+        if (this.Fire.visible)
+          this.physics.moveToObject(this.Fire, this.target, speed);
+        this.physics.moveToObject(this.Key, this.target, speed);
+
+        this.moving = true
+        this.onFinishMoving = onFinishMoving
 
         return true;
       }

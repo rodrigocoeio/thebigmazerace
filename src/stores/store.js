@@ -191,6 +191,10 @@ const state = {
         count: 0,
       },
       {
+        type: 'key',
+        image: '/images/key.png',
+      },
+      {
         type: 'chest',
         image: '/images/chest.png',
       },
