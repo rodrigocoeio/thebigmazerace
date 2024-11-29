@@ -7,7 +7,8 @@ export default (configs, gameComponent, objectComponents) => {
     width: window.innerWidth,
     height: window.innerHeight,
     backgroundColor: '#fffcbd',
-    resolution: 3,
+    powerPreference: 'high-performance',
+    //resolution: 3,
     physics: {
       default: 'arcade',
       /* arcade: {
