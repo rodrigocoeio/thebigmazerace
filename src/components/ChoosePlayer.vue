@@ -1,7 +1,7 @@
 <template>
   <div class="ChoosePlayer" @click="openPlayers">
     <div class="Player" v-show="selected">
-      <img :src="selected.image">
+      <img :src="selected.image" height="50">
       {{ selected.name }}
       ↓
     </div>
@@ -12,7 +12,7 @@
       <div class="Placeholder">Choose a player</div>
       <div :class="['Player', player.selected ? 'Selected' : '']" :key="index" v-for="player, index in players"
         @click="select(player)">
-        <img :src="player.image">
+        <img :src="player.image" height="50">
         {{ player.name }}
       </div>
     </div>
