@@ -24,7 +24,7 @@ export default {
   },
 
   mounted() {
-    if (this.item.type === "chest") {
+    if (this.item.type === "chest" || this.item.type === "key") {
       let Item = this
 
       setTimeout(() => {
