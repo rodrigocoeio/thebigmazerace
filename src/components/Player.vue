@@ -230,6 +230,8 @@ export default {
           case "speedup":
             if (this.item.count == 0) {
               let audioNumber = Math.floor(Math.random() * 3) + 1
+              let rocketAudio = playAudio("rocket")
+              rocketAudio.volume = 0.5
               playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
               this.Fire.visible = true
             }
@@ -237,6 +239,7 @@ export default {
           case "speeddown":
             if (this.item.count == 0) {
               let audioNumber = Math.floor(Math.random() * 3) + 1
+              playAudio("mud")
               playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
               this.Mud.visible = true
             }
@@ -285,6 +288,8 @@ export default {
 
       if (Player.item.count == 0) {
         let audioNumber = Math.floor(Math.random() * 3) + 1
+        let swirlAudio = playAudio("swirl")
+        swirlAudio.volume = 0.5
         playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
       }
 
@@ -307,6 +312,8 @@ export default {
 
       if (Player.item.count == 0) {
         let audioNumber = Math.floor(Math.random() * 3) + 1
+        let twisterAudio = playAudio("twister")
+        twisterAudio.volume = 0.8
         playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
       }
 
@@ -349,6 +356,7 @@ export default {
 
       if (Player.item.count == 0) {
         let audioNumber = Math.floor(Math.random() * 3) + 1
+        playAudio("twister")
         playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
       }
 
