@@ -24,23 +24,20 @@ export default {
   },
 
   mounted() {
-    if (this.item.type === "chest" || this.item.type === "key") {
+    /* if (this.item.type === "chest" || this.item.type === "key") {
       let Item = this
 
       setTimeout(() => {
         Item.glowing = true
         Item.glow()
       }, 500)
-    }
+    } */
   },
 
   beforeUnmount() {
     //console.log("unmounting item number: " + this.item.number)
     if (this.Item)
       this.Item.destroy()
-
-    if (this.Shadow)
-      this.Shadow.destroy()
   },
 
   computed: {
@@ -52,9 +49,6 @@ export default {
       if (taken) {
         if (this.Item)
           this.Item.destroy()
-
-        if (this.Shadow)
-          this.Shadow.destroy()
       }
     }
   },
@@ -69,27 +63,19 @@ export default {
       let item_x = tile.x + tile.width / 2
       let item_y = tile.y + tile.height / 2
 
-      const Shadow = Scene.physics.add.sprite((item_x + this.shadowDistance), (item_y + this.shadowDistance), this.item.type);
       const Item = Scene.physics.add.sprite(item_x, item_y, this.item.type);
+      const shadow = Item.preFX.addShadow(-10, -10, 0.006, 2, 0x333333, 10);
 
       Item.depth = 0.9
-      Shadow.depth = 0.9
-
-      Shadow.setOrigin(0.5);
-      Shadow.tint = 0x000000;
-      Shadow.alpha = 0.5;
 
       // Scale Item
       let itemHeight = this.item.type === "chest" ? tile.height / 1.5 : tile.height / 2
       Item.displayHeight = itemHeight
       Item.scaleX = Item.scaleY;
-      Shadow.displayHeight = itemHeight
-      Shadow.scaleX = Shadow.scaleY;
 
 
       this.physics = Scene.physics;
       this.Item = Item;
-      this.Shadow = Shadow;
     },
 
     update(Scene) {
@@ -102,7 +88,6 @@ export default {
           //  before it is considered as being there. The faster it moves, the more tolerance is required.
           if (distance < 6) {
             this.Item.body.reset(this.target.x, this.target.y);
-            this.Shadow.body.reset((this.target.x + this.shadowDistance), (this.target.y + this.shadowDistance));
             this.target = false;
           }
         } else { this.moving = false; this.target = false; }
@@ -122,7 +107,6 @@ export default {
         };
 
         this.physics.moveToObject(this.Item, this.target, speed);
-        this.physics.moveToObject(this.Shadow, this.target, speed);
 
         return true;
       }

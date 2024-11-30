@@ -31,13 +31,9 @@ const listenKeyBoardEvents = function (e) {
       store.paused = !store.paused
 
       if (store.paused) {
-        console.log('Game Paused!')
-        store.stopsVoice()
-        store.Scene.sys.pause()
-        if (store.music) store.music.volume = 0
+        store.pauseGame()
       } else {
-        store.Scene.sys.resume()
-        if (store.music) store.music.volume = 0.2
+        store.unpauseGame()
       }
     }
   }

@@ -20,6 +20,16 @@ export default {
 
     this.startTime = new Date()
   },
+  pauseGame() {
+    console.log('Game Paused!')
+    this.stopsVoice()
+    this.Scene.sys.pause()
+    if (this.music) this.music.volume = 0
+  },
+  unpauseGame() {
+    this.Scene.sys.resume()
+    if (this.music) this.music.volume = 0.2
+  },
   quitGame() {
     console.log('Game Quited!')
 
@@ -37,11 +47,11 @@ export default {
 
     this.finishedTime = new Date()
     this.started = true
-    this.paused = true
     this.finished = true
     this.winner = winner
 
     this.stopsMusic()
+    this.pauseGame()
   },
   startsMusic() {
     if (!this.music) {

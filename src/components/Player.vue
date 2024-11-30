@@ -22,7 +22,6 @@ export default {
       Game: Game,
       Scene: false,
       Player: false,
-      Shadow: false,
       Glow: false,
       shadowDistance: 5,
       moving: false,
@@ -54,8 +53,6 @@ export default {
 
     if (this.Player)
       this.Player.destroy()
-    if (this.Shadow)
-      this.Shadow.destroy()
     if (this.Dizzy)
       this.Dizzy.destroy()
     if (this.Fire)
@@ -98,7 +95,6 @@ export default {
       }
 
       //this.Player.x = this.currentTile.width / 2
-      //this.Shadow.x = this.currentTile.width / 2
 
       this.moveToNextTile()
     },
@@ -110,14 +106,12 @@ export default {
       const x = this.player.position ? this.player.position.x : 0;
       const y = this.player.position ? this.player.position.y : 0;
       this.Player.setPosition(x, y);
-      this.Shadow.setPosition(x + this.shadowDistance, y + this.shadowDistances);
       this.moving = false
       this.target = false
       this.tilesStack = []
       this.tile = false
       this.nextTile = false
       this.Player.body.reset(x, y);
-      this.Shadow.body.reset((x + this.shadowDistance), (y + this.shadowDistance));
     },
 
     stopsVoice() {
@@ -200,14 +194,12 @@ export default {
         let position = nextTile.position
         if (position == "left") {
           this.Player.setFlipX(true);
-          this.Shadow.setFlipX(true);
         } else if (position == "right") {
           this.Player.setFlipX(false);
-          this.Shadow.setFlipX(false);
         }
 
         this.nextTile = nextTile.tile
-        this.moveTo(nextTile.tile.number, speed)
+        this.moveTo(nextTile.tile, speed)
       }
     },
 
@@ -341,7 +333,7 @@ export default {
             randomTile = store.getRandomTile(true)
             Player.nextTile = randomTile
             Player.twister_item.count++
-            return this.moveTo(randomTile.number, speed * 3, onFinished)
+            return this.moveTo(randomTile, speed * 3, onFinished)
           }
 
           Player.twister_item = false
@@ -352,7 +344,7 @@ export default {
         }
 
         Player.nextTile = randomTile
-        return this.moveTo(randomTile.number, speed * 3, onFinished)
+        return this.moveTo(randomTile, speed * 3, onFinished)
       }
 
       return false
@@ -420,7 +412,7 @@ export default {
 
         console.log(this.player.name + " twisting golden" + goToTile.number)
         Player.nextTile = goToTile
-        return this.moveTo(goToTile.number, speed * 3, onFinished)
+        return this.moveTo(goToTile, speed * 3, onFinished)
       }
 
       return false
@@ -432,18 +424,15 @@ export default {
       angle = angle ? angle : 35
 
       Player.Player.setOrigin(0.5, 0.5);
-      Player.Shadow.setOrigin(0.5, 0.5);
       return setInterval(() => {
         if (store.paused) return false
         Player.Player.angle += angle;
-        Player.Shadow.angle += angle;
       }, interval)
     },
 
     stopRotating(rotating) {
       if (rotating) {
         this.Player.angle = 0;
-        this.Shadow.angle = 0;
 
         clearInterval(rotating)
         rotating = false
@@ -554,23 +543,20 @@ export default {
     create(Scene) {
       const x = this.player.position ? this.player.position.x : 0;
       const y = this.player.position ? this.player.position.y : 0;
-      const shadow = Scene.physics.add.sprite((x + this.shadowDistance), (y + this.shadowDistance), this.player.name);
       const player = Scene.physics.add.sprite(x, y, this.player.name);
+      const shadow = player.preFX.addShadow(-10, -10, 0.006, 2, 0x333333, 10);
       const dizzySprite = Scene.physics.add.sprite(x, y, "dizzy");
       const mudSprite = Scene.physics.add.sprite(x, y, "mud");
       const fireSprite = Scene.physics.add.sprite(x, y, "fire");
       const keySprite = Scene.physics.add.sprite(x, y, "hasKey");
 
+
+
       player.depth = 1
-      shadow.depth = 1
       dizzySprite.depth = 1
       mudSprite.depth = 1
       fireSprite.depth = 0.9
       keySprite.depth = 1.1
-
-      shadow.setOrigin(0.5);
-      shadow.tint = 0x000000;
-      shadow.alpha = 0.5;
 
       // Scale Player
       let tileHeight = this.currentTile.height
@@ -578,8 +564,6 @@ export default {
 
       player.displayHeight = playerHeight
       player.scaleX = player.scaleY;
-      shadow.displayHeight = playerHeight
-      shadow.scaleX = player.scaleY;
       dizzySprite.displayHeight = playerHeight
       dizzySprite.scaleX = dizzySprite.scaleY;
       mudSprite.displayHeight = playerHeight
@@ -597,8 +581,6 @@ export default {
       let playerY = tileHeight / 2
       player.x = playerX
       player.y = playerY
-      shadow.x = playerX + this.shadowDistance
-      shadow.y = playerY + this.shadowDistance
       dizzySprite.x = playerX + this.shadowDistance
       dizzySprite.y = playerY + this.shadowDistance
       mudSprite.x = playerX + this.shadowDistance
@@ -616,7 +598,6 @@ export default {
 
       this.physics = Scene.physics;
       this.Player = player;
-      this.Shadow = shadow;
       this.Dizzy = dizzySprite;
       this.Mud = mudSprite;
       this.Fire = fireSprite;
@@ -649,7 +630,7 @@ export default {
     },
 
     update(Scene) {
-      this.isOutOfScreenFix()
+      //this.isOutOfScreenFix()
 
       if (this.target && this.Player.body) {
         if (this.Player.body.speed > 0) {
@@ -664,7 +645,6 @@ export default {
             this.Mud.body.reset(this.target.x, this.target.y);
             this.Fire.body.reset(this.target.x, this.target.y);
             this.Key.body.reset(this.target.x, this.target.y);
-            this.Shadow.body.reset((this.target.x + this.shadowDistance), (this.target.y + this.shadowDistance));
             this.target = false;
             this.distance = 0
           } else {
@@ -674,6 +654,37 @@ export default {
           //console.log(this.player.name + " is moving, distance: " + distance)
         } else { this.moving = false; this.target = false; }
       } else { this.moving = false; }
+    },
+
+    moveTo(tile, speed = 100, onFinishMoving) {
+      const player_x = tile.width / 2
+      const player_y = tile.height / 2
+
+      if (tile) {
+        this.target = {
+          x: (tile.x + player_x),
+          y: (tile.y + player_y),
+          tile: tile
+        };
+
+        this.physics.moveToObject(this.Player, this.target, speed);
+
+        if (this.Dizzy.visible)
+          this.physics.moveToObject(this.Dizzy, this.target, speed);
+        if (this.Mud.visible)
+          this.physics.moveToObject(this.Mud, this.target, speed);
+        if (this.Fire.visible)
+          this.physics.moveToObject(this.Fire, this.target, speed);
+        if (store.configs.mode == "key")
+          this.physics.moveToObject(this.Key, this.target, speed);
+
+        this.moving = true
+        this.onFinishMoving = onFinishMoving
+
+        return true;
+      }
+
+      throw Error("Error while moving player " + this.player.name + " to: " + to + " ( tile " + to + " does not exist )");
     },
 
     isOutOfScreenFix() {
@@ -689,7 +700,6 @@ export default {
         this.Dizzy.body.speed = 0
         this.Fire.body.speed = 0
         this.Mud.body.speed = 0
-        this.Shadow.body.speed = 0
         this.Key.body.speed = 0
 
         const tile = this.currentTile
@@ -717,38 +727,6 @@ export default {
       }
 
       return isOutOfScreen
-    },
-
-    moveTo(to, speed = 100, onFinishMoving) {
-      const tile = store.tiles.find(t => t.number == to)
-      const player_x = tile.width / 2
-      const player_y = tile.height / 2
-
-      if (tile) {
-        this.target = {
-          x: (tile.x + player_x),
-          y: (tile.y + player_y),
-          tile: tile
-        };
-
-        this.physics.moveToObject(this.Player, this.target, speed);
-        this.physics.moveToObject(this.Shadow, this.target, speed);
-        if (this.Dizzy.visible)
-          this.physics.moveToObject(this.Dizzy, this.target, speed);
-        if (this.Mud.visible)
-          this.physics.moveToObject(this.Mud, this.target, speed);
-        if (this.Fire.visible)
-          this.physics.moveToObject(this.Fire, this.target, speed);
-        if (store.configs.mode == "key")
-          this.physics.moveToObject(this.Key, this.target, speed);
-
-        this.moving = true
-        this.onFinishMoving = onFinishMoving
-
-        return true;
-      }
-
-      throw Error("Error while moving player " + this.player.name + " to: " + to + " ( tile " + to + " does not exist )");
     },
 
     glow() {

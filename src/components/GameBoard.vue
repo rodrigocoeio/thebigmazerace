@@ -166,7 +166,7 @@ export default
         this.Scene = Scene
 
         // Background
-        Scene.load.image('board', "/images/background.jpeg");
+        Scene.load.image('board', "/images/background2.jpeg");
         Scene.load.image('tile-column', "images/column.png");
         Scene.load.image('tile-row', "images/row.png");
 
@@ -186,7 +186,7 @@ export default
         this.Scene = Scene
 
         // Board
-        this.board = Scene.add.image(store.configs.width / 2, store.configs.height / 2, 'board');
+        //this.board = Scene.add.image(store.configs.width / 2, store.configs.height / 2, 'board');
         //this.board.setAlpha(0.8);
       },
       update(Scene) {
