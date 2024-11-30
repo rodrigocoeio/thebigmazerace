@@ -276,13 +276,6 @@ export default {
         return false
       }
 
-      this.stopsVoice()
-      this.stopsAllRotation()
-
-      let audioNumber = Math.floor(Math.random() * 2) + 1
-      playAudio("take_chest")
-      playAudio("finished" + audioNumber, "mp3", "voice")
-
       this.hasKey = false
       store.finishGame(this)
     },

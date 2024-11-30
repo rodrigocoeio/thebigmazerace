@@ -45,13 +45,16 @@ export default {
     console.log('Game Finished!')
     console.info(winner.player.name + ' has founded the chest in ' + this.getTimeElapsed() + 's')
 
+    this.pauseGame()
+
     this.finishedTime = new Date()
     this.started = true
     this.finished = true
     this.winner = winner
 
-    this.stopsMusic()
-    this.pauseGame()
+    let audioNumber = Math.floor(Math.random() * 2) + 1
+    playAudio('take_chest')
+    playAudio('finished' + audioNumber, 'mp3', 'voice')
   },
   startsMusic() {
     if (!this.music) {
