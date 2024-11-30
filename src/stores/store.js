@@ -50,6 +50,9 @@ const state = {
     refresh_items_seconds: false, // Refresh one item every x seconds
     twister_golden_after_seconds: 0, // Special Twister Appears after x seconds ( takes the player to the chest )
     detect_players_touch_seconds: 2, // Detect that players have touch after x seconds ( used in stole key mode)
+    display: {
+      shadows: false,
+    },
     players: [
       {
         number: 0,

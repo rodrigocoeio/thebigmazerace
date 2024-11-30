@@ -544,7 +544,8 @@ export default {
       const x = this.player.position ? this.player.position.x : 0;
       const y = this.player.position ? this.player.position.y : 0;
       const player = Scene.physics.add.sprite(x, y, this.player.name);
-      const shadow = player.preFX.addShadow(-10, -10, 0.006, 2, 0x333333, 10);
+      if (store.configs.display.shadows)
+        player.preFX.addShadow(-10, -10, 0.006, 2, 0x333333, 10);
       const dizzySprite = Scene.physics.add.sprite(x, y, "dizzy");
       const mudSprite = Scene.physics.add.sprite(x, y, "mud");
       const fireSprite = Scene.physics.add.sprite(x, y, "fire");

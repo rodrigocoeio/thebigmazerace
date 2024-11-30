@@ -64,7 +64,8 @@ export default {
       let item_y = tile.y + tile.height / 2
 
       const Item = Scene.physics.add.sprite(item_x, item_y, this.item.type);
-      const shadow = Item.preFX.addShadow(-10, -10, 0.006, 2, 0x333333, 10);
+      if (store.configs.display.shadows)
+        Item.preFX.addShadow(-10, -10, 0.006, 2, 0x333333, 10);
 
       Item.depth = 0.9
 
