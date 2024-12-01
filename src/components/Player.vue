@@ -333,7 +333,7 @@ export default {
             randomTile = store.getRandomTile(true)
             Player.nextTile = randomTile
             Player.twister_item.count++
-            return this.moveTo(randomTile, speed * 3, onFinished)
+            return this.moveTo(randomTile, speed * store.configs.twister_speed_multiplier, onFinished)
           }
 
           Player.twister_item = false
@@ -344,7 +344,7 @@ export default {
         }
 
         Player.nextTile = randomTile
-        return this.moveTo(randomTile, speed * 3, onFinished)
+        return this.moveTo(randomTile, speed * store.configs.twister_speed_multiplier, onFinished)
       }
 
       return false
@@ -413,7 +413,7 @@ export default {
 
         console.log(this.player.name + " twisting golden" + goToTile.number)
         Player.nextTile = goToTile
-        return this.moveTo(goToTile, speed * 3, onFinished)
+        return this.moveTo(goToTile, speed * store.configs.twister_speed_multiplier, onFinished)
       }
 
       return false

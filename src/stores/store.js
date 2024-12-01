@@ -50,6 +50,7 @@ const state = {
     startAfterSeconds: 3, // Start Players After x seconds
     refresh_items_seconds: false, // Refresh one item every x seconds
     twister_golden_after_seconds: 0, // Special Twister Appears after x seconds ( takes the player to the chest )
+    twister_speed_multiplier: 2.5, // Twister speed multiplier
     detect_players_touch_seconds: 2, // Detect that players have touch after x seconds ( used in stole key mode)
     display: {
       shadows: false,
@@ -195,7 +196,7 @@ const state = {
     hard: {
       columns: 12,
       rows: 12,
-      speed: 150,
+      speed: 140,
       inteligence: 'smart',
       changeWayEveryNumberOfTiles: 7,
       items_count: 40,
