@@ -179,7 +179,7 @@ const state = {
       max_swirlings: 3,
       max_twisters: 3,
       max_bombs: 5,
-      twister_golden_after_seconds: 60, // Special Twister Appears after x seconds ( takes the player to the chest )
+      twister_golden_after_seconds: 50, // Special Twister Appears after x seconds ( takes the player to the chest )
     },
     normal: {
       columns: 9,
@@ -191,7 +191,7 @@ const state = {
       max_swirlings: 5,
       max_twisters: 5,
       max_bombs: 10,
-      twister_golden_after_seconds: 90, // Special Twister Appears after x seconds ( takes the player to the chest )
+      twister_golden_after_seconds: 70, // Special Twister Appears after x seconds ( takes the player to the chest )
     },
     hard: {
       columns: 12,
@@ -203,7 +203,7 @@ const state = {
       max_swirlings: 7,
       max_twisters: 7,
       max_bombs: 15,
-      twister_golden_after_seconds: 120, // Special Twister Appears after x seconds ( takes the player to the chest )
+      twister_golden_after_seconds: 90, // Special Twister Appears after x seconds ( takes the player to the chest )
     },
   },
 }
