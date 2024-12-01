@@ -250,11 +250,13 @@ export default
         chest_shadow.tint = 0x000000;
         chest_shadow.alpha = 0.5;
 
-        const text_y = chest_y + 80
-        const text_x = x - 300
-        const finishedText = "The " + winner.player.name + " has found the chest!"
+        const text_y = chest_y + 120
+        const text_x = x
+        const spentTime = store.getTimeElapsed()
+        const finishedText = "The " + winner.player.name + " has found the chest in " + spentTime + " seconds!"
         const text = this.Scene.add.text(text_x, text_y, finishedText, { font: "600 48px Poppins", color: "white" });
         text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 1);
+        text.setOrigin(0.5);
 
         overlay.depth = 1.9
         player.depth = 2
