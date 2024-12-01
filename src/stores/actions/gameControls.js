@@ -1,4 +1,14 @@
 export default {
+  buildGame() {
+    this.tiles = []
+    this.items = []
+    this.players = []
+
+    this.generateTiles()
+    this.generateMaze()
+    this.generateItems()
+    this.generatePlayers()
+  },
   startGame() {
     console.log('Game Started!')
 

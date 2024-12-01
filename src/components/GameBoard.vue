@@ -85,33 +85,12 @@ export default
     },
 
     created() {
-      store.tiles = [];
-      store.items = [];
-      store.players = [];
-
-      store.generateTiles();
-      store.generateMaze();
-      store.generateItems();
-      store.generatePlayers();
+      store.buildGame()
     },
 
     mounted() {
-      let Game = this
-      setTimeout(function () {
-        Game.startPlayers()
-      }, 3000)
-
-      // Refresh one item every x seconds
-      if (this.configs.refresh_items_seconds) {
-        this.itemRefresher = setInterval(function () {
-          let item = store.items.find(i => !i.taken && i.type != "chest")
-
-          if (item) {
-            item.taken = true
-            store.generateItem()
-          }
-        }, this.configs.refresh_items_seconds * 1000)
-      }
+      this.startPlayers()
+      this.itemRefresher()
     },
 
     beforeUnmount() {
@@ -121,12 +100,16 @@ export default
 
     methods: {
       startPlayers() {
-        this.$refs.players.forEach(player => player.start());
-
         let Game = this
+        let store = getStore()
+
+        setTimeout(function () {
+          Game.$refs.players.forEach(player => player.start());
+        }, store.configs.startAfterSeconds * 1000)
+
         this.timeInterval = setInterval(() => {
           Game.currentTime = new Date()
-        })
+        }, 1000)
       },
 
       stopGame() {
@@ -159,6 +142,20 @@ export default
         let store = getStore()
         if (store.finished) {
           store.quitGame()
+        }
+      },
+
+      // Refresh one item every x seconds
+      itemRefresher() {
+        if (this.configs.refresh_items_seconds) {
+          this.itemRefresher = setInterval(function () {
+            let item = store.items.find(i => !i.taken && i.type != "chest")
+
+            if (item) {
+              item.taken = true
+              store.generateItem()
+            }
+          }, this.configs.refresh_items_seconds * 1000)
         }
       },
 

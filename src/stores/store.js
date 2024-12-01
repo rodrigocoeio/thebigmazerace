@@ -23,7 +23,7 @@ const state = {
     height: window.innerHeight,
     columns: 12,
     rows: 8,
-    difficulty: 'easy',
+    difficulty: 'normal',
     mode: 'chest', // Chest Mode  / Key Mode
     speed: 120,
     items_count: 9,
@@ -47,6 +47,7 @@ const state = {
     dev: false,
     changeWayEveryNumberOfTiles: 5,
     instant_mode: false, // Instant movement, for testing purposes
+    startAfterSeconds: 3, // Start Players After x seconds
     refresh_items_seconds: false, // Refresh one item every x seconds
     twister_golden_after_seconds: 0, // Special Twister Appears after x seconds ( takes the player to the chest )
     detect_players_touch_seconds: 2, // Detect that players have touch after x seconds ( used in stole key mode)
@@ -128,7 +129,7 @@ const state = {
       {
         type: 'speeddown',
         image: '/images/speeddown.png',
-        limit: 3,
+        limit: 1,
         count: 0,
       },
       {
@@ -172,7 +173,7 @@ const state = {
       rows: 6,
       speed: 120,
       inteligence: 'smart',
-      changeWayEveryNumberOfTiles: 5,
+      changeWayEveryNumberOfTiles: 3,
       items_count: 15,
       max_swirlings: 3,
       max_twisters: 3,
@@ -184,7 +185,7 @@ const state = {
       rows: 9,
       speed: 130,
       inteligence: 'smart',
-      changeWayEveryNumberOfTiles: 7,
+      changeWayEveryNumberOfTiles: 5,
       items_count: 25,
       max_swirlings: 5,
       max_twisters: 5,
@@ -196,7 +197,7 @@ const state = {
       rows: 12,
       speed: 150,
       inteligence: 'smart',
-      changeWayEveryNumberOfTiles: 10,
+      changeWayEveryNumberOfTiles: 7,
       items_count: 40,
       max_swirlings: 7,
       max_twisters: 7,

@@ -91,7 +91,7 @@ export default {
     },
 
     buildWalls(Scene) {
-      let columnWallHeight = this.height / 5;
+      let columnWallHeight = this.height / 6;
 
       // Top Wall
       if (this.walls.top) {
@@ -110,7 +110,7 @@ export default {
       // Bottom Wall
       if (this.walls.bottom) {
         let bottomX = this.x + (this.width / 2)
-        let bottomY = this.y + this.height //- (columnWallHeight / 2)
+        let bottomY = this.y + this.height - (columnWallHeight / 2)
         this.bottomWall = Scene.add.image(bottomX, bottomY, 'tile-row');
         //this.bottomWall.preFX.addShadow(-10, -10, 0.006, 2, 0x333333, 10);
 
@@ -126,14 +126,14 @@ export default {
         let leftY = this.y + (this.height / 2)
         this.leftWall = Scene.add.image(leftX, leftY, 'tile-column');
         this.leftWall.displayWidth = columnWallHeight;
-        this.leftWall.displayHeight = this.height + (columnWallHeight);
+        this.leftWall.displayHeight = this.height + (columnWallHeight)
       } else if (this.leftWall) {
         this.leftWall.destroy();
       }
 
       // Right Wall
       if (this.walls.right) {
-        let rightX = this.x + this.width// - (columnWallHeight / 2)
+        let rightX = this.x + this.width - (columnWallHeight / 2)
         let rightY = this.y + (this.height / 2)
         this.rightWall = Scene.add.image(rightX, rightY, 'tile-column');
         this.rightWall.displayWidth = columnWallHeight;
