@@ -65,6 +65,18 @@ export default {
     let audioNumber = Math.floor(Math.random() * 2) + 1
     playAudio('take_chest')
     playAudio('finished' + audioNumber, 'mp3', 'voice')
+
+    // Loop Matches
+    if (this.configs.loop_matches) {
+      let store = this
+      setTimeout(function () {
+        store.quitGame()
+
+        setTimeout(function () {
+          store.startGame()
+        }, 1000)
+      }, 5000)
+    }
   },
   startsMusic() {
     if (!this.music) {

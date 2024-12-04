@@ -145,6 +145,10 @@ export default {
     // Avoid last neighbor
     neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
 
+    // Get Special Items
+    let specialItemNeighbor = this.getSpecialItemNeighbor(neighbors)
+    if (specialItemNeighbor) return specialItemNeighbor
+
     return unvisitedNeighbor
       ? unvisitedNeighbor
       : this.getLeastDecidedNeighbor(currentTile, neighbors)
@@ -167,6 +171,10 @@ export default {
       }
       return true
     })
+
+    // Get Special Items
+    let specialItemNeighbor = this.getSpecialItemNeighbor(neighbors)
+    if (specialItemNeighbor) return specialItemNeighbor
 
     // Try first going unvisited neighbors
     let unvisitedNeighbors = neighbors.filter((n) => n.tile.visited === 0)
@@ -192,5 +200,12 @@ export default {
     })
 
     return leastDecidedNeighbor
+  },
+
+  getSpecialItemNeighbor(neighbors) {
+    let specialItems = ['key', 'chest', 'twister_golden', 'speedup']
+    return neighbors.find((neighbor) => {
+      return specialItems.includes(neighbor.tile.item.type)
+    })
   },
 }

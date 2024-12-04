@@ -27,6 +27,7 @@ export default {
       moving: false,
       glowing: false,
       start_position: false,
+      started: false,
       tiles: [],
       tilesStack: [], // walked tiles
       lastTile: false,
@@ -94,13 +95,12 @@ export default {
         this.currentTile.visited = 1
       }
 
-      //this.Player.x = this.currentTile.width / 2
-
+      this.started = true
       this.moveToNextTile()
     },
     stop() {
-      this.moving = false
-      this.target = false
+      this.started = false
+      this.nextTile = false
     },
     restart() {
       const x = this.player.position ? this.player.position.x : 0;
@@ -153,7 +153,7 @@ export default {
     moveToNextTile() {
       store = getStore();
 
-      if (!store.started || this.moving || store.paused)
+      if (!store.started || !this.started || this.moving || store.paused)
         return false
 
       let speed = this.player.speed ? this.player.speed : store.configs.speed

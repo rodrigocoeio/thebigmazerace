@@ -45,6 +45,7 @@ const state = {
     voice: true,
     music: true,
     dev: false,
+    loop_matches: true,
     changeWayEveryNumberOfTiles: 5,
     instant_mode: false, // Instant movement, for testing purposes
     startAfterSeconds: 3, // Start Players After x seconds
