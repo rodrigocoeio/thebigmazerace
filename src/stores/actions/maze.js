@@ -1,4 +1,23 @@
 export default {
+  rebuildMaze() {
+    this.tiles = [];
+    this.items = [];
+    this.players = [];
+
+    setTimeout(() => {
+      this.generateTiles();
+      this.generateMaze();
+      this.generateItems();
+      this.generatePlayers();
+
+      player1.restart()
+      player2.restart()
+
+      player1.start()
+      player2.start()
+    }, 10);
+  },
+
   // Generates Maze
   generateMaze() {
     let changeCourseEveryNumberOfTiles = this.configs.changeWayEveryNumberOfTiles

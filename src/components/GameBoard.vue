@@ -118,23 +118,12 @@ export default
       },
 
       restartGame() {
-        this.stopGame()
+        this.startTime = new Date()
         this.$refs.players.forEach($player => $player.restart())
       },
 
       rebuildMaze() {
-        this.restartGame()
-
-        store.tiles = [];
-        store.items = [];
-        store.players = [];
-
-        setTimeout(() => {
-          store.generateTiles();
-          store.generateMaze();
-          store.generateItems();
-          store.generatePlayers();
-        }, 10);
+        store.rebuildMaze()
       },
 
       quitGameIfFinished() {

@@ -608,13 +608,15 @@ export default {
 
       // Collider stolle key on key mode
       if (store.configs.mode == "key" && this.player.number == 2) {
-        let lastTouched = new Date()
+        let PlayerComponent = this
+        this.lastTouched = new Date()
         Scene.physics.add.overlap(player1.Player, player, function (args) {
-          let lastTouchedSeconds = Math.round((new Date() - lastTouched) / 1000, 2)
+          let lastTouchedSeconds = Math.round((new Date() - PlayerComponent.lastTouched) / 1000, 2)
 
+          console.log("Players last touched "+ lastTouchedSeconds+ " seconds")
           // Detect touch every x second
           if (lastTouchedSeconds >= store.configs.detect_players_touch_seconds) {
-            lastTouched = new Date()
+            PlayerComponent.lastTouched = new Date()
 
             // Stole Key
             if (player1.hasKey) {

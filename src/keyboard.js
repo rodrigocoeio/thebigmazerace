@@ -41,7 +41,7 @@ const listenKeyBoardEvents = function (e) {
   // Speeds UP
   if (e.key == '+') {
     let newSpeed = store.configs.speed + 10
-    store.configs.speed = newSpeed < 200 ? newSpeed : 200
+    store.configs.speed = newSpeed < 300 ? newSpeed : 300
   }
   // Speeds Down
   if (e.key == '-') {

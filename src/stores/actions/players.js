@@ -161,7 +161,7 @@ export default {
     neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
 
     // Avoid dead ends
-    let findOpenedNeighbors = this.findOpenedNeighbors
+    /* let findOpenedNeighbors = this.findOpenedNeighbors
     neighbors = neighbors.filter((n) => {
       let myNeighbors = findOpenedNeighbors(n.tile, tiles)
 
@@ -170,16 +170,21 @@ export default {
         return n.tile.goal || n.tile.item
       }
       return true
-    })
+    }) */
 
     // Get Special Items
     let specialItemNeighbor = this.getSpecialItemNeighbor(neighbors)
-    if (specialItemNeighbor) return specialItemNeighbor
+    if (specialItemNeighbor) {
+      console.log(specialItemNeighbor)
+      return specialItemNeighbor
+    }
 
     // Try first going unvisited neighbors
     let unvisitedNeighbors = neighbors.filter((n) => n.tile.visited === 0)
     let unvisitedNeighbor = this.getDumbestNextTile(currentTile, unvisitedNeighbors)
-    if (unvisitedNeighbor) return unvisitedNeighbor
+    if (unvisitedNeighbor){
+      return unvisitedNeighbor
+    }
 
     // Gets least decided direction neighbor
     return this.getLeastDecidedNeighbor(currentTile, neighbors)
@@ -205,7 +210,7 @@ export default {
   getSpecialItemNeighbor(neighbors) {
     let specialItems = ['key', 'chest', 'twister_golden', 'speedup']
     return neighbors.find((neighbor) => {
-      return specialItems.includes(neighbor.tile.item.type)
+      return !neighbor.tile.item.taken && specialItems.includes(neighbor.tile.item.type)
     })
   },
 }
