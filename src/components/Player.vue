@@ -27,6 +27,7 @@ export default {
       moving: false,
       glowing: false,
       start_position: false,
+      started: false,
       tiles: [],
       tilesStack: [], // walked tiles
       lastTile: false,
@@ -94,13 +95,12 @@ export default {
         this.currentTile.visited = 1
       }
 
-      //this.Player.x = this.currentTile.width / 2
-
+      this.started = true
       this.moveToNextTile()
     },
     stop() {
-      this.moving = false
-      this.target = false
+      this.started = false
+      this.nextTile = false
     },
     restart() {
       const x = this.player.position ? this.player.position.x : 0;
@@ -153,7 +153,7 @@ export default {
     moveToNextTile() {
       store = getStore();
 
-      if (!store.started || this.moving || store.paused)
+      if (!store.started || !this.started || this.moving || store.paused)
         return false
 
       let speed = this.player.speed ? this.player.speed : store.configs.speed
@@ -608,13 +608,15 @@ export default {
 
       // Collider stolle key on key mode
       if (store.configs.mode == "key" && this.player.number == 2) {
-        let lastTouched = new Date()
+        let PlayerComponent = this
+        this.lastTouched = new Date()
         Scene.physics.add.overlap(player1.Player, player, function (args) {
-          let lastTouchedSeconds = Math.round((new Date() - lastTouched) / 1000, 2)
+          let lastTouchedSeconds = Math.round((new Date() - PlayerComponent.lastTouched) / 1000, 2)
 
+          console.log("Players last touched "+ lastTouchedSeconds+ " seconds")
           // Detect touch every x second
           if (lastTouchedSeconds >= store.configs.detect_players_touch_seconds) {
-            lastTouched = new Date()
+            PlayerComponent.lastTouched = new Date()
 
             // Stole Key
             if (player1.hasKey) {

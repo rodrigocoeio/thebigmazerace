@@ -25,12 +25,12 @@ const state = {
     rows: 8,
     difficulty: 'normal',
     mode: 'chest', // Chest Mode  / Key Mode
-    speed: 120,
+    speed: 200,
     items_count: 9,
     max_swirlings: 2,
     max_twisters: 2,
     max_bombs: 2,
-    dizzy_seconds: 3,
+    dizzy_seconds: 1,
 
     // Inteligences
     // dumbest: Players doesn't remember where they came from, so they will randomly choose a next way
@@ -45,6 +45,7 @@ const state = {
     voice: true,
     music: true,
     dev: false,
+    loop_matches: false,
     changeWayEveryNumberOfTiles: 5,
     instant_mode: false, // Instant movement, for testing purposes
     startAfterSeconds: 3, // Start Players After x seconds
@@ -172,7 +173,7 @@ const state = {
     easy: {
       columns: 6,
       rows: 6,
-      speed: 120,
+      speed: 200,
       inteligence: 'smart',
       changeWayEveryNumberOfTiles: 3,
       items_count: 15,
@@ -185,7 +186,7 @@ const state = {
       columns: 9,
       rows: 9,
       speed: 130,
-      inteligence: 'smart',
+      inteligence: 'kickass',
       changeWayEveryNumberOfTiles: 5,
       items_count: 25,
       max_swirlings: 5,
@@ -197,7 +198,7 @@ const state = {
       columns: 12,
       rows: 12,
       speed: 140,
-      inteligence: 'smart',
+      inteligence: 'kickass',
       changeWayEveryNumberOfTiles: 7,
       items_count: 40,
       max_swirlings: 7,

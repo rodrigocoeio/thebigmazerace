@@ -5,7 +5,7 @@
     <label>Rows</label>
     <input type="number" min="1" max="12" v-model="configs.rows" />
     <label>Speed</label>
-    <input type="number" min="100" max="500" v-model="configs.speed" />
+    <input type="number" min="100" max="300" v-model="configs.speed" />
     <label>Change Way Every</label>
     <input type="number" min="1" max="100" v-model="configs.changeWayEveryNumberOfTiles" />
     <label>Inteligence</label>
@@ -18,8 +18,7 @@
     </select>
 
     <button @click="rebuildMaze">Rebuild Maze</button>
-    <button @click="startGame">Start Game</button>
-    <button @click="stopGame">Stop Game</button>
+    <button @click="startGame" v-if="!store.started">Start Game</button>
     <button @click="restartGame">Restart Game</button>
 
     Time: {{ timeElapsed }}s
@@ -28,14 +27,22 @@
 
 <script>
 import getStore from "$/store.js";
+import store from "@/stores/store";
 
 export default {
   data() {
     let store = getStore()
 
     return {
+      store: store,
       configs: store.configs
     };
+  },
+
+  computed: {
+    timeElapsed() {
+      return this.$parent.timeElapsed
+    }
   },
 
   watch: {
@@ -49,13 +56,10 @@ export default {
       this.$parent.rebuildMaze()
     },
     startGame() {
-      this.$parent.startGame()
-    },
-    stopGame() {
-      this.$parent.stopGame()
+      store.startGame()
     },
     restartGame() {
-      this.$parent.restartGame()
+      store.restartGame()
     }
   }
 }
