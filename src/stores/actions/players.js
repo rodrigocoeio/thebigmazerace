@@ -208,7 +208,7 @@ export default {
   },
 
   getSpecialItemNeighbor(neighbors) {
-    let specialItems = ['key', 'chest', 'twister_golden', 'speedup']
+    let specialItems = ['key', 'chest', 'twister_golden']
     return neighbors.find((neighbor) => {
       return !neighbor.tile.item.taken && specialItems.includes(neighbor.tile.item.type)
     })
