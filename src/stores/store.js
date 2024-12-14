@@ -23,8 +23,8 @@ const state = {
     height: window.innerHeight,
     columns: 12,
     rows: 8,
-    difficulty: 'normal',
-    mode: 'chest', // Chest Mode  / Key Mode
+    difficulty: 'easy',
+    mode: 'key', // Chest Mode  / Key Mode
     speed: 200,
     items_count: 9,
     max_swirlings: 2,
@@ -173,7 +173,7 @@ const state = {
     easy: {
       columns: 6,
       rows: 6,
-      speed: 200,
+      speed: 300,
       inteligence: 'smart',
       changeWayEveryNumberOfTiles: 3,
       items_count: 15,
