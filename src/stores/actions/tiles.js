@@ -61,4 +61,8 @@ export default {
 
     return randomTile
   },
+
+  getTileNumber(number) {
+    return this.tiles.find((tile) => tile.number == number)
+  },
 }

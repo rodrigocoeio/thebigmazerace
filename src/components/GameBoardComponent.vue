@@ -1,17 +1,17 @@
-<!-- eslint-disable vue/valid-v-for -->
 <template>
   <div class="GameBoard">
-    <tile :number="tile.number" :x="tile.x" :y="tile.y" :image="tile.image" :width="tile.width" :height="tile.height"
-      :walls="tile.walls" :goal="tile.goal" v-for="tile in tiles" ref="tiles"></tile>
+    <tile-component :number="tile.number" :x="tile.x" :y="tile.y" :image="tile.image" :width="tile.width"
+      :height="tile.height" :walls="tile.walls" :goal="tile.goal" :key="'tile' + index" v-for="tile, index in tiles"
+      ref="tiles"></tile-component>
     <slot></slot>
-
-    <Item v-for="item in items" :number="item.number" :tile="item.tile" :name="item.type" :taken="item.taken"
-      :item="item" ref="items">
-    </Item>
-    <Player v-for="player in players" :player="player" ref="players"></Player>
+    <item-component v-for="item, index in items" :key="'item' + index" :number="item.number" :tile="item.tile"
+      :name="item.type" :taken="item.taken" :item="item" ref="items">
+    </item-component>
+    <player-component v-for="player, index in players" :key="'player' + index" :player="player" :number="player.number"
+      ref="players"></player-component>
   </div>
 
-  <dev v-if="configs.dev"></dev>
+  <dev-component v-if="configs.dev"></dev-component>
 
   <div id="game-canvas" @click="quitGameIfFinished"></div>
 </template>
@@ -19,10 +19,10 @@
 <script>
 import getStore from "$/store.js";
 import gameMixins from "@/mixins/game-mixins";
-import Tile from "#/Tile.vue";
-import Player from "#/Player.vue";
-import Item from "#/Item.vue";
-import Dev from "#/Dev.vue";
+import TileComponent from "#/TileComponent.vue";
+import PlayerComponent from "#/PlayerComponent.vue";
+import ItemComponent from "#/ItemComponent.vue";
+import DevComponent from "#/DevComponent.vue";
 let store;
 
 export default
@@ -54,6 +54,12 @@ export default
       },
       untakenItems() {
         return this.items.filter(item => !item.taken)
+      },
+      player1() {
+        return this.$refs.players.find(player => player.number == 1)
+      },
+      player2() {
+        return this.$refs.players.find(player => player.number == 2)
       }
     },
 
@@ -90,12 +96,15 @@ export default
 
     mounted() {
       this.startPlayers()
+      this.watchPlayers()
       this.itemRefresher()
+      this.timerStart()
     },
 
     beforeUnmount() {
       clearInterval(this.timeInterval)
       clearInterval(this.itemRefresher)
+      clearInterval(this.playersWatcher)
     },
 
     methods: {
@@ -106,10 +115,28 @@ export default
         setTimeout(function () {
           Game.$refs.players.forEach(player => player.start());
         }, store.configs.startAfterSeconds * 1000)
+      },
 
+      timerStart() {
+        const Game = this
         this.timeInterval = setInterval(() => {
           Game.currentTime = new Date()
         }, 1000)
+      },
+
+      // Watch Players, if not moving then move to next tile
+      watchPlayers() {
+        const Game = this
+
+        if (this.playersWatcher)
+          clearInterval(this.playersWatcher)
+
+        this.playersWatcher = setInterval(function () {
+          Game.$refs.players.forEach(player => {
+            if (!player.moving && !player.target && !player.nextTile)
+              player.moveToNextTile()
+          });
+        }, 1000);
       },
 
       stopGame() {
@@ -175,10 +202,10 @@ export default
         //this.board = Scene.add.image(store.configs.width / 2, store.configs.height / 2, 'board');
         //this.board.setAlpha(0.8);
       },
-      update(Scene) {
+      update() {
 
       },
-      destroy(Scene) {
+      destroy() {
         if (this.board)
           this.board.destroy();
       },
@@ -256,10 +283,10 @@ export default
     },
 
     components: {
-      Tile,
-      Player,
-      Item,
-      Dev
+      TileComponent,
+      PlayerComponent,
+      ItemComponent,
+      DevComponent
     }
   }
 </script>

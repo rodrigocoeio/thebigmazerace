@@ -10,7 +10,7 @@ export default {
 
     // Key Item
     if (this.configs.mode === 'key') {
-      let key_tile = this.getRandomTile()
+      let key_tile = this.getRandomTile() //this.getTileNumber(2)
       let key = this.configs.items.find((i) => i.type == 'key')
       this.items.push({ number: 2, tile: key_tile.number, ...key })
       key_tile.item = key

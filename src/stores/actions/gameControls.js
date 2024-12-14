@@ -1,3 +1,5 @@
+import { playAudio } from '@/utils'
+
 export default {
   buildGame() {
     this.tiles = []

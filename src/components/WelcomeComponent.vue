@@ -33,11 +33,11 @@
               </td>
               <td>
                 <label>Player 1</label>
-                <choose-player number="1"></choose-player>
+                <choose-player-component number="1"></choose-player-component>
               </td>
               <td>
                 <label>Player 2</label>
-                <choose-player number="2"></choose-player>
+                <choose-player-component number="2"></choose-player-component>
               </td>
             </tr>
           </tbody>
@@ -60,7 +60,8 @@
 
 <script>
 import getStore from '$/store'
-import ChoosePlayer from "./ChoosePlayer.vue"
+import ChoosePlayerComponent from "./ChoosePlayerComponent.vue"
+import { playAudio } from "@/utils"
 
 export default {
   props: ["canStart"],
@@ -92,7 +93,7 @@ export default {
     }
   },
   components: {
-    ChoosePlayer
+    ChoosePlayerComponent
   }
 }
 </script>

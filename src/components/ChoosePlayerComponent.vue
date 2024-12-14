@@ -21,7 +21,8 @@
 
 <script>
 import getStore from "$/store"
-import store from "@/stores/store";
+import $ from 'jquery'
+import { playAudio } from "@/utils"
 
 export default {
   props: ["number"],
@@ -46,7 +47,7 @@ export default {
 
       let ChoosePlayers = this
       setTimeout(function () {
-        $(window).off("click").on("click", function (e) {
+        $(window).off("click").on("click", function () {
           ChoosePlayers.closePlayers()
           $(window).off("click")
         })
