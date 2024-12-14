@@ -185,7 +185,7 @@ const state = {
     normal: {
       columns: 9,
       rows: 9,
-      speed: 130,
+      speed: 300,
       inteligence: 'kickass',
       changeWayEveryNumberOfTiles: 5,
       items_count: 25,
@@ -197,7 +197,7 @@ const state = {
     hard: {
       columns: 12,
       rows: 12,
-      speed: 140,
+      speed: 300,
       inteligence: 'kickass',
       changeWayEveryNumberOfTiles: 7,
       items_count: 40,
