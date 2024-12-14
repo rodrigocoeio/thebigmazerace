@@ -1,5 +1,6 @@
 <template>
   <div class="dev">
+    [ Development ]
     <label>Columns</label>
     <input type="number" min="1" max="12" v-model="configs.columns" />
     <label>Rows</label>
@@ -21,7 +22,7 @@
     <button @click="startGame" v-if="!store.started">Start Game</button>
     <button @click="restartGame">Restart Game</button>
 
-    Time: {{ timeElapsed }}s
+    Time: {{ Game.timeElapsed }}s
   </div>
 </template>
 
@@ -34,15 +35,10 @@ export default {
     let store = getStore()
 
     return {
+      Game: this.$parent,
       store: store,
       configs: store.configs
     };
-  },
-
-  computed: {
-    timeElapsed() {
-      return this.$parent.timeElapsed
-    }
   },
 
   watch: {
