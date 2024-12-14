@@ -49,6 +49,8 @@ export default {
   },
 
   beforeUnmount() {
+    window["player" + this.player.number] = undefined
+
     if (this.Glow) {
       this.glowing = false
       this.glow()
@@ -107,13 +109,16 @@ export default {
     restart() {
       const x = this.player.position ? this.player.position.x : 0;
       const y = this.player.position ? this.player.position.y : 0;
-      this.Player.setPosition(x, y);
+
+      this.started = false
       this.moving = false
       this.target = false
       this.tilesStack = []
       this.tile = false
       this.nextTile = false
-      this.Player.body.reset(x, y);
+
+      this.Player.body.reset(x, y)
+      this.Player.setPosition(x, y)
     },
 
     stopsVoice() {
@@ -654,6 +659,8 @@ export default {
         if (this.Player.body.speed > 0) {
           let distance = Phaser.Math.Distance.Between(this.Player.x, this.Player.y, this.target.x, this.target.y);
           this.moving = true;
+
+          //console.log(distance);
 
           //  4 is our distance tolerance, i.e. how close the source can get to the target
           //  before it is considered as being there. The faster it moves, the more tolerance is required.

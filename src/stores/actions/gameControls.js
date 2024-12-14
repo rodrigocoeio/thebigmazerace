@@ -32,6 +32,11 @@ export default {
 
     this.startTime = new Date()
   },
+  restartGame() {
+    const Game = this.Game
+    Game.$refs.players.forEach((player) => player.restart())
+    this.startPlayers()
+  },
   pauseGame() {
     console.log('Game Paused!')
     this.stopsVoice()
@@ -68,9 +73,11 @@ export default {
     playAudio('take_chest')
     playAudio('finished' + audioNumber, 'mp3', 'voice')
 
-    // Loop Matches
+    this.loopMatches()
+  },
+  loopMatches() {
     if (this.configs.loop_matches) {
-      let store = this
+      const store = this
       setTimeout(function () {
         store.quitGame()
 

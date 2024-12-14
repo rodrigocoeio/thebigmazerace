@@ -9,7 +9,7 @@ export default {
       this.generateMaze()
       this.generateItems()
       this.generatePlayers()
-    }, 10)
+    }, 100)
   },
 
   // Generates Maze

@@ -23,15 +23,12 @@ import TileComponent from "#/TileComponent.vue";
 import PlayerComponent from "#/PlayerComponent.vue";
 import ItemComponent from "#/ItemComponent.vue";
 import DevComponent from "#/DevComponent.vue";
-let store;
 
 export default
   {
     mixins: gameMixins,
 
     data() {
-      store = getStore();
-
       return {
         board: false,
         background_audio: false,
@@ -91,6 +88,7 @@ export default
     },
 
     created() {
+      const store = getStore()
       store.buildGame()
     },
 
@@ -109,12 +107,24 @@ export default
 
     methods: {
       startPlayers() {
-        let Game = this
-        let store = getStore()
+        const Game = this
+        const store = getStore()
+        const startAfter = store.configs.startAfterSeconds
 
-        setTimeout(function () {
-          Game.$refs.players.forEach(player => player.start());
-        }, store.configs.startAfterSeconds * 1000)
+        if (this.playersStartCountdown)
+          clearInterval(this.playersStartCountdown)
+
+        let count = startAfter;
+        this.playersStartCountdown = setInterval(function () {
+          if (count === 0) {
+            Game.$refs.players.forEach(player => player.start());
+            clearInterval(Game.playersStartCountdown)
+            console.log("GO!")
+          } else {
+            console.log("Countdown: " + count)
+            count--;
+          }
+        }, 1000)
       },
 
       timerStart() {
@@ -139,20 +149,6 @@ export default
         }, 1000);
       },
 
-      stopGame() {
-        store.paused = true;
-        clearInterval(this.timeInterval)
-      },
-
-      restartGame() {
-        this.startTime = new Date()
-        this.$refs.players.forEach($player => $player.restart())
-      },
-
-      rebuildMaze() {
-        store.rebuildMaze()
-      },
-
       quitGameIfFinished() {
         console.log("Quit Game")
         let store = getStore()
@@ -163,6 +159,8 @@ export default
 
       // Refresh one item every x seconds
       itemRefresher() {
+        const store = getStore()
+
         if (this.configs.refresh_items_seconds) {
           this.itemRefresher = setInterval(function () {
             let item = store.items.find(i => !i.taken && i.type != "chest")
@@ -176,6 +174,8 @@ export default
       },
 
       preload(Scene) {
+        const store = getStore()
+
         this.Scene = Scene
 
         // Background
@@ -240,6 +240,8 @@ export default
       },
 
       finishedScreen() {
+        const store = getStore()
+
         const width = this.configs.width
         const height = this.configs.height
         const winner = this.winner

@@ -196,7 +196,7 @@ export default {
     let decisions = currentTile.decisions ? currentTile.decisions : {}
     let times = 0
 
-    console.log(decisions)
+    //console.log(decisions)
 
     neighbors.forEach((n) => {
       if (n.tile.visited === 0) {
