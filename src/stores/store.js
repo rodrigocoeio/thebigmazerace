@@ -49,7 +49,7 @@ const state = {
     changeWayEveryNumberOfTiles: 5,
     instant_mode: false, // Instant movement, for testing purposes
     startAfterSeconds: 3, // Start Players After x seconds
-    refresh_items_seconds: false, // Refresh one item every x seconds
+    refresh_items_seconds: 1, // Refresh one item every x seconds
     twister_golden_after_seconds: 0, // Special Twister Appears after x seconds ( takes the player to the chest )   // For Key Mode cut the twister golden time in half
     twister_speed_multiplier: 2.5, // Twister speed multiplier
     detect_players_touch_seconds: 2, // Detect that players have touch after x seconds ( used in stole key mode)

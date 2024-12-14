@@ -163,7 +163,7 @@ export default
 
         if (this.configs.refresh_items_seconds) {
           this.itemRefresher = setInterval(function () {
-            let item = store.items.find(i => !i.taken && i.type != "chest")
+            let item = store.items.find(i => !i.taken && i.type != "chest" && i.type != "key")
 
             if (item) {
               item.taken = true
