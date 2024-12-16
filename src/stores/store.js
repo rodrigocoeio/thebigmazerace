@@ -26,6 +26,7 @@ const state = {
     difficulty: 'easy',
     mode: 'key', // Chest Mode  / Key Mode
     speed: 200,
+    speed: 300,
     items_count: 9,
     max_swirls: 2,
     max_twisters: 2,
