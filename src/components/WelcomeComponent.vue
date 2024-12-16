@@ -33,11 +33,11 @@
               </td>
               <td>
                 <label>Player 1</label>
-                <choose-player number="1"></choose-player>
+                <choose-player-component number="1"></choose-player-component>
               </td>
               <td>
                 <label>Player 2</label>
-                <choose-player number="2"></choose-player>
+                <choose-player-component number="2"></choose-player-component>
               </td>
             </tr>
           </tbody>
@@ -60,7 +60,8 @@
 
 <script>
 import getStore from '$/store'
-import ChoosePlayer from "./ChoosePlayer.vue"
+import ChoosePlayerComponent from "./ChoosePlayerComponent.vue"
+import { playAudio } from "@/utils"
 
 export default {
   props: ["canStart"],
@@ -76,6 +77,7 @@ export default {
       let store = getStore()
       store.configs.difficulty = difficulty
       playAudio("selected")
+      this.setGameDifficulty();
     },
     mode(mode) {
       let store = getStore()
@@ -89,10 +91,22 @@ export default {
 
       let store = getStore()
       store.startGame()
+    },
+    setGameDifficulty() {
+      const store = getStore()
+      const difficulty = store.configs.difficulty
+      const difficulty_configs = store.difficulty_configs[difficulty]
+      let storageConfigs = window.localStorage.getItem("configs_" + difficulty);
+
+      if (storageConfigs) {
+        return store.configs = JSON.parse(storageConfigs);
+      }
+
+      store.configs = { ...store.configs, ...difficulty_configs }
     }
   },
   components: {
-    ChoosePlayer
+    ChoosePlayerComponent
   }
 }
 </script>

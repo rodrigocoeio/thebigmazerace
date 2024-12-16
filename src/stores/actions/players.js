@@ -156,7 +156,7 @@ export default {
 
   // Gets unvisited first or the least decided (chosen) neighbor
   // Avoids dead ends
-  getKickAssNextTile(currentTile, neighbors, lastTile, tiles) {
+  getKickAssNextTile(currentTile, neighbors, lastTile) {
     // Avoid last neighbor
     neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
 
@@ -175,19 +175,23 @@ export default {
     // Get Special Items
     let specialItemNeighbor = this.getSpecialItemNeighbor(neighbors)
     if (specialItemNeighbor) {
-      console.log(specialItemNeighbor)
       return specialItemNeighbor
     }
 
     // Try first going unvisited neighbors
     let unvisitedNeighbors = neighbors.filter((n) => n.tile.visited === 0)
     let unvisitedNeighbor = this.getDumbestNextTile(currentTile, unvisitedNeighbors)
-    if (unvisitedNeighbor){
+    if (unvisitedNeighbor) {
       return unvisitedNeighbor
     }
 
     // Gets least decided direction neighbor
-    return this.getLeastDecidedNeighbor(currentTile, neighbors)
+    let leastDecidedNeighbor = this.getLeastDecidedNeighbor(currentTile, neighbors)
+    if (leastDecidedNeighbor) {
+      return leastDecidedNeighbor
+    }
+
+    return this.getNormalNextTile(currentTile, neighbors, lastTile)
   },
 
   // Gets the least decided direction/neighbor
@@ -197,6 +201,11 @@ export default {
     let times = 0
 
     neighbors.forEach((n) => {
+      if (n.tile.visited === 0) {
+        leastDecidedNeighbor = n
+        return
+      }
+
       let decided_times = decisions[n.position] ? decisions[n.position] : 0
       if (!leastDecidedNeighbor || n.tile.visited == 0 || decided_times < times) {
         leastDecidedNeighbor = n

@@ -1,12 +1,12 @@
-window.dd = (out) => {
+export const dd = (out) => {
   console.log(out)
 }
 
-window.log = (out) => {
+export const log = (out) => {
   console.log(out)
 }
 
-window.sortByKey = (array, key, order = 'asc') => {
+export const sortByKey = (array, key, order = 'asc') => {
   return array.sort(function (a, b) {
     var x = a[key]
     var y = b[key]
@@ -24,7 +24,7 @@ window.sortByKey = (array, key, order = 'asc') => {
 
 import getStore from '$/store.js'
 
-window.playAudio = (audio_name, extension = 'mp3', type = 'sound') => {
+export const playAudio = (audio_name, extension = 'mp3', type = 'sound') => {
   let store = getStore()
   let onEnded = function () {}
   let onError = function () {}

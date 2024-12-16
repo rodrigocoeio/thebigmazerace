@@ -1,3 +1,5 @@
+import { playAudio } from '@/utils'
+
 export default {
   buildGame() {
     this.tiles = []
@@ -19,16 +21,21 @@ export default {
     this.voice = false
     this.music = false
 
-    let difficulty = this.configs.difficulty
-    let configs = this.difficulty_configs[difficulty]
-    this.configs = { ...this.configs, ...configs }
-
     let audioNumber = Math.floor(Math.random() * 2) + 1
     playAudio('start_game' + audioNumber, 'mp3', 'voice')
 
     this.startsMusic()
 
     this.startTime = new Date()
+  },
+  restartGame() {
+    const store = this
+
+    this.quitGame()
+
+    setTimeout(function () {
+      store.startGame()
+    }, 1)
   },
   pauseGame() {
     console.log('Game Paused!')
@@ -66,9 +73,11 @@ export default {
     playAudio('take_chest')
     playAudio('finished' + audioNumber, 'mp3', 'voice')
 
-    // Loop Matches
+    this.loopMatches()
+  },
+  loopMatches() {
     if (this.configs.loop_matches) {
-      let store = this
+      const store = this
       setTimeout(function () {
         store.quitGame()
 

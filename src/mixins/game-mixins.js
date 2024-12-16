@@ -5,14 +5,14 @@ const GameMixins = []
 
 GameMixins.push({
   data() {
-    let store = getStore()
+    const store = getStore()
     return store
   },
 
   mounted() {
-    let store = getStore()
-    store.Game = this
+    const store = getStore()
 
+    store.Game = this
     store.Phaser = Game(store.configs, this, store.components)
   },
 
@@ -27,13 +27,13 @@ GameMixins.push({
   },
 
   methods: {
-    preload(Scene) {},
+    preload() {},
 
-    create(Scene) {},
+    create() {},
 
-    update(Scene) {},
+    update() {},
 
-    render(Scene) {},
+    render() {},
 
     destroy() {},
   },

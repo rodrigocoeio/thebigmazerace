@@ -48,7 +48,7 @@ export default {
   getRandomTile(withItem, tiles) {
     tiles = tiles ? tiles : this.tiles
     tiles = tiles.filter((t) => !t.goal && t.number != 1)
-    if (!withItem) tiles = tiles.filter((t) => !t.item)
+    if (!withItem) tiles = tiles.filter((t) => !t.item || t.item.taken)
     let random = Math.floor(Math.random() * tiles.length)
 
     let randomTile = tiles[random]
@@ -60,5 +60,9 @@ export default {
     }
 
     return randomTile
+  },
+
+  getTileNumber(number) {
+    return this.tiles.find((tile) => tile.number == number)
   },
 }
