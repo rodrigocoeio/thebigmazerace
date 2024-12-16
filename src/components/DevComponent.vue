@@ -1,38 +1,139 @@
 <template>
   <div class="dev">
     <h1 class="title">Dev Configs</h1>
-    <div class="row">
-      <label>Columns</label>
-      <input type="number" min="1" max="12" v-model="configs.columns" />
-      <label>Rows</label>
-      <input type="number" min="1" max="12" v-model="configs.rows" />
-      <label>Change Way Every</label>
-      <input type="number" min="1" max="100" v-model="configs.changeWayEveryNumberOfTiles" />
-    </div>
-    <br>
 
     <div class="row">
-      <label>Speed</label>
-      <input type="number" min="100" max="300" v-model="configs.speed" />
-      <label>Inteligence</label>
-      <select v-model="configs.inteligence">
-        <option value="dumbest">Dumbest</option>
-        <option value="dumb">Dumb</option>
-        <option value="normal">Normal</option>
-        <option value="smart">Smart</option>
-        <option value="kickass">KickAss</option>
-      </select>
-    </div>
-
-    <br>
-
-    <div class="row">
-      <button @click="rebuildMaze">Rebuild Maze</button>
-      <button @click="startGame" v-if="!store.started">Start Game</button>
+      <!-- <button @click="rebuildMaze">Rebuild Maze</button>
+      <button @click="startGame" v-if="!store.started">Start Game</button> -->
       <button @click="restartGame">Restart Game</button>
     </div>
 
-    Time: {{ timeElapsed }}s
+    <br>
+
+
+    <div class="row">
+      <table>
+        <tbody>
+          <tr>
+            <td align="right">Columns:</td>
+            <td align="left"><input type="number" min="1" max="12" v-model="configs.columns" /></td>
+          </tr>
+          <tr>
+            <td align="right">Rows:</td>
+            <td align="left"><input type="number" min="1" max="12" v-model="configs.rows" /></td>
+          </tr>
+          <tr>
+            <td align="right">Change Way Every:</td>
+            <td align="left">
+              <input type="number" min="1" max="100" v-model="configs.changeWayEveryNumberOfTiles" />
+              tiles
+            </td>
+          </tr>
+          <tr>
+            <td><br></td>
+          </tr>
+          <tr>
+            <td align="right">Speed:</td>
+            <td align="left"><input type="number" min="100" max="300" v-model="configs.speed" /></td>
+          </tr>
+          <tr>
+            <td align="right">Inteligence:</td>
+            <td align="left">
+              <select v-model="configs.inteligence">
+                <option value="dumbest">Dumbest</option>
+                <option value="dumb">Dumb</option>
+                <option value="normal">Normal</option>
+                <option value="smart">Smart</option>
+                <option value="kickass">KickAss</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Start Countdown:</td>
+            <td align="left">
+              <input type="number" min="0" max="12" v-model="configs.start_countdown" />
+              seconds
+            </td>
+          </tr>
+          <tr>
+            <td><br></td>
+          </tr>
+          <tr>
+            <td align="right">Item Count:</td>
+            <td align="left"><input type="number" min="0" max="30" v-model="configs.items_count" /></td>
+          </tr>
+          <tr>
+            <td align="right">Refresh Item Every:</td>
+            <td align="left">
+              <input type="number" min="0" max="30" v-model="configs.refresh_items_seconds" />
+              seconds
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Golden Twister After:</td>
+            <td align="left">
+              <input type="number" min="0" max="500" v-model="configs.twister_golden_after_seconds" />
+              seconds
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Max Bombs:</td>
+            <td align="left"><input type="number" min="0" max="12" v-model="configs.max_bombs" /></td>
+          </tr>
+          <tr>
+            <td align="right">Max Swirls:</td>
+            <td align="left"><input type="number" min="0" max="12" v-model="configs.max_swirls" /></td>
+          </tr>
+          <tr>
+            <td align="right">Max Twisters:</td>
+            <td align="left">
+              <input type="number" min="0" max="12" v-model="configs.max_twisters" />
+            </td>
+          </tr>
+          <tr>
+            <td><br></td>
+          </tr>
+          <tr>
+            <td align="right">Dizzy Time:</td>
+            <td align="left">
+              <input type="number" min="0" max="12" v-model="configs.dizzy_seconds" />
+              seconds
+            </td>
+          </tr>
+
+          <tr>
+            <td align="right">Loop Matches:</td>
+            <td align="left"><input type="checkbox" v-model="configs.loop_matches"></td>
+          </tr>
+
+          <tr>
+            <td><br></td>
+          </tr>
+          <tr>
+            <td align="right">Shadows:</td>
+            <td align="left"><input type="checkbox" v-model="configs.display.shadows"></td>
+          </tr>
+          <!-- <tr>
+            <td align="right">Glows:</td>
+            <td align="left"><input type="checkbox" v-model="configs.display.glows"></td>
+          </tr> -->
+          <tr>
+            <td align="right">Sound:</td>
+            <td align="left"><input type="checkbox" v-model="configs.sound"></td>
+          </tr>
+          <tr>
+            <td align="right">Music:</td>
+            <td align="left"><input type="checkbox" v-model="configs.music"></td>
+          </tr>
+          <tr>
+            <td align="right">Voice:</td>
+            <td align="left"><input type="checkbox" v-model="configs.voice"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Time: {{ timeElapsed }}s -->
   </div>
 </template>
 
@@ -51,6 +152,13 @@ export default {
   },
 
   watch: {
+    configs: {
+      deep: true,
+      handler(configs) {
+        const difficulty = configs.difficulty
+        window.localStorage.setItem("configs_" + difficulty, JSON.stringify(configs));
+      }
+    },
     "configs.speed": function (speed) {
       this.configs.speed = parseInt(speed)
     }

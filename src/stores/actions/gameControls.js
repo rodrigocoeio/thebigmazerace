@@ -21,10 +21,6 @@ export default {
     this.voice = false
     this.music = false
 
-    let difficulty = this.configs.difficulty
-    let configs = this.difficulty_configs[difficulty]
-    this.configs = { ...this.configs, ...configs }
-
     let audioNumber = Math.floor(Math.random() * 2) + 1
     playAudio('start_game' + audioNumber, 'mp3', 'voice')
 
@@ -33,9 +29,13 @@ export default {
     this.startTime = new Date()
   },
   restartGame() {
-    const Game = this.Game
-    Game.$refs.players.forEach((player) => player.restart())
-    this.startPlayers()
+    const store = this
+
+    this.quitGame()
+
+    setTimeout(function () {
+      store.startGame()
+    }, 1)
   },
   pauseGame() {
     console.log('Game Paused!')

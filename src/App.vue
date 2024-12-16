@@ -1,5 +1,5 @@
 <template>
-  <welcome-component v-if="!started"></welcome-component>
+  <welcome-component ref="welcome" v-if="!started"></welcome-component>
   <game-board-component ref="gameboard" v-if="started"></game-board-component>
 </template>
 
@@ -10,12 +10,16 @@ import getStore from "$/store"
 
 export default {
   data() {
-    let store = getStore()
+    const store = getStore()
     return store
   },
   mounted() {
-    let store = getStore()
+    const store = getStore()
     window.store = store
+
+    if (!store.started) {
+      this.$refs.welcome.setGameDifficulty();
+    }
   },
   components: {
     WelcomeComponent,

@@ -175,7 +175,6 @@ export default {
     // Get Special Items
     let specialItemNeighbor = this.getSpecialItemNeighbor(neighbors)
     if (specialItemNeighbor) {
-      console.log(specialItemNeighbor)
       return specialItemNeighbor
     }
 
@@ -187,7 +186,12 @@ export default {
     }
 
     // Gets least decided direction neighbor
-    return this.getLeastDecidedNeighbor(currentTile, neighbors)
+    let leastDecidedNeighbor = this.getLeastDecidedNeighbor(currentTile, neighbors)
+    if (leastDecidedNeighbor) {
+      return leastDecidedNeighbor
+    }
+
+    return this.getNormalNextTile(currentTile, neighbors, lastTile)
   },
 
   // Gets the least decided direction/neighbor
@@ -195,8 +199,6 @@ export default {
     let leastDecidedNeighbor = false
     let decisions = currentTile.decisions ? currentTile.decisions : {}
     let times = 0
-
-    //console.log(decisions)
 
     neighbors.forEach((n) => {
       if (n.tile.visited === 0) {

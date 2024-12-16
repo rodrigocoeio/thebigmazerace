@@ -77,6 +77,7 @@ export default {
       let store = getStore()
       store.configs.difficulty = difficulty
       playAudio("selected")
+      this.setGameDifficulty();
     },
     mode(mode) {
       let store = getStore()
@@ -90,6 +91,18 @@ export default {
 
       let store = getStore()
       store.startGame()
+    },
+    setGameDifficulty() {
+      const store = getStore()
+      const difficulty = store.configs.difficulty
+      const difficulty_configs = store.difficulty_configs[difficulty]
+      let storageConfigs = window.localStorage.getItem("configs_" + difficulty);
+
+      if (storageConfigs) {
+        return store.configs = JSON.parse(storageConfigs);
+      }
+
+      store.configs = { ...store.configs, ...difficulty_configs }
     }
   },
   components: {

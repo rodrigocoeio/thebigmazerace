@@ -109,20 +109,19 @@ export default
       startPlayers() {
         const Game = this
         const store = getStore()
-        const startAfter = store.configs.startAfterSeconds
 
         if (this.playersStartCountdown)
           clearInterval(this.playersStartCountdown)
 
-        let count = startAfter;
+        let countdown = store.configs.start_countdown;
         this.playersStartCountdown = setInterval(function () {
-          if (count === 0) {
+          if (countdown === 0) {
             Game.$refs.players.forEach(player => player.start());
             clearInterval(Game.playersStartCountdown)
             console.log("GO!")
           } else {
-            console.log("Countdown: " + count)
-            count--;
+            console.log("Countdown: " + countdown)
+            countdown--;
           }
         }, 1000)
       },

@@ -27,7 +27,7 @@ export default {
       Glow: false,
       shadowDistance: 5,
       moving: false,
-      glowing: false,
+      glowing: store.configs.display.glows,
       start_position: false,
       started: false,
       tiles: [],
@@ -589,7 +589,7 @@ export default {
       const mudSprite = Scene.physics.add.sprite(x, y, "mud");
       mudSprite.depth = 1.1
       mudSprite.displayHeight = playerHeight
-      mudSprite.scaleX = dizzySprite.scaleY;
+      mudSprite.scaleX = mudSprite.scaleY;
       mudSprite.x = playerX
       mudSprite.y = playerY
       mudSprite.alpha = 0.7
@@ -600,7 +600,7 @@ export default {
       const fireSprite = Scene.physics.add.sprite(x, y, "fire");
       fireSprite.depth = 0.9
       fireSprite.displayHeight = playerHeight
-      fireSprite.scaleX = dizzySprite.scaleY;
+      fireSprite.scaleX = fireSprite.scaleY;
       fireSprite.x = playerX
       fireSprite.y = playerY
       fireSprite.visible = false
@@ -610,7 +610,7 @@ export default {
       const keySprite = Scene.physics.add.sprite(x, y, "hasKey");
       keySprite.depth = 1.1
       keySprite.displayHeight = playerHeight
-      keySprite.scaleX = dizzySprite.scaleY;
+      keySprite.scaleX = keySprite.scaleY;
       keySprite.x = playerX
       keySprite.y = playerY
       keySprite.visible = this.hasKey

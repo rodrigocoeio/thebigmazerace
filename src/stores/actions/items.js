@@ -38,11 +38,11 @@ export default {
 
   getRandomItem() {
     let items = this.configs.items.filter((item) => {
-      if (item.type == 'swirling') {
+      if (item.type == 'swirl') {
         let swirlings = this.items.filter((i) => i.type == item.type && !i.taken)
-        let maxSwirlings = this.configs.max_swirlings
+        let maxSwirls = this.configs.max_swirls
 
-        return swirlings.length < maxSwirlings
+        return swirlings.length < maxSwirls
       }
 
       if (item.type == 'twister') {
