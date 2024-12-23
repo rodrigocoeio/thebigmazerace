@@ -33,19 +33,23 @@ export default {
       tiles: [],
       tilesStack: [], // walked tiles
       lastTile: false,
-      currentTile: store.tiles.find(t => t.number === 1),
+      currentTile: false,
       nextTile: false,
       item: false,
       effect: false,
       inteligence: false,
-      hasKey: false
+      hasKey: false,
+      knowGoal: false
     }
   },
 
   mounted() {
-    //this.player.Component = this;
+    const store = getStore()
+
     this.inteligence = this.player.inteligence || store.configs.inteligence
     window["player" + this.player.number] = this
+
+    this.currentTile = store.tiles.find(t => t.number === 1)
   },
 
   beforeUnmount() {
@@ -69,6 +73,16 @@ export default {
   },
 
   watch: {
+    currentTile() {
+      const store = getStore()
+      const playerNumber = this.number
+      const player = store.players.find(player => player.number === playerNumber)
+      player.tile = this.currentTile
+
+      if (this.currentTile.goal) {
+        this.knowGoal = true
+      }
+    },
     moving(moving) {
       if (!moving) {
         this.reachedTile()
@@ -77,6 +91,11 @@ export default {
     hasKey(hasKey) {
       if (this.Key)
         this.Key.visible = hasKey
+
+      const store = getStore()
+      const playerNumber = this.number
+      const player = store.players.find(player => parseInt(player.number) == parseInt(playerNumber))
+      player.hasKey = hasKey
     }
   },
 
@@ -187,7 +206,7 @@ export default {
       }
 
       // Get Next Tile
-      let nextTile = store.getPlayerNextRandomTile(this.currentTile, this.lastTile, this.tiles, this.inteligence, this.player.avoidChest);
+      let nextTile = store.getPlayerNextRandomTile(this);
 
       // If none Next Tile, get last in visited (go back)
       if (!nextTile) {
@@ -300,12 +319,12 @@ export default {
         playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
       }
 
-      this.stopRotating(this.swirling)
+      this.stopsAllRotation()
       this.swirling = this.rotate(9, 50)
 
       setTimeout(function () {
         Player.item = false;
-        Player.stopRotating(Player.swirling)
+        Player.stopsAllRotation()
         Player.dizzy();
         Player.moveToNextTile(true);
       }, this.item.limit * 1000)
@@ -330,7 +349,7 @@ export default {
 
       if (randomTile) {
         // Rotate
-        this.stopRotating(this.twisting)
+        this.stopsAllRotation()
         this.twisting = Player.rotate()
         this.twister_item = { ...this.item }
 
@@ -345,7 +364,7 @@ export default {
 
           Player.twister_item = false
           Player.item = false
-          Player.stopRotating(Player.twisting)
+          Player.stopsAllRotation()
           Player.dizzy();
           return Player.moveToNextTile()
         }
@@ -402,7 +421,7 @@ export default {
 
       if (goToTile) {
         // Rotate
-        this.stopRotating(this.twisting_golden)
+        this.stopsAllRotation()
         this.twisting_golden = Player.rotate()
         this.twister_item = { ...this.item }
 
@@ -413,7 +432,7 @@ export default {
 
           if (Player.currentTile.number === goToTile.number) {
             console.log(Player.player.name + " finished twisting golden" + Player.currentTile.number)
-            Player.stopRotating(Player.twisting_golden)
+            Player.stopsAllRotation()
             Player.dizzy();
             return Player.moveToNextTile()
           }
@@ -631,7 +650,7 @@ export default {
         Scene.physics.add.overlap(player1.Player, this.Player, function () {
           let lastTouchedSeconds = Math.round((new Date() - player2.lastTouched) / 1000, 2)
 
-          console.log("Players last touched " + lastTouchedSeconds + " seconds")
+          //console.log("Players last touched " + lastTouchedSeconds + " seconds")
 
           // Detect touch every x second
           if (lastTouchedSeconds >= store.configs.detect_players_touch_seconds) {

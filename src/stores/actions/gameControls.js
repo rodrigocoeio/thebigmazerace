@@ -20,6 +20,7 @@ export default {
     this.winner = false
     this.voice = false
     this.music = false
+    this.dev = false
 
     let audioNumber = Math.floor(Math.random() * 2) + 1
     playAudio('start_game' + audioNumber, 'mp3', 'voice')

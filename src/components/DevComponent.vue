@@ -110,6 +110,10 @@
             <td><br></td>
           </tr>
           <tr>
+            <td align="right">Show Tile Numbers:</td>
+            <td align="left"><input type="checkbox" v-model="configs.showTileNumbers"></td>
+          </tr>
+          <tr>
             <td align="right">Shadows:</td>
             <td align="left"><input type="checkbox" v-model="configs.display.shadows"></td>
           </tr>
@@ -156,6 +160,7 @@ export default {
       deep: true,
       handler(configs) {
         const difficulty = configs.difficulty
+        configs = { ...configs, dev: false };
         window.localStorage.setItem("configs_" + difficulty, JSON.stringify(configs));
       }
     },
