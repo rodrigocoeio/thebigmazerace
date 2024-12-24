@@ -11,7 +11,7 @@ const listenKeyBoardEvents = function (e) {
   if (e.key.toUpperCase() === 'D') store.configs.dev = !store.configs.dev
 
   // Quits Game
-  if (e.key === 'Escape' || e.key === 'Backspace') store.quitGame()
+  if (e.key === 'Escape') store.quitGame()
 
   // Starts Game
   if (e.key === 'Enter') {

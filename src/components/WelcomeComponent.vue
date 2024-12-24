@@ -102,7 +102,7 @@ export default {
         return store.configs = JSON.parse(storageConfigs);
       }
 
-      store.configs = { ...store.configs, ...difficulty_configs }
+      store.configs = { ...store.configs, ...difficulty_configs, dev: false }
     }
   },
   components: {

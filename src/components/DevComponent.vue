@@ -6,6 +6,7 @@
       <!-- <button @click="rebuildMaze">Rebuild Maze</button>
       <button @click="startGame" v-if="!store.started">Start Game</button> -->
       <button @click="restartGame">Restart Game</button>
+      <button @click="close">Fechar</button>
     </div>
 
     <br>
@@ -179,6 +180,9 @@ export default {
     },
     restartGame() {
       this.store.restartGame()
+    },
+    close() {
+      this.store.configs.dev = false
     }
   }
 }
