@@ -162,8 +162,19 @@ export default {
   // Gets unvisited first or the least decided (chosen) neighbor
   // Avoids dead ends
   getKickAssNextTile(currentTile, neighbors, lastTile, tiles, Player) {
+    // Avoid last neighbor
+    neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
+
+    // Get Special Items
+    let specialItemNeighbor = this.getSpecialItemNeighbor(neighbors)
+    if (specialItemNeighbor) {
+      return specialItemNeighbor
+    }
+
     // If player has the key and know where the goal is, go to it
-    if (Player.hasKey && Player.knowGoal) return this.getNextRightNeighbor(currentTile, neighbors)
+    if (Player.hasKey && Player.knowGoal) {
+      return this.getNextGoalNeighbor(currentTile, neighbors)
+    }
 
     // If adversary player has the key, chase it
     const adversaryPlayerWithKey = this.players.find((player) => player.hasKey)
@@ -172,27 +183,6 @@ export default {
         (tile) => tile.number == adversaryPlayerWithKey.tile.number,
       )
       return this.getNextAdversaryNeighbor(currentTile, adversaryTile, neighbors)
-    }
-
-    // Avoid last neighbor
-    neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
-
-    // Avoid dead ends
-    /* let findOpenedNeighbors = this.findOpenedNeighbors
-    neighbors = neighbors.filter((n) => {
-      let myNeighbors = findOpenedNeighbors(n.tile, tiles)
-
-      // if goal or have items walk into it anyways
-      if (myNeighbors.length === 1) {
-        return n.tile.goal || n.tile.item
-      }
-      return true
-    }) */
-
-    // Get Special Items
-    let specialItemNeighbor = this.getSpecialItemNeighbor(neighbors)
-    if (specialItemNeighbor) {
-      return specialItemNeighbor
     }
 
     // Try first going unvisited neighbors
@@ -240,10 +230,9 @@ export default {
     })
   },
 
-  getNextRightNeighbor(currentTile, neighbors) {
-    const chestItem = this.items.find((item) => item.type == 'chest')
-    const chestTile = this.tiles.find((tile) => tile.number == chestItem.tile)
-    const path = this.findPath(currentTile.number, chestTile.number)
+  getNextGoalNeighbor(currentTile, neighbors) {
+    const goalTile = this.tiles.find((tile) => tile.goal)
+    const path = this.findPath(currentTile.number, goalTile.number)
     const rightNeighbor = neighbors.find((neighbor) => neighbor.tile.number == path[1])
 
     return rightNeighbor
@@ -308,64 +297,5 @@ export default {
         }
       }
     }
-  },
-
-  findPathMaze(maze, start, goal) {
-    // Initialize an empty queue for BFS
-    const queue = []
-    queue.push(start)
-
-    // Create a visited set to keep track of visited nodes
-    const visited = new Set()
-    visited.add(start.toString())
-
-    // Create a parent map to store the path
-    const parent = {}
-    parent[start.toString()] = null
-
-    // Define directions to explore (up, down, left, right)
-    const directions = [
-      [-1, 0], // Up
-      [1, 0], // Down
-      [0, -1], // Left
-      [0, 1], // Right
-    ]
-
-    while (queue.length > 0) {
-      const current = queue.shift()
-
-      if (current.x === goal.x && current.y === goal.y) {
-        // Goal reached! Reconstruct the path
-        const path = []
-        let node = goal
-        while (node) {
-          path.unshift(node)
-          node = parent[node.toString()]
-        }
-        return path
-      }
-
-      for (const [dx, dy] of directions) {
-        const neighbor = { x: current.x + dx, y: current.y + dy }
-
-        // Check if the neighbor is within the maze bounds and not a wall
-        if (
-          neighbor.x >= 0 &&
-          neighbor.x < maze.length &&
-          neighbor.y >= 0 &&
-          neighbor.y < maze[0].length &&
-          maze[neighbor.x][neighbor.y] !== 1
-        ) {
-          if (!visited.has(neighbor.toString())) {
-            visited.add(neighbor.toString())
-            parent[neighbor.toString()] = current
-            queue.push(neighbor)
-          }
-        }
-      }
-    }
-
-    // No path found
-    return null
   },
 }

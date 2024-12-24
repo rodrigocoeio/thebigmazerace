@@ -80,11 +80,13 @@ export default {
     if (this.configs.loop_matches) {
       const store = this
       setTimeout(function () {
-        store.quitGame()
+        if (store.started && store.finished) {
+          store.quitGame()
 
-        setTimeout(function () {
-          store.startGame()
-        }, 1000)
+          setTimeout(function () {
+            if (!store.started) store.startGame()
+          }, 1000)
+        }
       }, 5000)
     }
   },

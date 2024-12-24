@@ -31,6 +31,10 @@ const state = {
     max_twisters: 2,
     max_bombs: 2,
     dizzy_seconds: 1,
+    playersLastTouched: false,
+
+    pursuePlayerWithKey: true,
+    knowGoal: true,
 
     // Inteligences
     // dumbest: Players doesn't remember where they came from, so they will randomly choose a next way
@@ -52,7 +56,7 @@ const state = {
     refresh_items_seconds: 2, // Refresh one item every x seconds
     twister_golden_after_seconds: 0, // Special Twister Appears after x seconds ( takes the player to the chest )   // For Key Mode cut the twister golden time in half
     twister_speed_multiplier: 2.5, // Twister speed multiplier
-    detect_players_touch_seconds: 2, // Detect that players have touch after x seconds ( used in stole key mode)
+    detect_players_touch_seconds: 5, // Detect that players have touch after x seconds ( used in stole key mode)
     display: {
       shadows: false,
       glows: false,

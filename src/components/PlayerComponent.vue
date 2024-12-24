@@ -217,6 +217,7 @@ export default {
 
       // If Next Tile
       if (nextTile) {
+        console.log("Player " + this.number + " is moving to " + nextTile.tile.number)
         let position = nextTile.position
         if (position == "left") {
           this.Player.setFlipX(true);
@@ -226,6 +227,8 @@ export default {
 
         this.nextTile = nextTile.tile
         this.moveTo(nextTile.tile, speed)
+      } else {
+        console.log("Player " + this.number + " could not find a next tile")
       }
     },
 
@@ -404,14 +407,8 @@ export default {
 
         // If key is with other player, go to player
         else {
-          switch (this.player.number) {
-            case 1:
-              goToTile = GameBoard.player2.nextTile
-              break;
-            case 2:
-              goToTile = GameBoard.player1.nextTile
-              break
-          }
+          let playerWithKey = store.players.find(player => player.hasKey)
+          goToTile = store.tiles.find(tile => tile.number == playerWithKey.tile.number)
         }
 
         // Chest Mode
@@ -441,9 +438,9 @@ export default {
         console.log(this.player.name + " twisting golden" + goToTile.number)
         Player.nextTile = goToTile
         return this.moveTo(goToTile, speed * store.configs.twister_speed_multiplier, onFinished)
+      } else {
+        console.error("Twister Golden: Could not find the right go to tile")
       }
-
-      return false
     },
 
     rotate(angle, interval) {
@@ -645,16 +642,14 @@ export default {
         const GameBoard = this.$parent
         const player1 = GameBoard.player1
         const player2 = GameBoard.player2
+        store.playersLastTouched = new Date()
 
-        this.lastTouched = new Date()
         Scene.physics.add.overlap(player1.Player, this.Player, function () {
-          let lastTouchedSeconds = Math.round((new Date() - player2.lastTouched) / 1000, 2)
-
-          //console.log("Players last touched " + lastTouchedSeconds + " seconds")
+          let lastTouchedSeconds = Math.round((new Date() - store.playersLastTouched) / 1000, 2)
 
           // Detect touch every x second
           if (lastTouchedSeconds >= store.configs.detect_players_touch_seconds) {
-            player2.lastTouched = new Date()
+            store.playersLastTouched = new Date()
 
             // Stole Key
             if (player1.hasKey) {

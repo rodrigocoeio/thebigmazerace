@@ -55,10 +55,6 @@ export default {
       if (item.type == 'twister_golden') {
         let twister_golden_after_seconds = this.configs.twister_golden_after_seconds
 
-        // For Key Mode cut the twister golden time in half
-        if (this.configs.mode == 'key')
-          twister_golden_after_seconds = twister_golden_after_seconds / 2
-
         return this.getTimeElapsed() >= twister_golden_after_seconds
       }
 
