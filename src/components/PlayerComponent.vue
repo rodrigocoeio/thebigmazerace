@@ -380,7 +380,6 @@ export default {
     },
 
     twister_golden() {
-      let GameBoard = this.$parent
       let Player = this
       let store = getStore()
 
@@ -642,13 +641,14 @@ export default {
         const GameBoard = this.$parent
         const player1 = GameBoard.player1
         const player2 = GameBoard.player2
+        const stoleKeyTime = store.configs.stole_key_time;
         store.playersLastTouched = new Date()
 
         Scene.physics.add.overlap(player1.Player, this.Player, function () {
           let lastTouchedSeconds = Math.round((new Date() - store.playersLastTouched) / 1000, 2)
 
           // Detect touch every x second
-          if (lastTouchedSeconds >= store.configs.detect_players_touch_seconds) {
+          if (lastTouchedSeconds >= stoleKeyTime) {
             store.playersLastTouched = new Date()
 
             // Stole Key

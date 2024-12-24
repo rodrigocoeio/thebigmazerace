@@ -99,7 +99,8 @@ export default {
       let storageConfigs = window.localStorage.getItem("configs_" + difficulty);
 
       if (storageConfigs) {
-        return store.configs = JSON.parse(storageConfigs);
+        storageConfigs = JSON.parse(storageConfigs);
+        return store.configs = { ...store.configs, ...storageConfigs };
       }
 
       store.configs = { ...store.configs, ...difficulty_configs, dev: false }
