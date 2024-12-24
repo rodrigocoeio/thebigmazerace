@@ -54,8 +54,13 @@ export default {
 
       if (item.type == 'twister_golden') {
         let twister_golden_after_seconds = this.configs.twister_golden_after_seconds
+        let twisters_golden = this.items.filter((i) => i.type == item.type && !i.taken)
+        let maxTwistersGolden = this.configs.max_twisters_golden
 
-        return this.getTimeElapsed() >= twister_golden_after_seconds
+        return (
+          twisters_golden.length < maxTwistersGolden &&
+          this.getTimeElapsed() >= twister_golden_after_seconds
+        )
       }
 
       if (item.type == 'bomb') {
@@ -64,6 +69,7 @@ export default {
 
         return bombs.length < maxBombs
       }
+
       return item.type != 'chest' && item.type != 'key'
     })
     let random = Math.floor(Math.random() * items.length)

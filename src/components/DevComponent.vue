@@ -79,16 +79,22 @@
           </tr>
           <tr>
             <td align="right">Max Bombs:</td>
-            <td align="left"><input type="number" min="0" max="12" v-model="configs.max_bombs" /></td>
+            <td align="left"><input type="number" min="0" max="100" v-model="configs.max_bombs" /></td>
           </tr>
           <tr>
             <td align="right">Max Swirls:</td>
-            <td align="left"><input type="number" min="0" max="12" v-model="configs.max_swirls" /></td>
+            <td align="left"><input type="number" min="0" max="100" v-model="configs.max_swirls" /></td>
           </tr>
           <tr>
             <td align="right">Max Twisters:</td>
             <td align="left">
-              <input type="number" min="0" max="12" v-model="configs.max_twisters" />
+              <input type="number" min="0" max="100" v-model="configs.max_twisters" />
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Max Golden Twisters:</td>
+            <td align="left">
+              <input type="number" min="0" max="100" v-model="configs.max_twisters_golden" />
             </td>
           </tr>
           <tr>
@@ -98,6 +104,13 @@
             <td align="right">Dizzy Time:</td>
             <td align="left">
               <input type="number" min="0" max="12" v-model="configs.dizzy_seconds" />
+              seconds
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Stole Key Time:</td>
+            <td align="left">
+              <input type="number" min="0" max="12" v-model="configs.stole_key_time" />
               seconds
             </td>
           </tr>

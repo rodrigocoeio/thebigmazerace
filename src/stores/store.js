@@ -29,6 +29,7 @@ const state = {
     items_count: 9,
     max_swirls: 2,
     max_twisters: 2,
+    max_twisters_golden: 2,
     max_bombs: 2,
     dizzy_seconds: 1,
     playersLastTouched: false,
@@ -56,7 +57,7 @@ const state = {
     refresh_items_seconds: 2, // Refresh one item every x seconds
     twister_golden_after_seconds: 0, // Special Twister Appears after x seconds ( takes the player to the chest )   // For Key Mode cut the twister golden time in half
     twister_speed_multiplier: 2.5, // Twister speed multiplier
-    detect_players_touch_seconds: 5, // Detect that players have touch after x seconds ( used in stole key mode)
+    stole_key_time: 3, // Detect that players have touch after x seconds ( used in stole key mode)
     display: {
       shadows: false,
       glows: false,
@@ -184,6 +185,7 @@ const state = {
       items_count: 15,
       max_swirls: 3,
       max_twisters: 3,
+      max_twisters_golden: 3,
       max_bombs: 5,
       twister_golden_after_seconds: 60, // Special Twister Appears after x seconds ( takes the player to the chest )
     },
@@ -196,6 +198,7 @@ const state = {
       items_count: 25,
       max_swirls: 5,
       max_twisters: 5,
+      max_twisters_golden: 5,
       max_bombs: 10,
       twister_golden_after_seconds: 90, // Special Twister Appears after x seconds ( takes the player to the chest )
     },
@@ -208,6 +211,7 @@ const state = {
       items_count: 40,
       max_swirls: 7,
       max_twisters: 7,
+      max_twisters_golden: 7,
       max_bombs: 15,
       twister_golden_after_seconds: 120, // Special Twister Appears after x seconds ( takes the player to the chest )
     },
