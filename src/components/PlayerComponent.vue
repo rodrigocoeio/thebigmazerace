@@ -7,10 +7,12 @@
 <script>
 import objectMixins from "@/mixins/object-mixins.js";
 import getStore from "$/store.js";
+import { playAudio } from "@/utils"
+import Phaser from 'phaser'
 let store
 
 export default {
-  props: ['player'],
+  props: ['player', 'number'],
 
   mixins: objectMixins,
 
@@ -25,28 +27,34 @@ export default {
       Glow: false,
       shadowDistance: 5,
       moving: false,
-      glowing: false,
+      glowing: store.configs.display.glows,
       start_position: false,
       started: false,
       tiles: [],
       tilesStack: [], // walked tiles
       lastTile: false,
-      currentTile: store.tiles.find(t => t.number === 1),
+      currentTile: false,
       nextTile: false,
       item: false,
       effect: false,
       inteligence: false,
-      hasKey: false
+      hasKey: false,
+      knowGoal: false
     }
   },
 
   mounted() {
-    this.player.Component = this;
+    const store = getStore()
+
     this.inteligence = this.player.inteligence || store.configs.inteligence
     window["player" + this.player.number] = this
+
+    this.currentTile = store.tiles.find(t => t.number === 1)
   },
 
   beforeUnmount() {
+    window["player" + this.player.number] = undefined
+
     if (this.Glow) {
       this.glowing = false
       this.glow()
@@ -65,6 +73,16 @@ export default {
   },
 
   watch: {
+    currentTile() {
+      const store = getStore()
+      const playerNumber = this.number
+      const player = store.players.find(player => player.number === playerNumber)
+      player.tile = this.currentTile
+
+      if (this.currentTile.goal) {
+        this.knowGoal = true
+      }
+    },
     moving(moving) {
       if (!moving) {
         this.reachedTile()
@@ -73,6 +91,11 @@ export default {
     hasKey(hasKey) {
       if (this.Key)
         this.Key.visible = hasKey
+
+      const store = getStore()
+      const playerNumber = this.number
+      const player = store.players.find(player => parseInt(player.number) == parseInt(playerNumber))
+      player.hasKey = hasKey
     }
   },
 
@@ -105,13 +128,16 @@ export default {
     restart() {
       const x = this.player.position ? this.player.position.x : 0;
       const y = this.player.position ? this.player.position.y : 0;
-      this.Player.setPosition(x, y);
+
+      this.started = false
       this.moving = false
       this.target = false
       this.tilesStack = []
       this.tile = false
       this.nextTile = false
-      this.Player.body.reset(x, y);
+
+      this.Player.body.reset(x, y)
+      this.Player.setPosition(x, y)
     },
 
     stopsVoice() {
@@ -180,7 +206,7 @@ export default {
       }
 
       // Get Next Tile
-      let nextTile = store.getPlayerNextRandomTile(this.currentTile, this.lastTile, this.tiles, this.inteligence, this.player.avoidChest);
+      let nextTile = store.getPlayerNextRandomTile(this);
 
       // If none Next Tile, get last in visited (go back)
       if (!nextTile) {
@@ -293,12 +319,12 @@ export default {
         playAudio(Player.player.name.toLowerCase() + "_" + Player.item.type + audioNumber, "mp3", "voice")
       }
 
-      this.stopRotating(this.swirling)
+      this.stopsAllRotation()
       this.swirling = this.rotate(9, 50)
 
       setTimeout(function () {
         Player.item = false;
-        Player.stopRotating(Player.swirling)
+        Player.stopsAllRotation()
         Player.dizzy();
         Player.moveToNextTile(true);
       }, this.item.limit * 1000)
@@ -323,7 +349,7 @@ export default {
 
       if (randomTile) {
         // Rotate
-        this.stopRotating(this.twisting)
+        this.stopsAllRotation()
         this.twisting = Player.rotate()
         this.twister_item = { ...this.item }
 
@@ -338,7 +364,7 @@ export default {
 
           Player.twister_item = false
           Player.item = false
-          Player.stopRotating(Player.twisting)
+          Player.stopsAllRotation()
           Player.dizzy();
           return Player.moveToNextTile()
         }
@@ -351,6 +377,7 @@ export default {
     },
 
     twister_golden() {
+      let GameBoard = this.$parent
       let Player = this
       let store = getStore()
 
@@ -379,10 +406,10 @@ export default {
         else {
           switch (this.player.number) {
             case 1:
-              goToTile = player2.nextTile
+              goToTile = GameBoard.player2.nextTile
               break;
             case 2:
-              goToTile = player1.nextTile
+              goToTile = GameBoard.player1.nextTile
               break
           }
         }
@@ -394,7 +421,7 @@ export default {
 
       if (goToTile) {
         // Rotate
-        this.stopRotating(this.twisting_golden)
+        this.stopsAllRotation()
         this.twisting_golden = Player.rotate()
         this.twister_item = { ...this.item }
 
@@ -405,7 +432,7 @@ export default {
 
           if (Player.currentTile.number === goToTile.number) {
             console.log(Player.player.name + " finished twisting golden" + Player.currentTile.number)
-            Player.stopRotating(Player.twisting_golden)
+            Player.stopsAllRotation()
             Player.dizzy();
             return Player.moveToNextTile()
           }
@@ -542,81 +569,92 @@ export default {
     },
 
     create(Scene) {
+      this.physics = Scene.physics;
+
       const x = this.player.position ? this.player.position.x : 0;
       const y = this.player.position ? this.player.position.y : 0;
+      // Scale Player by Tiles Height
+      const tileHeight = this.currentTile.height
+      const playerHeight = tileHeight / 1.5
+      // Position Player by Tiles Width
+      const tileWidth = this.currentTile.width
+      const playerX = this.currentTile.number === 1 ? (tileWidth / 2 / 2) * this.player.number : tileWidth / 2
+      const playerY = tileHeight / 2
+
+      // Create Player Sprite
       const player = Scene.physics.add.sprite(x, y, this.player.name);
-      if (store.configs.display.shadows)
-        player.preFX.addShadow(-10, -10, 0.006, 2, 0x333333, 10);
-      const dizzySprite = Scene.physics.add.sprite(x, y, "dizzy");
-      const mudSprite = Scene.physics.add.sprite(x, y, "mud");
-      const fireSprite = Scene.physics.add.sprite(x, y, "fire");
-      const keySprite = Scene.physics.add.sprite(x, y, "hasKey");
-
-
-
       player.depth = 1
-      dizzySprite.depth = 1
-      mudSprite.depth = 1
-      fireSprite.depth = 0.9
-      keySprite.depth = 1.1
-
-      // Scale Player
-      let tileHeight = this.currentTile.height
-      let playerHeight = tileHeight / 1.5
-
       player.displayHeight = playerHeight
       player.scaleX = player.scaleY;
-      dizzySprite.displayHeight = playerHeight
-      dizzySprite.scaleX = dizzySprite.scaleY;
-      mudSprite.displayHeight = playerHeight
-      mudSprite.scaleX = dizzySprite.scaleY;
-      fireSprite.displayHeight = playerHeight
-      fireSprite.scaleX = dizzySprite.scaleY;
-      keySprite.displayHeight = playerHeight
-      keySprite.scaleX = dizzySprite.scaleY;
-
-      // Position Player
-      let tileWidth = this.currentTile.width
-
-      // First Tile
-      let playerX = this.currentTile.number === 1 ? (tileWidth / 2 / 2) * this.player.number : tileWidth / 2
-      let playerY = tileHeight / 2
       player.x = playerX
       player.y = playerY
-      dizzySprite.x = playerX + this.shadowDistance
-      dizzySprite.y = playerY + this.shadowDistance
-      mudSprite.x = playerX + this.shadowDistance
-      mudSprite.y = playerY + this.shadowDistance
-      fireSprite.x = playerX + this.shadowDistance
-      fireSprite.y = playerY + this.shadowDistance
-      keySprite.x = playerX + this.shadowDistance
-      keySprite.y = playerY + this.shadowDistance
-
-      dizzySprite.visible = false
-      mudSprite.visible = false
-      fireSprite.visible = false
-      keySprite.visible = this.hasKey
-      mudSprite.alpha = 0.7
-
-      this.physics = Scene.physics;
       this.Player = player;
-      this.Dizzy = dizzySprite;
-      this.Mud = mudSprite;
-      this.Fire = fireSprite;
-      this.Key = keySprite;
-      this.Glow = this.glow();
 
+      // Player Shadow
+      if (store.configs.display.shadows)
+        player.preFX.addShadow(-10, -10, 0.006, 2, 0x333333, 10);
+
+      // Dizzy Sprite
+      const dizzySprite = Scene.physics.add.sprite(x, y, "dizzy");
+      dizzySprite.depth = 1.1
+      dizzySprite.displayHeight = playerHeight
+      dizzySprite.scaleX = dizzySprite.scaleY;
+      dizzySprite.x = playerX
+      dizzySprite.y = playerY
+      dizzySprite.visible = false
+      this.Dizzy = dizzySprite;
+
+      // Mud Sprite
+      const mudSprite = Scene.physics.add.sprite(x, y, "mud");
+      mudSprite.depth = 1.1
+      mudSprite.displayHeight = playerHeight
+      mudSprite.scaleX = mudSprite.scaleY;
+      mudSprite.x = playerX
+      mudSprite.y = playerY
+      mudSprite.alpha = 0.7
+      mudSprite.visible = false
+      this.Mud = mudSprite;
+
+      // Fire Sprite
+      const fireSprite = Scene.physics.add.sprite(x, y, "fire");
+      fireSprite.depth = 0.9
+      fireSprite.displayHeight = playerHeight
+      fireSprite.scaleX = fireSprite.scaleY;
+      fireSprite.x = playerX
+      fireSprite.y = playerY
+      fireSprite.visible = false
+      this.Fire = fireSprite;
+
+      // Key Sprite
+      const keySprite = Scene.physics.add.sprite(x, y, "hasKey");
+      keySprite.depth = 1.1
+      keySprite.displayHeight = playerHeight
+      keySprite.scaleX = keySprite.scaleY;
+      keySprite.x = playerX
+      keySprite.y = playerY
+      keySprite.visible = this.hasKey
+      this.Key = keySprite;
+
+      this.Glow = this.glow();
+      this.stoleKeyCollider(Scene);
+    },
+
+    stoleKeyCollider(Scene) {
       // Collider stolle key on key mode
       if (store.configs.mode == "key" && this.player.number == 2) {
-        let PlayerComponent = this
-        this.lastTouched = new Date()
-        Scene.physics.add.overlap(player1.Player, player, function (args) {
-          let lastTouchedSeconds = Math.round((new Date() - PlayerComponent.lastTouched) / 1000, 2)
+        const GameBoard = this.$parent
+        const player1 = GameBoard.player1
+        const player2 = GameBoard.player2
 
-          console.log("Players last touched "+ lastTouchedSeconds+ " seconds")
+        this.lastTouched = new Date()
+        Scene.physics.add.overlap(player1.Player, this.Player, function () {
+          let lastTouchedSeconds = Math.round((new Date() - player2.lastTouched) / 1000, 2)
+
+          //console.log("Players last touched " + lastTouchedSeconds + " seconds")
+
           // Detect touch every x second
           if (lastTouchedSeconds >= store.configs.detect_players_touch_seconds) {
-            PlayerComponent.lastTouched = new Date()
+            player2.lastTouched = new Date()
 
             // Stole Key
             if (player1.hasKey) {
@@ -633,13 +671,15 @@ export default {
       }
     },
 
-    update(Scene) {
+    update() {
       //this.isOutOfScreenFix()
 
       if (this.target && this.Player.body) {
         if (this.Player.body.speed > 0) {
           let distance = Phaser.Math.Distance.Between(this.Player.x, this.Player.y, this.target.x, this.target.y);
           this.moving = true;
+
+          //console.log(distance);
 
           //  4 is our distance tolerance, i.e. how close the source can get to the target
           //  before it is considered as being there. The faster it moves, the more tolerance is required.
@@ -687,8 +727,6 @@ export default {
 
         return true;
       }
-
-      throw Error("Error while moving player " + this.player.name + " to: " + to + " ( tile " + to + " does not exist )");
     },
 
     isOutOfScreenFix() {

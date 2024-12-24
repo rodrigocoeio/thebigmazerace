@@ -1,4 +1,4 @@
-import store from '$/store.js'
+import Phaser from 'phaser'
 
 export default (configs, gameComponent, objectComponents) => {
   const PhaserGame = new Phaser.Game({
@@ -55,7 +55,7 @@ export default (configs, gameComponent, objectComponents) => {
 
   const canvas = document.querySelectorAll('canvas')
   if (canvas.length > 1) {
-    log('removing doubled canvas')
+    console.log('removing doubled canvas')
     canvas[0].remove()
   }
 

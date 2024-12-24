@@ -1,25 +1,29 @@
 <template>
-  <welcome v-if="!started"></welcome>
-  <game-board v-if="started"></game-board>
+  <welcome-component ref="welcome" v-if="!started"></welcome-component>
+  <game-board-component ref="gameboard" v-if="started"></game-board-component>
 </template>
 
 <script>
-import Welcome from "#/Welcome.vue";
-import GameBoard from "#/GameBoard.vue";
+import WelcomeComponent from "#/WelcomeComponent.vue";
+import GameBoardComponent from "#/GameBoardComponent.vue";
 import getStore from "$/store"
 
 export default {
   data() {
-    let store = getStore()
+    const store = getStore()
     return store
   },
   mounted() {
-    let store = getStore()
+    const store = getStore()
     window.store = store
+
+    if (!store.started) {
+      this.$refs.welcome.setGameDifficulty();
+    }
   },
   components: {
-    Welcome,
-    GameBoard
+    WelcomeComponent,
+    GameBoardComponent
   }
 }
 </script>
