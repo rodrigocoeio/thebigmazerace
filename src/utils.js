@@ -24,9 +24,11 @@ export const sortByKey = (array, key, order = 'asc') => {
 
 import getStore from '$/store.js'
 
-export const playAudio = (audio_name, extension = 'mp3', type = 'sound') => {
+export const playAudio = (audio_name, extension = 'mp3', type = 'sound', onEndedCallBack) => {
   let store = getStore()
-  let onEnded = function () {}
+  let onEnded = function () {
+    if (typeof onEndedCallBack === 'function') onEndedCallBack()
+  }
   let onError = function () {}
   let src = '/audios/' + audio_name + '.' + extension
   var audio = new Audio(src)
@@ -36,6 +38,7 @@ export const playAudio = (audio_name, extension = 'mp3', type = 'sound') => {
 
     onEnded = function () {
       store.voice = false
+      if (typeof onEndedCallBack === 'function') onEndedCallBack()
     }
     onError = onEnded
 

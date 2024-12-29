@@ -43,6 +43,35 @@ export default {
     }
   },
 
+  watch: {
+    currentTile() {
+      const store = getStore()
+      const playerNumber = this.number
+      const player = store.players.find(player => player.number === playerNumber)
+      player.tile = this.currentTile
+    },
+    nextTile() {
+      const store = getStore()
+      const playerNumber = this.number
+      const player = store.players.find(player => player.number === playerNumber)
+      player.nextTile = this.nextTile
+    },
+    moving(moving) {
+      if (!moving) {
+        this.reachedTile()
+      }
+    },
+    hasKey(hasKey) {
+      if (this.Key)
+        this.Key.visible = hasKey
+
+      const store = getStore()
+      const playerNumber = this.number
+      const player = store.players.find(player => parseInt(player.number) == parseInt(playerNumber))
+      player.hasKey = hasKey
+    }
+  },
+
   mounted() {
     const store = getStore()
 
@@ -70,33 +99,6 @@ export default {
       this.Mud.destroy()
     if (this.Key)
       this.Key.destroy()
-  },
-
-  watch: {
-    currentTile() {
-      const store = getStore()
-      const playerNumber = this.number
-      const player = store.players.find(player => player.number === playerNumber)
-      player.tile = this.currentTile
-
-      if (this.currentTile.goal) {
-        this.knowGoal = true
-      }
-    },
-    moving(moving) {
-      if (!moving) {
-        this.reachedTile()
-      }
-    },
-    hasKey(hasKey) {
-      if (this.Key)
-        this.Key.visible = hasKey
-
-      const store = getStore()
-      const playerNumber = this.number
-      const player = store.players.find(player => parseInt(player.number) == parseInt(playerNumber))
-      player.hasKey = hasKey
-    }
   },
 
   methods: {
@@ -154,6 +156,14 @@ export default {
       let currentTile = this.nextTile ? this.nextTile : this.currentTile
       this.tilesStack.push(lastTile)
       currentTile.visited++
+
+      if (this.currentTile.goal) {
+        this.knowGoal = true
+
+        store.stopsVoice()
+        playAudio("knows_goal")
+        playAudio(this.player.name.toLowerCase() + "_knows_chest", "mp3", "voice")
+      }
 
       this.lastTile = lastTile
       this.currentTile = currentTile
@@ -295,9 +305,25 @@ export default {
     foundKey() {
       store.stopsVoice()
 
-      let audioNumber = Math.floor(Math.random() * 2) + 1
+      const playerNumber = this.player.number;
+      const playerName = this.player.name.toLowerCase();
+      const knowGoal = this.knowGoal;
+      const audioNumber = Math.floor(Math.random() * 2) + 1
+      const adversary = store.players.find(player => player.number != playerNumber);
+      const adversaryName = adversary ? adversary.name.toLowerCase() : "";
+
       playAudio("key", "wav")
-      playAudio(this.player.name.toLowerCase() + "_key" + audioNumber, "mp3", "voice")
+      playAudio(playerName + "_key" + audioNumber, "mp3", "voice", function () {
+        if (knowGoal) {
+          playAudio(playerName + "_heading_chest", "mp3", "voice", function () {
+            store.stopsVoice()
+            playAudio(adversaryName + "_chasing_" + playerName, "mp3", "voice")
+          })
+        } else {
+          store.stopsVoice()
+          playAudio(adversaryName + "_chasing_" + playerName, "mp3", "voice")
+        }
+      })
       this.hasKey = true
     },
 
@@ -309,6 +335,7 @@ export default {
       }
 
       this.hasKey = false
+      playAudio("found_chest")
       store.finishGame(this)
     },
 
@@ -641,14 +668,14 @@ export default {
         const GameBoard = this.$parent
         const player1 = GameBoard.player1
         const player2 = GameBoard.player2
-        const stoleKeyTime = store.configs.stole_key_time;
+        const grabStolenKeyTime = store.configs.grab_stolen_key_time;
         store.playersLastTouched = new Date()
 
         Scene.physics.add.overlap(player1.Player, this.Player, function () {
           let lastTouchedSeconds = Math.round((new Date() - store.playersLastTouched) / 1000, 2)
 
           // Detect touch every x second
-          if (lastTouchedSeconds >= stoleKeyTime) {
+          if (lastTouchedSeconds >= grabStolenKeyTime) {
             store.playersLastTouched = new Date()
 
             // Stole Key

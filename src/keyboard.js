@@ -1,6 +1,4 @@
 import getStore from '$/store'
-let player = false
-let inteligences = ['dumbest', 'dumb', 'normal', 'smart', 'kickass']
 
 const listenKeyBoardEvents = function (e) {
   let store = getStore()
@@ -8,7 +6,7 @@ const listenKeyBoardEvents = function (e) {
   console.log(e.key + ' key pressed!')
 
   // Open Dev Mode
-  if (e.key.toUpperCase() === 'D') store.configs.dev = !store.configs.dev
+  if (e.shiftKey && e.key.toUpperCase() === 'D') store.configs.dev = !store.configs.dev
 
   // Quits Game
   if (e.key === 'Escape') store.quitGame()
@@ -49,27 +47,10 @@ const listenKeyBoardEvents = function (e) {
     store.configs.speed = newSpeed > 50 ? newSpeed : 50
   }
 
-  if (!player) {
-    let player_number = parseInt(e.key) - 1
-    if (store.players[player_number]) {
-      player = store.players[player_number]
-      console.log(player.name + ' selected')
-    } else {
-      player = false
-    }
-  } else {
-    if (e.key == 0) {
-      player.avoidChest = player.avoidChest ? false : true
-      if (player.avoidChest) console.log('Player ' + player.number + ' is avoiding the chest!')
-      else console.log('Player ' + player.number + ' stopped avoinding the chest!')
-      player = false
-      return
-    }
-
-    if (inteligences[e.key]) {
-      player.inteligence = inteligences[e.key]
-      console.log(player.name + ' is now on ' + player.inteligence + ' mode')
-      player = false
+  if (parseInt(e.key) === 1 || parseInt(e.key) === 2) {
+    let player = store.players.find((player) => player.number === parseInt(e.key))
+    if (player) {
+      store.getCheatGoldenTwister(player)
     }
   }
 }

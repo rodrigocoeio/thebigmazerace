@@ -162,6 +162,9 @@ export default
 
         if (this.configs.refresh_items_seconds) {
           this.itemRefresher = setInterval(function () {
+            if (store.paused)
+              return false;
+
             let item = store.items.find(i => !i.taken && i.type != "chest" && i.type != "key")
 
             if (item) {
