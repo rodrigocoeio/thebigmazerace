@@ -10,10 +10,18 @@ export default {
           knowChest: false,
           hasKey: false,
           tile: false,
+          nextTile: false,
           ...player,
         })
       }
     })
+  },
+
+  // Cheat Golden Twister
+  getCheatGoldenTwister(player) {
+    const item = this.configs.items.find((item) => item.type == 'twister_golden')
+
+    this.newItem(item, player.nextTile)
   },
 
   // Get Player Next Random Tile
@@ -177,11 +185,14 @@ export default {
     }
 
     // If adversary player has the key, chase it
-    const adversaryPlayerWithKey = this.players.find((player) => player.hasKey)
-    if (adversaryPlayerWithKey && adversaryPlayerWithKey.number != Player.number) {
-      let adversaryTile = this.tiles.find(
-        (tile) => tile.number == adversaryPlayerWithKey.tile.number,
-      )
+    const adversaryPlayerWithKey = this.players.find(
+      (player) => player.hasKey && player.number != Player.number,
+    )
+    if (adversaryPlayerWithKey) {
+      let adversaryTile = adversaryPlayerWithKey.nextTile ? adversaryPlayerWithKey.nextTile : false
+      adversaryTile =
+        !adversaryTile && adversaryPlayerWithKey.tile ? adversaryPlayerWithKey.tile : adversaryTile
+
       return this.getNextAdversaryNeighbor(currentTile, adversaryTile, neighbors)
     }
 

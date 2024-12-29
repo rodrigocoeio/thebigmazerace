@@ -27,7 +27,17 @@ export default {
     let tile = this.getRandomTile()
     let item = this.getRandomItem()
 
+    this.newItem(item, tile)
+  },
+
+  newItem(item, tile) {
     if (tile && item) {
+      if (tile.item) {
+        const item = this.items.find((i) => i.number === tile.item.number)
+        item.taken = true
+        tile.item.taken = true
+      }
+
       let itemNumber = Date.now() + Math.floor(Math.random() * 9999999)
       let newItem = { number: itemNumber, tile: tile.number, taken: false, ...item }
 
@@ -38,6 +48,20 @@ export default {
 
   getRandomItem() {
     let items = this.configs.items.filter((item) => {
+      if (item.type == 'speedup') {
+        let speedups = this.items.filter((i) => i.type == item.type && !i.taken)
+        let maxSpeedups = this.configs.max_speedups
+
+        return speedups.length < maxSpeedups
+      }
+
+      if (item.type == 'speeddown') {
+        let speeddowns = this.items.filter((i) => i.type == item.type && !i.taken)
+        let maxSpeeddowns = this.configs.max_speeddowns
+
+        return speeddowns.length < maxSpeeddowns
+      }
+
       if (item.type == 'swirl') {
         let swirlings = this.items.filter((i) => i.type == item.type && !i.taken)
         let maxSwirls = this.configs.max_swirls

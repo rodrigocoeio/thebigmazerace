@@ -27,6 +27,8 @@ const state = {
     mode: 'key', // Chest Mode  / Key Mode
     speed: 300,
     items_count: 9,
+    max_speedups: 50,
+    max_speeddowns: 3,
     max_swirls: 2,
     max_twisters: 2,
     max_twisters_golden: 2,
@@ -48,16 +50,16 @@ const state = {
     menu: true,
     sound: true,
     voice: true,
-    music: true,
+    music: false,
     dev: false,
     loop_matches: false,
     changeWayEveryNumberOfTiles: 5,
     instant_mode: false, // Instant movement, for testing purposes
-    start_countdown: 3, // Start Players After x seconds
+    start_countdown: 4, // Start Players After x seconds
     refresh_items_seconds: 2, // Refresh one item every x seconds
     twister_golden_after_seconds: 0, // Special Twister Appears after x seconds ( takes the player to the chest )   // For Key Mode cut the twister golden time in half
     twister_speed_multiplier: 2.5, // Twister speed multiplier
-    stole_key_time: 3, // Detect that players have touch after x seconds ( used in stole key mode)
+    grab_stolen_key_time: 3, // Detect that players have touch after x seconds ( used in stole key mode)
     display: {
       shadows: false,
       glows: false,

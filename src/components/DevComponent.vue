@@ -6,7 +6,8 @@
       <!-- <button @click="rebuildMaze">Rebuild Maze</button>
       <button @click="startGame" v-if="!store.started">Start Game</button> -->
       <button @click="restartGame">Restart Game</button>
-      <button @click="close">Fechar</button>
+      <button @click="resetDefaults">Reset Defaults</button>
+      <button @click="close">Close</button>
     </div>
 
     <br>
@@ -17,11 +18,11 @@
         <tbody>
           <tr>
             <td align="right">Columns:</td>
-            <td align="left"><input type="number" min="1" max="12" v-model="configs.columns" /></td>
+            <td align="left"><input type="number" min="1" max="20" v-model="configs.columns" /></td>
           </tr>
           <tr>
             <td align="right">Rows:</td>
-            <td align="left"><input type="number" min="1" max="12" v-model="configs.rows" /></td>
+            <td align="left"><input type="number" min="1" max="20" v-model="configs.rows" /></td>
           </tr>
           <tr>
             <td align="right">Change Way Every:</td>
@@ -61,7 +62,7 @@
           </tr>
           <tr>
             <td align="right">Item Count:</td>
-            <td align="left"><input type="number" min="0" max="30" v-model="configs.items_count" /></td>
+            <td align="left"><input type="number" min="0" max="100" v-model="configs.items_count" /></td>
           </tr>
           <tr>
             <td align="right">Refresh Item Every:</td>
@@ -76,6 +77,14 @@
               <input type="number" min="0" max="500" v-model="configs.twister_golden_after_seconds" />
               seconds
             </td>
+          </tr>
+          <tr>
+            <td align="right">Max Speed Ups:</td>
+            <td align="left"><input type="number" min="0" max="100" v-model="configs.max_speedups" /></td>
+          </tr>
+          <tr>
+            <td align="right">Max Speed Downs:</td>
+            <td align="left"><input type="number" min="0" max="100" v-model="configs.max_speeddowns" /></td>
           </tr>
           <tr>
             <td align="right">Max Bombs:</td>
@@ -108,9 +117,9 @@
             </td>
           </tr>
           <tr>
-            <td align="right">Stole Key Time:</td>
+            <td align="right">Grab Stolen Key Time:</td>
             <td align="left">
-              <input type="number" min="0" max="12" v-model="configs.stole_key_time" />
+              <input type="number" min="0" max="12" v-model="configs.grab_stolen_key_time" />
               seconds
             </td>
           </tr>
@@ -127,10 +136,10 @@
             <td align="right">Show Tile Numbers:</td>
             <td align="left"><input type="checkbox" v-model="configs.showTileNumbers"></td>
           </tr>
-          <tr>
+          <!-- <tr>
             <td align="right">Shadows:</td>
             <td align="left"><input type="checkbox" v-model="configs.display.shadows"></td>
-          </tr>
+          </tr> -->
           <!-- <tr>
             <td align="right">Glows:</td>
             <td align="left"><input type="checkbox" v-model="configs.display.glows"></td>
@@ -173,7 +182,7 @@ export default {
     configs: {
       deep: true,
       handler(configs) {
-        const difficulty = configs.difficulty
+        const difficulty = configs.difficulty;
         configs = { ...configs, dev: false };
         window.localStorage.setItem("configs_" + difficulty, JSON.stringify(configs));
       }
@@ -193,6 +202,13 @@ export default {
     },
     restartGame() {
       this.store.restartGame()
+    },
+    resetDefaults() {
+      const store = getStore();
+      const difficulty = store.configs.difficulty;
+
+      window.localStorage.removeItem("configs_" + difficulty);
+      window.location.reload();
     },
     close() {
       this.store.configs.dev = false
