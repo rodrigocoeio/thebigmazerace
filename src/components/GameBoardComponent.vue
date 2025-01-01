@@ -171,7 +171,7 @@ export default
             clearInterval(this.itemRefresher)
 
           this.itemRefresher = setInterval(function () {
-            if (store.paused)
+            if (store.paused || store.finished)
               return false;
 
             // Removes one item if max is reached

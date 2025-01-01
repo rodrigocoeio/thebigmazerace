@@ -26,7 +26,7 @@ const state = {
     difficulty: 'easy',
     mode: 'key', // Chest Mode  / Key Mode
     speed: 300,
-    distance_tolerance: 30,
+    distance_tolerance: 20,
     refresh_items_seconds: 1, // Refresh one item every x seconds
     max_items: 9,
     max_speedups: 50,
