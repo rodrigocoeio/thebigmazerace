@@ -1,7 +1,5 @@
 <template>
-  <div class="GamePlayer">
-
-  </div>
+  <div class="GamePlayer" :number="number"></div>
 </template>
 
 <script>
@@ -12,7 +10,7 @@ import Phaser from 'phaser'
 let store
 
 export default {
-  props: ['player', 'number'],
+  props: ['player', 'name', 'number'],
 
   mixins: objectMixins,
 
@@ -20,7 +18,6 @@ export default {
     store = getStore();
     const Game = this.$parent.Game;
     return {
-      name: this.player.name,
       Game: Game,
       Scene: false,
       Player: false,
@@ -74,11 +71,15 @@ export default {
 
   mounted() {
     const store = getStore()
+    const player = store.players.find(player => player.number == this.number)
 
     this.inteligence = this.player.inteligence || store.configs.inteligence
     window["player" + this.player.number] = this
+    player.Component = this
 
     this.currentTile = store.tiles.find(t => t.number === 1)
+
+    setInterval(this.isOutOfScreenFix, 1000)
   },
 
   beforeUnmount() {
@@ -327,6 +328,10 @@ export default {
       this.hasKey = true
     },
 
+    loseKey() {
+      this.hasKey = false
+    },
+
     foundChest() {
       let store = getStore()
       if (store.configs.mode == "key" && !this.hasKey) {
@@ -375,7 +380,9 @@ export default {
 
       //console.log(this.player.name + " got a TWISTERR")
 
-      let randomTile = store.getRandomTile(true)
+      const avoidedItems = ['key', 'chest', 'twister', 'twister_golden', 'swirl']
+      let tiles = store.tiles.filter(tile => !tile.item || !avoidedItems.includes(tile.item.type))
+      let randomTile = store.getRandomTile(true, tiles)
 
       if (randomTile) {
         // Rotate
@@ -386,7 +393,8 @@ export default {
         const speed = store.configs.speed
         let onFinished = function () {
           if (Player.item && Player.twister_item.count <= Player.twister_item.limit) {
-            randomTile = store.getRandomTile(true)
+            let tiles = store.tiles.filter(tile => !tile.item || !avoidedItems.includes(tile.item.type))
+            randomTile = store.getRandomTile(true, tiles)
             Player.nextTile = randomTile
             Player.twister_item.count++
             return this.moveTo(randomTile, speed * store.configs.twister_speed_multiplier, onFinished)
@@ -434,7 +442,7 @@ export default {
         // If key is with other player, go to player
         else {
           let playerWithKey = store.players.find(player => player.hasKey)
-          goToTile = store.tiles.find(tile => tile.number == playerWithKey.tile.number)
+          goToTile = store.tiles.find(tile => tile.number == playerWithKey.nextTile.number)
         }
 
         // Chest Mode
@@ -664,29 +672,37 @@ export default {
 
     stoleKeyCollider(Scene) {
       // Collider stolle key on key mode
-      if (store.configs.mode == "key" && this.player.number == 2) {
-        const GameBoard = this.$parent
-        const player1 = GameBoard.player1
-        const player2 = GameBoard.player2
-        const grabStolenKeyTime = store.configs.grab_stolen_key_time;
-        store.playersLastTouched = new Date()
+      if (store.configs.mode == "key") {
+        const adversary = store.players.find(player => player.number != this.Player.number)
+        const PlayerComponent = this;
+        const AdversaryComponent = adversary.Component
+        const keyRecoveryTime = store.configs.key_recovery_time;
+        PlayerComponent.playersLastTouched = new Date()
 
-        Scene.physics.add.overlap(player1.Player, this.Player, function () {
-          let lastTouchedSeconds = Math.round((new Date() - store.playersLastTouched) / 1000, 2)
+        Scene.physics.add.overlap(PlayerComponent.Player, AdversaryComponent.Player, function () {
+          let lastTouchedSeconds = Math.round((new Date() - PlayerComponent.playersLastTouched) / 1000, 2)
+
+
 
           // Detect touch every x second
-          if (lastTouchedSeconds >= grabStolenKeyTime) {
-            store.playersLastTouched = new Date()
+          if (lastTouchedSeconds >= keyRecoveryTime) {
+            PlayerComponent.playersLastTouched = new Date()
+            console.log(PlayerComponent.name + " has touched the " + AdversaryComponent.name)
+            console.log("touched seconds: " + lastTouchedSeconds)
 
-            // Stole Key
-            if (player1.hasKey) {
-              player1.hasKey = false
-              player2.foundKey()
-            }
-            else
-              if (player2.hasKey) {
-                player2.hasKey = false
-                player1.foundKey()
+            // Lose the key
+            if (PlayerComponent.hasKey) {
+              console.log("touched player has key: " + PlayerComponent.hasKey)
+              PlayerComponent.loseKey()
+              AdversaryComponent.foundKey()
+              console.log(AdversaryComponent.name + " has stolen the key from the " + PlayerComponent.name)
+            } else
+              // Stole the Key
+              if (AdversaryComponent.hasKey) {
+                console.log("touched adversary has key: " + AdversaryComponent.hasKey)
+                AdversaryComponent.loseKey()
+                PlayerComponent.foundKey()
+                console.log(PlayerComponent.name + " has stolen the key from the " + AdversaryComponent.name)
               }
           }
         });
@@ -705,7 +721,7 @@ export default {
 
           //  4 is our distance tolerance, i.e. how close the source can get to the target
           //  before it is considered as being there. The faster it moves, the more tolerance is required.
-          if (distance < 8 || store.configs.instant_mode) {
+          if (distance < store.configs.distance_tolerance || store.configs.instant_mode) {
             this.Player.body.reset(this.target.x, this.target.y);
             this.Dizzy.body.reset(this.target.x, this.target.y);
             this.Mud.body.reset(this.target.x, this.target.y);

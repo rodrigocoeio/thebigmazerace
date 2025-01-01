@@ -7,8 +7,8 @@
     <item-component v-for="item, index in items" :key="'item' + index" :number="item.number" :tile="item.tile"
       :name="item.type" :taken="item.taken" :item="item" ref="items">
     </item-component>
-    <player-component v-for="player, index in players" :key="'player' + index" :player="player" :number="player.number"
-      ref="players"></player-component>
+    <player-component v-for="player, index in players" :key="'player' + index" :player="player" :name="player.name"
+      :number="player.number" ref="players"></player-component>
   </div>
 
   <dev-component v-if="configs.dev"></dev-component>
