@@ -175,6 +175,7 @@ export default
               return false;
 
             // Removes one item if max is reached
+            store.items = store.items.filter(i => !i.taken)
             if ((store.items.length - 2) >= store.configs.max_items) {
               let item = store.items.find(i => !i.taken && i.type != "chest" && i.type != "key")
               if (item) {
