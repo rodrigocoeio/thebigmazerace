@@ -72,8 +72,8 @@
             <td><br></td>
           </tr>
           <tr>
-            <td align="right">Item Count:</td>
-            <td align="left"><input type="number" min="0" max="100" v-model="configs.items_count" /></td>
+            <td align="right">Max Items:</td>
+            <td align="left"><input type="number" min="0" max="100" v-model="configs.max_items" /></td>
           </tr>
           <tr>
             <td align="right">Refresh Item Every:</td>
@@ -128,6 +128,10 @@
             </td>
           </tr>
 
+          <tr>
+            <td align="right">Start With Items:</td>
+            <td align="left"><input type="checkbox" v-model="configs.start_with_items"></td>
+          </tr>
           <tr>
             <td align="right">Avoid Chest:</td>
             <td align="left"><input type="checkbox" v-model="configs.avoid_chest"></td>

@@ -4,7 +4,7 @@
       :height="tile.height" :walls="tile.walls" :goal="tile.goal" :key="'tile' + index" v-for="tile, index in tiles"
       ref="tiles"></tile-component>
     <slot></slot>
-    <item-component v-for="item, index in items" :key="'item' + index" :number="item.number" :tile="item.tile"
+    <item-component v-for="item in untakenItems" :key="'item' + item.number" :number="item.number" :tile="item.tile"
       :name="item.type" :taken="item.taken" :item="item" ref="items">
     </item-component>
     <player-component v-for="player, index in players" :key="'player' + index" :player="player" :name="player.name"
@@ -61,6 +61,9 @@ export default
     },
 
     watch: {
+      'configs.refresh_items_seconds': function () {
+        this.itemRefresher()
+      },
       paused(paused) {
         this.pausedScreen()
 
@@ -95,8 +98,6 @@ export default
     mounted() {
       this.startPlayers()
       this.watchPlayers()
-      this.itemRefresher()
-      this.timerStart()
     },
 
     beforeUnmount() {
@@ -118,6 +119,8 @@ export default
           if (countdown === 0) {
             Game.$refs.players.forEach(player => player.start());
             clearInterval(Game.playersStartCountdown)
+            Game.itemRefresher()
+            Game.timerStart()
             console.log("GO!")
           } else {
             console.log("Countdown: " + countdown)
@@ -160,18 +163,27 @@ export default
       itemRefresher() {
         const store = getStore()
 
-        if (this.configs.refresh_items_seconds) {
+        if (store.configs.refresh_items_seconds === 0)
+          store.configs.refresh_items_seconds = 0.4
+
+        if (store.configs.refresh_items_seconds) {
+          if (this.itemRefresher)
+            clearInterval(this.itemRefresher)
+
           this.itemRefresher = setInterval(function () {
             if (store.paused)
               return false;
 
-            let item = store.items.find(i => !i.taken && i.type != "chest" && i.type != "key")
-
-            if (item) {
-              item.taken = true
-              store.generateItem()
+            // Removes one item if max is reached
+            if (store.items.length >= store.configs.max_items) {
+              let item = store.items.find(i => !i.taken && i.type != "chest" && i.type != "key")
+              if (item) {
+                item.taken = true
+              }
             }
-          }, this.configs.refresh_items_seconds * 1000)
+
+            store.generateItem()
+          }, store.configs.refresh_items_seconds * 1000)
         }
       },
 

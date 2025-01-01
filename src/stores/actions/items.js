@@ -17,9 +17,11 @@ export default {
     }
 
     // Generate Random Items
-    let randomItemsCount = this.configs.items_count
-    for (let i = 0; i < randomItemsCount; i++) {
-      this.generateItem()
+    if (this.configs.start_with_items) {
+      let maxItems = this.configs.max_items
+      for (let i = 0; i < maxItems; i++) {
+        this.generateItem()
+      }
     }
   },
 
@@ -37,6 +39,8 @@ export default {
         item.taken = true
         tile.item.taken = true
         tile.item = false
+
+        this.items = this.items.filter((i) => i.number != item.number)
       }
 
       let itemNumber = Date.now() + Math.floor(Math.random() * 9999999)

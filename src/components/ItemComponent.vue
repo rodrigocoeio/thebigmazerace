@@ -14,7 +14,7 @@ export default {
 
   mixins: objectMixins,
 
-  beforeUnmount() {
+  unmounted() {
     if (this.Item)
       this.Item.destroy()
   },
