@@ -39,7 +39,7 @@ const listenKeyBoardEvents = function (e) {
   // Speeds UP
   if (e.key == '+') {
     let newSpeed = store.configs.speed + 10
-    store.configs.speed = newSpeed < 300 ? newSpeed : 300
+    store.configs.speed = newSpeed < 600 ? newSpeed : 600
   }
   // Speeds Down
   if (e.key == '-') {
@@ -47,6 +47,10 @@ const listenKeyBoardEvents = function (e) {
     store.configs.speed = newSpeed > 50 ? newSpeed : 50
   }
 
+  // Cheat Golden Twister,
+  // press:
+  // number 1 for Player 1
+  // number 2 for Player 2
   if (parseInt(e.key) === 1 || parseInt(e.key) === 2) {
     let player = store.players.find((player) => player.number === parseInt(e.key))
     if (player) {

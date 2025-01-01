@@ -6,6 +6,7 @@ export default {
     this.configs.players.forEach((player) => {
       if (player.selected) {
         store.players.push({
+          Component: false,
           avoidChest: false,
           knowChest: false,
           hasKey: false,
@@ -21,6 +22,15 @@ export default {
   getCheatGoldenTwister(player) {
     const item = this.configs.items.find((item) => item.type == 'twister_golden')
 
+    if (player.nextTile.item) {
+      if (['key', 'chest'].includes(player.nextTile.item.type)) {
+        return false
+      }
+
+      player.nextTile.item.taken = true
+      player.nextTile.item = false
+    }
+
     this.newItem(item, player.nextTile)
   },
 
@@ -30,7 +40,7 @@ export default {
     const lastTile = Player.lastTile
     const tiles = Player.tiles
     let inteligence = Player.inteligence
-    const avoidChest = Player.player.avoidChest
+    const avoidChest = this.configs.avoid_chest
 
     inteligence = inteligence || this.configs.inteligence
     let neighbors = this.findOpenedNeighbors(currentTile, tiles)
@@ -170,14 +180,14 @@ export default {
   // Gets unvisited first or the least decided (chosen) neighbor
   // Avoids dead ends
   getKickAssNextTile(currentTile, neighbors, lastTile, tiles, Player) {
-    // Avoid last neighbor
-    neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
-
     // Get Special Items
     let specialItemNeighbor = this.getSpecialItemNeighbor(neighbors)
     if (specialItemNeighbor) {
       return specialItemNeighbor
     }
+
+    // Avoid last neighbor
+    neighbors = this.filtersLastNeighborOut(neighbors, lastTile)
 
     // If player has the key and know where the goal is, go to it
     if (Player.hasKey && Player.knowGoal) {
@@ -235,9 +245,42 @@ export default {
   },
 
   getSpecialItemNeighbor(neighbors) {
-    let specialItems = ['key', 'chest', 'twister_golden']
+    const findKey = this.getNeighborWithItemType(neighbors, 'key')
+    if (findKey) {
+      console.log('taking special item: key')
+      return findKey
+    }
+
+    const findChest = this.getNeighborWithItemType(neighbors, 'chest')
+    if (findChest) {
+      console.log('taking special item: chest')
+      return findChest
+    }
+
+    const findTwisterGolden = this.getNeighborWithItemType(neighbors, 'twister_golden')
+    if (findTwisterGolden) {
+      console.log('taking special item: twister golden')
+      return findTwisterGolden
+    }
+
+    const findBomb = this.getNeighborWithItemType(neighbors, 'bomb')
+    if (findBomb) {
+      console.log('taking special item: bomb')
+      return findBomb
+    }
+  },
+
+  getNeighborWithItemType(neighbors, type) {
+    const store = this
     return neighbors.find((neighbor) => {
-      return !neighbor.tile.item.taken && specialItems.includes(neighbor.tile.item.type)
+      if (neighbor.tile.item) {
+        const specialItem = store.items.filter(
+          (item) => !item.taken && item.type == type && item.number == neighbor.tile.item.number,
+        )
+        return specialItem.length > 0
+      }
+
+      return false
     })
   },
 

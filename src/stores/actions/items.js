@@ -12,7 +12,7 @@ export default {
     if (this.configs.mode === 'key') {
       let key_tile = this.getRandomTile() //this.getTileNumber(2)
       let key = this.configs.items.find((i) => i.type == 'key')
-      this.items.push({ number: 2, tile: key_tile.number, ...key })
+      this.items.push({ number: 2, tile: key_tile.number, ...key, taken: false })
       key_tile.item = key
     }
 
@@ -36,6 +36,7 @@ export default {
         const item = this.items.find((i) => i.number === tile.item.number)
         item.taken = true
         tile.item.taken = true
+        tile.item = false
       }
 
       let itemNumber = Date.now() + Math.floor(Math.random() * 9999999)

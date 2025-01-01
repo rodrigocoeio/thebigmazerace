@@ -36,7 +36,18 @@
           </tr>
           <tr>
             <td align="right">Speed:</td>
-            <td align="left"><input type="number" min="100" max="300" v-model="configs.speed" /></td>
+            <td align="left"><input type="number" min="100" max="600" v-model="configs.speed" /></td>
+          </tr>
+          <tr>
+            <td align="right">Distance Tolerance:</td>
+            <td align="left"><input type="number" min="4" max="100" v-model="configs.distance_tolerance" /></td>
+          </tr>
+          <tr>
+            <td align="right">Key Recovery Time:</td>
+            <td align="left">
+              <input type="number" min="0" max="12" v-model="configs.key_recovery_time" />
+              seconds
+            </td>
           </tr>
           <tr>
             <td align="right">Inteligence:</td>
@@ -116,14 +127,11 @@
               seconds
             </td>
           </tr>
-          <tr>
-            <td align="right">Grab Stolen Key Time:</td>
-            <td align="left">
-              <input type="number" min="0" max="12" v-model="configs.grab_stolen_key_time" />
-              seconds
-            </td>
-          </tr>
 
+          <tr>
+            <td align="right">Avoid Chest:</td>
+            <td align="left"><input type="checkbox" v-model="configs.avoid_chest"></td>
+          </tr>
           <tr>
             <td align="right">Loop Matches:</td>
             <td align="left"><input type="checkbox" v-model="configs.loop_matches"></td>

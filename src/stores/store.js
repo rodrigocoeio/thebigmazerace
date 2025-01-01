@@ -26,6 +26,7 @@ const state = {
     difficulty: 'easy',
     mode: 'key', // Chest Mode  / Key Mode
     speed: 300,
+    distance_tolerance: 30,
     items_count: 9,
     max_speedups: 50,
     max_speeddowns: 3,
@@ -35,6 +36,7 @@ const state = {
     max_bombs: 2,
     dizzy_seconds: 1,
     playersLastTouched: false,
+    avoid_chest: false,
 
     pursuePlayerWithKey: true,
     knowGoal: true,
@@ -59,7 +61,7 @@ const state = {
     refresh_items_seconds: 2, // Refresh one item every x seconds
     twister_golden_after_seconds: 0, // Special Twister Appears after x seconds ( takes the player to the chest )   // For Key Mode cut the twister golden time in half
     twister_speed_multiplier: 2.5, // Twister speed multiplier
-    grab_stolen_key_time: 3, // Detect that players have touch after x seconds ( used in stole key mode)
+    key_recovery_time: 3, // time to recover the key fron adversary
     display: {
       shadows: false,
       glows: false,

@@ -49,6 +49,13 @@
           </option>
         </select> -->
 
+        <button :class="['OptionsButton', !music ? 'Disabled' : '']" @click="musicSwitch"><img src="/images/music.png"
+            height="50" /></button>
+        <button :class="['OptionsButton', !sound ? 'Disabled' : '']" @click="soundSwitch"><img src="/images/sound.png"
+            height="50" /></button>
+        <button :class="['OptionsButton', !voice ? 'Disabled' : '']" @click="voiceSwitch"><img src="/images/voice.png"
+            height="50" /></button>
+
         <button class="StartGame" :disabled="false" @click="startGame">
           Start Game
         </button>
@@ -66,10 +73,24 @@ import { playAudio } from "@/utils"
 export default {
   props: ["canStart"],
   data() {
-    let store = getStore()
+    const store = getStore()
     return {
       difficulty: store.configs.difficulty,
       mode: store.configs.mode
+    }
+  },
+  computed: {
+    music() {
+      const store = getStore()
+      return store.configs.music
+    },
+    sound() {
+      const store = getStore()
+      return store.configs.sound
+    },
+    voice() {
+      const store = getStore()
+      return store.configs.voice
     }
   },
   watch: {
@@ -104,6 +125,18 @@ export default {
       }
 
       store.configs = { ...store.configs, ...difficulty_configs, dev: false }
+    },
+    musicSwitch() {
+      const store = getStore()
+      store.configs.music = !store.configs.music
+    },
+    soundSwitch() {
+      const store = getStore()
+      store.configs.sound = !store.configs.sound
+    },
+    voiceSwitch() {
+      const store = getStore()
+      store.configs.voice = !store.configs.voice
     }
   },
   components: {
@@ -176,5 +209,15 @@ export default {
 .PleaseSelect {
   border: 3px solid red !important;
   box-sizing: border-box;
+}
+
+.OptionsButton {
+  margin: 15px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.OptionsButton.Disabled {
+  opacity: 0.5;
 }
 </style>
