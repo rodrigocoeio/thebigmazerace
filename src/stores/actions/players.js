@@ -3,7 +3,7 @@ export default {
   generatePlayers() {
     let store = this
 
-    this.configs.players.forEach((player) => {
+    this.players_available.forEach((player) => {
       if (player.selected) {
         store.players.push({
           Component: false,
@@ -20,7 +20,7 @@ export default {
 
   // Cheat Golden Twister
   getCheatGoldenTwister(player) {
-    const item = this.configs.items.find((item) => item.type == 'twister_golden')
+    const item = this.items_available.find((item) => item.type == 'twister_golden')
 
     if (player.nextTile.item) {
       if (['key', 'chest'].includes(player.nextTile.item.type)) {

@@ -93,6 +93,7 @@ export default
     created() {
       const store = getStore()
       store.buildGame()
+      clearInterval(store.itemRefresher)
     },
 
     mounted() {
@@ -100,9 +101,10 @@ export default
       this.watchPlayers()
     },
 
-    beforeUnmount() {
+    unmounted() {
+      const store = getStore()
       clearInterval(this.timeInterval)
-      clearInterval(this.itemRefresher)
+      clearInterval(store.itemRefresher)
       clearInterval(this.playersWatcher)
     },
 
@@ -117,11 +119,11 @@ export default
         let countdown = store.configs.start_countdown;
         this.playersStartCountdown = setInterval(function () {
           if (countdown === 0) {
+            console.log("GO!")
+            Game.startItemRefresher()
+            Game.timerStart()
             Game.$refs.players.forEach(player => player.start());
             clearInterval(Game.playersStartCountdown)
-            Game.itemRefresher()
-            Game.timerStart()
-            console.log("GO!")
           } else {
             console.log("Countdown: " + countdown)
             countdown--;
@@ -160,17 +162,21 @@ export default
       },
 
       // Refresh one item every x seconds
-      itemRefresher() {
+      startItemRefresher() {
+        console.log("Creating Item Refresher")
+
         const store = getStore()
 
         if (!store.configs.refresh_items_seconds)
-          store.configs.refresh_items_seconds = 0.5
+          store.configs.refresh_items_seconds = 1
 
         if (store.configs.refresh_items_seconds) {
-          if (this.itemRefresher)
-            clearInterval(this.itemRefresher)
+          if (store.itemRefresher)
+            clearInterval(store.itemRefresher)
 
-          this.itemRefresher = setInterval(function () {
+          store.itemRefresher = setInterval(function () {
+            console.log("Item Refresher")
+
             if (store.paused || store.finished)
               return false;
 
@@ -200,7 +206,7 @@ export default
         Scene.load.image('tile-row', "images/row.png");
 
         // Load Items
-        store.configs.items.forEach(item => {
+        store.items_available.forEach(item => {
           Scene.load.image(item.type, item.image);
 
           let image = new Image();

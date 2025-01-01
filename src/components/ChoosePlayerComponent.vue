@@ -29,12 +29,12 @@ export default {
   data() {
     let store = getStore()
     let playerNumber = this.number
-    let selected = store.configs.players.find(player => player.number == parseInt(playerNumber) && player.selected)
+    let selected = store.players_available.find(player => player.number == parseInt(playerNumber) && player.selected)
 
     return {
       selected: selected,
       open: false,
-      players: store.configs.players
+      players: store.players_available
     }
   },
   created() {
