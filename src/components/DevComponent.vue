@@ -17,15 +17,58 @@
       <table>
         <tbody>
           <tr>
-            <td align="right">Columns:</td>
+            <td align="right"><label for="startwithitems">Start With Items:</label></td>
+            <td align="left"><input type="checkbox" id="startwithitems" v-model="configs.start_with_items"></td>
+          </tr>
+          <tr>
+            <td align="right"><label for="avoidchest">Avoid Chest:</label></td>
+            <td align="left"><input type="checkbox" id="avoidchest" v-model="configs.avoid_chest"></td>
+          </tr>
+          <tr>
+            <td align="right"><label for="loopmatches">Loop Matches:</label></td>
+            <td align="left"><input type="checkbox" id="loopmatches" v-model="configs.loop_matches"></td>
+          </tr>
+          <tr>
+            <td><br></td>
+          </tr>
+          <tr>
+            <td align="right"><label for="showtilenumbers">Show Tile Numbers:</label></td>
+            <td align="left"><input type="checkbox" id="showtilenumbers" v-model="configs.showTileNumbers"></td>
+          </tr>
+          <!-- <tr>
+            <td align="right"><label for="shadows">Shadows:</label></td>
+            <td align="left"><input type="checkbox" id="shadows" v-model="configs.display.shadows"></td>
+          </tr> -->
+          <!-- <tr>
+            <td align="right"><label for="glows">Glows:</label></td>
+            <td align="left"><input type="checkbox" id="glows" v-model="configs.display.glows"></td>
+          </tr> -->
+          <tr>
+            <td align="right"><label for="sound">Sound:</label></td>
+            <td align="left"><input type="checkbox" id="sound" v-model="configs.sound"></td>
+          </tr>
+          <tr>
+            <td align="right"><label for="music">Music:</label></td>
+            <td align="left"><input type="checkbox" id="music" v-model="configs.music"></td>
+          </tr>
+          <tr>
+            <td align="right"><label for="voice">Voice:</label></td>
+            <td align="left"><input type="checkbox" id="voice" v-model="configs.voice"></td>
+          </tr>
+          <tr>
+            <td><br></td>
+          </tr>
+
+          <tr>
+            <td align="right">Maze Columns:</td>
             <td align="left"><input type="number" min="1" max="20" v-model="configs.columns" /></td>
           </tr>
           <tr>
-            <td align="right">Rows:</td>
+            <td align="right">Maze Rows:</td>
             <td align="left"><input type="number" min="1" max="20" v-model="configs.rows" /></td>
           </tr>
           <tr>
-            <td align="right">Change Way Every:</td>
+            <td align="right">Maze Change Way Every:</td>
             <td align="left">
               <input type="number" min="1" max="100" v-model="configs.changeWayEveryNumberOfTiles" />
               tiles
@@ -35,22 +78,16 @@
             <td><br></td>
           </tr>
           <tr>
-            <td align="right">Speed:</td>
+            <td align="right">Players Speed:</td>
             <td align="left"><input type="number" min="100" max="600" v-model="configs.speed" /></td>
           </tr>
           <tr>
-            <td align="right">Distance Tolerance:</td>
+            <td align="right">Players Distance Tolerance:</td>
             <td align="left"><input type="number" min="4" max="100" v-model="configs.distance_tolerance" /></td>
           </tr>
+
           <tr>
-            <td align="right">Key Recovery Time:</td>
-            <td align="left">
-              <input type="number" min="0" max="12" v-model="configs.key_recovery_time" />
-              seconds
-            </td>
-          </tr>
-          <tr>
-            <td align="right">Inteligence:</td>
+            <td align="right">Players Inteligence:</td>
             <td align="left">
               <select v-model="configs.inteligence">
                 <option value="dumbest">Dumbest</option>
@@ -62,32 +99,11 @@
             </td>
           </tr>
           <tr>
-            <td align="right">Start Countdown:</td>
-            <td align="left">
-              <input type="number" min="0" max="12" v-model="configs.start_countdown" />
-              seconds
-            </td>
-          </tr>
-          <tr>
             <td><br></td>
           </tr>
           <tr>
             <td align="right">Max Items:</td>
             <td align="left"><input type="number" min="0" max="100" v-model="configs.max_items" /></td>
-          </tr>
-          <tr>
-            <td align="right">Refresh Item Every:</td>
-            <td align="left">
-              <input type="number" min="0" max="30" v-model="configs.refresh_items_seconds" />
-              seconds
-            </td>
-          </tr>
-          <tr>
-            <td align="right">Golden Twister After:</td>
-            <td align="left">
-              <input type="number" min="0" max="500" v-model="configs.twister_golden_after_seconds" />
-              seconds
-            </td>
           </tr>
           <tr>
             <td align="right">Max Speed Ups:</td>
@@ -121,52 +137,39 @@
             <td><br></td>
           </tr>
           <tr>
+            <td align="right">Start Countdown:</td>
+            <td align="left">
+              <input type="number" min="0" max="12" v-model="configs.start_countdown" />
+              seconds
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Refresh Item Every:</td>
+            <td align="left">
+              <input type="number" min="0" max="30" v-model="configs.refresh_items_seconds" />
+              seconds
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Key Recovery Time:</td>
+            <td align="left">
+              <input type="number" min="0" max="12" v-model="configs.key_recovery_time" />
+              seconds
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Golden Twister After:</td>
+            <td align="left">
+              <input type="number" min="0" max="500" v-model="configs.twister_golden_after_seconds" />
+              seconds
+            </td>
+          </tr>
+          <tr>
             <td align="right">Dizzy Time:</td>
             <td align="left">
               <input type="number" min="0" max="12" v-model="configs.dizzy_seconds" />
               seconds
             </td>
-          </tr>
-
-          <tr>
-            <td align="right">Start With Items:</td>
-            <td align="left"><input type="checkbox" v-model="configs.start_with_items"></td>
-          </tr>
-          <tr>
-            <td align="right">Avoid Chest:</td>
-            <td align="left"><input type="checkbox" v-model="configs.avoid_chest"></td>
-          </tr>
-          <tr>
-            <td align="right">Loop Matches:</td>
-            <td align="left"><input type="checkbox" v-model="configs.loop_matches"></td>
-          </tr>
-
-          <tr>
-            <td><br></td>
-          </tr>
-          <tr>
-            <td align="right">Show Tile Numbers:</td>
-            <td align="left"><input type="checkbox" v-model="configs.showTileNumbers"></td>
-          </tr>
-          <!-- <tr>
-            <td align="right">Shadows:</td>
-            <td align="left"><input type="checkbox" v-model="configs.display.shadows"></td>
-          </tr> -->
-          <!-- <tr>
-            <td align="right">Glows:</td>
-            <td align="left"><input type="checkbox" v-model="configs.display.glows"></td>
-          </tr> -->
-          <tr>
-            <td align="right">Sound:</td>
-            <td align="left"><input type="checkbox" v-model="configs.sound"></td>
-          </tr>
-          <tr>
-            <td align="right">Music:</td>
-            <td align="left"><input type="checkbox" v-model="configs.music"></td>
-          </tr>
-          <tr>
-            <td align="right">Voice:</td>
-            <td align="left"><input type="checkbox" v-model="configs.voice"></td>
           </tr>
         </tbody>
       </table>
@@ -243,6 +246,7 @@ export default {
   margin-top: 50px;
   padding: 50px;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 24px;
   text-align: center;
   max-height: 400px;
   overflow-x: auto;
@@ -258,5 +262,22 @@ export default {
   margin: 5px;
   font-weight: bold;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+input,
+button,
+select {
+  padding: 5px;
+  font-size: 24px;
+}
+
+input[type='checkbox'] {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+label {
+  cursor: pointer;
 }
 </style>
