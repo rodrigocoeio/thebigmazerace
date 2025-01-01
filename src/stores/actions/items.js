@@ -39,7 +39,6 @@ export default {
         item.taken = true
         tile.item.taken = true
         tile.item = false
-
         this.items = this.items.filter((i) => i.number != item.number)
       }
 

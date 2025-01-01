@@ -163,8 +163,8 @@ export default
       itemRefresher() {
         const store = getStore()
 
-        if (store.configs.refresh_items_seconds === 0)
-          store.configs.refresh_items_seconds = 0.4
+        if (!store.configs.refresh_items_seconds)
+          store.configs.refresh_items_seconds = 0.5
 
         if (store.configs.refresh_items_seconds) {
           if (this.itemRefresher)
@@ -175,10 +175,11 @@ export default
               return false;
 
             // Removes one item if max is reached
-            if (store.items.length >= store.configs.max_items) {
+            if ((store.items.length - 2) >= store.configs.max_items) {
               let item = store.items.find(i => !i.taken && i.type != "chest" && i.type != "key")
               if (item) {
                 item.taken = true
+                store.items = store.items.filter(i => i.number !== item.number)
               }
             }
 

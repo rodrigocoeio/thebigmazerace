@@ -297,9 +297,6 @@ export default {
             this.bomb();
             break;
         }
-
-        if (!store.finished)
-          store.generateItem()
       }
     },
 
