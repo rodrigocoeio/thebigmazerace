@@ -4,24 +4,25 @@ export default {
 
     // Goal Chest Item
     let goal_tile = this.tiles.find((t) => t.goal)
-    let chest = this.configs.items.find((i) => i.type == 'chest')
+    let chest = this.items_available.find((i) => i.type == 'chest')
     this.items.push({ number: 1, tile: goal_tile.number, ...chest })
     goal_tile.item = chest
 
     // Key Item
     if (this.configs.mode === 'key') {
       let key_tile = this.getRandomTile() //this.getTileNumber(2)
-      let key = this.configs.items.find((i) => i.type == 'key')
+      let key = this.items_available.find((i) => i.type == 'key')
       this.items.push({ number: 2, tile: key_tile.number, ...key, taken: false })
       key_tile.item = key
     }
 
     // Generate Random Items
-    if (this.configs.start_with_items) {
-      let maxItems = this.configs.max_items
-      for (let i = 0; i < maxItems; i++) {
-        this.generateItem()
-      }
+    const startItems = this.configs.start_items
+    const maxItems = this.configs.max_items
+    const countItems = startItems < maxItems ? startItems : maxItems
+
+    for (let i = 0; i < countItems; i++) {
+      this.generateItem()
     }
   },
 
@@ -51,7 +52,7 @@ export default {
   },
 
   getRandomItem() {
-    let items = this.configs.items.filter((item) => {
+    let items = this.items_available.filter((item) => {
       if (item.type == 'speedup') {
         let speedups = this.items.filter((i) => i.type == item.type && !i.taken)
         let maxSpeedups = this.configs.max_speedups

@@ -17,10 +17,6 @@
       <table>
         <tbody>
           <tr>
-            <td align="right"><label for="startwithitems">Start With Items:</label></td>
-            <td align="left"><input type="checkbox" id="startwithitems" v-model="configs.start_with_items"></td>
-          </tr>
-          <tr>
             <td align="right"><label for="avoidchest">Avoid Chest:</label></td>
             <td align="left"><input type="checkbox" id="avoidchest" v-model="configs.avoid_chest"></td>
           </tr>
@@ -100,6 +96,10 @@
           </tr>
           <tr>
             <td><br></td>
+          </tr>
+          <tr>
+            <td align="right">Start Items:</td>
+            <td align="left"><input type="number" min="0" max="100" v-model="configs.start_items"></td>
           </tr>
           <tr>
             <td align="right">Max Items:</td>

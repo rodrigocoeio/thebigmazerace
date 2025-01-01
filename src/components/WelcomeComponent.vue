@@ -106,6 +106,9 @@ export default {
       playAudio("selected")
     },
   },
+  created() {
+    this.setGameDifficulty();
+  },
   methods: {
     startGame() {
       playAudio('selected')
